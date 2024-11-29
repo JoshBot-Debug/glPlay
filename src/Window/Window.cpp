@@ -7,10 +7,7 @@
 #include "Input.h"
 #include "Time.h"
 
-void setFrameBufferSize(GLFWwindow *window, int width, int height)
-{
-  glViewport(0, 0, width, height);
-}
+glm::ivec2 Window::dimensions = glm::ivec2(-1, -1);
 
 void errorCallback(int error, const char *description)
 {
@@ -67,6 +64,18 @@ void Window::open()
   this->onCleanUp();
 }
 
+const glm::ivec2 &Window::GetDimensions()
+{
+  return Window::dimensions;
+}
+
+void Window::setFrameBufferSize(GLFWwindow *window, int w, int h)
+{
+  glViewport(0, 0, w, h);
+  dimensions.x = w;
+  dimensions.y = h;
+}
+
 Window::Window(const WindowOptions &options)
 {
   glfwSetErrorCallback(errorCallback);
@@ -93,6 +102,7 @@ Window::Window(const WindowOptions &options)
 
   glfwMakeContextCurrent(window);
   glfwSetFramebufferSizeCallback(window, setFrameBufferSize);
+  glfwGetFramebufferSize(window, &dimensions.x, &dimensions.y);
 
   const int init = glewInit();
 

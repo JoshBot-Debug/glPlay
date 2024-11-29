@@ -7,9 +7,9 @@ layout(location=2)in vec2 in_TexCoord;
 layout(location=3)in vec3 in_Translate;
 layout(location=4)in vec3 in_Rotation;
 layout(location=5)in vec3 in_Scale;
-layout(location=6)in vec3 in_Color;
+layout(location=6)in vec4 in_Color;
 
-out vec3 f_Color;
+out vec4 f_Color;
 
 uniform mat4 u_ViewProjection;
 
@@ -71,5 +71,4 @@ void main(){
   
   f_Color=in_Color;
   gl_Position=u_ViewProjection*model*vec4(in_Position,1.);
-  // gl_Position=model*vec4(in_Position,1.);
 }

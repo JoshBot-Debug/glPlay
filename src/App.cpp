@@ -12,7 +12,7 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
-const WindowOptions options = {.title = "glPlay", .width = 800, .height = 600, .enableVSync = true, .imguiEnableDocking = true};
+const WindowOptions options = {.title = "glPlay", .width = 800, .height = 600, .enableDepth = true, .enableVSync = true, .imguiEnableDocking = true};
 
 /**
  * TODO need to add a ViewportManager class that holds all this information\
@@ -24,8 +24,8 @@ App::App() : Window(options)
    * Setup a camera
    * Specify the type, and other properties.
    */
-  // Camera *camera = new Camera();
-  // camera->setType(CameraType::Orthographic);
+  Camera *camera = new Camera();
+  camera->setType(CameraType::Orthographic);
 
   /**
    * Setup a light source
@@ -78,7 +78,7 @@ App::App() : Window(options)
   /**
    * Setup the renderer
    */
-  // renderer.setCamera(camera);
+  renderer.setCamera(camera);
   // renderer.addLight(light);
   renderer.addModel(model);
   // renderer.addFrameBuffer(scene);
@@ -91,7 +91,25 @@ App::App() : Window(options)
    *
    * You will update the Structs information and the renderer will update the unforms if changes were made before drawing
    */
-  InstanceManager &instance = renderer.add<Instance>("p1");
+  InstanceManager &i1 = renderer.add<Instance>("i1");
+  i1.instance.translate.x = -100.0f;
+  i1.instance.scale.x = 50.0f;
+  i1.instance.scale.y = 50.0f;
+
+  i1.instance.color.r = 1.0f;
+  i1.instance.color.g = 0.0f;
+  i1.instance.color.b = 0.0f;
+
+
+  InstanceManager &i2 = renderer.add<Instance>("i2");
+  i2.instance.translate.x = 100.0f;
+
+  i2.instance.scale.x = 50.0f;
+  i2.instance.scale.y = 50.0f;
+
+  i2.instance.color.r = 0.0f;
+  i2.instance.color.g = 0.0f;
+  i2.instance.color.b = 1.0f;
 
   // Begins the onDraw loop
   open();
@@ -101,45 +119,15 @@ void App::onDraw()
 {
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+  
   // Bind the "default" shader
   ShaderProgram *shader = renderer.getShaderProgram();
   shader->bind("default");
-
-  /**
-   * Update uniforms for camera and lights
-   */
-  renderer.updateCamera();
-  renderer.updateLights();
-
-  float wSize = 800 / 2.0f;
-  float hSize = 600 / 2.0f;
-
-  // Camera position
-  glm::vec2 cPosition = glm::vec2(0.0f);
-  float cRotation = 0.0f;
-
-  glm::mat4 projection = glm::ortho(-wSize, +wSize, -hSize, +hSize, -1.0f, 1.0f);
-  glm::mat4 translation = glm::translate(glm::mat4(1.0f), glm::vec3(-cPosition.x, -cPosition.y, 0.0f));
-  glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(cRotation), glm::vec3(0.0f, 0.0f, 1.0f));
-
-  glm::mat4 u_ViewProjection = projection * (translation * rotation);
-
-  shader->uniformMatrix4fv("u_ViewProjection", u_ViewProjection);
-
-  /**
-   * No need for this method, the renderer will update the uniforms for a model before drawing automatically.
-   */
-  // float transforms[3] = {1.0f, 1.0f, 1.0f};
-  // renderer.updateInstance("foo", transforms);
 
   // Bind the framebuffer to render the scene to an offscreen texture
   // Optional
   // renderer.bindFramebuffer("scene");
 
-  /**
-   * Draw the to the framebuffer "scene"
-   */
   renderer.draw("plane");
 
   // Bind the default framebuffer to display the scene

@@ -31,7 +31,7 @@ void ShaderProgram::unbind()
   program.reset();
 }
 
-void ShaderProgram::uniformMatrix4fv(const std::string &name, glm::mat4 &uniform)
+void ShaderProgram::uniformMatrix4fv(const std::string &name, const glm::mat4 &uniform)
 {
   try
   {

@@ -8,6 +8,7 @@
 #include "Camera.h"
 #include "Light.h"
 #include "Model.h"
+#include "Camera.h"
 #include "ShaderProgram.h"
 #include "FrameBuffer.h"
 #include "Instance.h"
@@ -18,6 +19,7 @@
 class Renderer
 {
 private:
+  Camera *camera;
   ShaderProgram *shader;
   std::vector<const Model *> models;
   std::unordered_map<std::string, InstanceManager> instances;
@@ -30,11 +32,14 @@ private:
   size_t indices;          // The number of indices to draw
   size_t maxInstances = 1; // The number of indices to draw
 
+private:
+  void update();
+
 public:
   Renderer();
   ~Renderer();
 
-  void setCamera(const Camera *camera);
+  void setCamera(Camera *camera);
 
   void addLight(const Light *light);
   void addModel(const Model *model);
@@ -47,9 +52,6 @@ public:
   template <typename T>
   InstanceManager &get(const std::string &name);
 
-  void updateCamera() const;
-  void updateLights() const;
-
   void updateInstance(const std::string &modelName, const void *buffer);
   void updateInstance(const std::string &modelName, const std::string &instanceName, const void *buffer);
 
@@ -59,5 +61,5 @@ public:
 
   void applyPostProcessingEffects();
 
-  ShaderProgram* getShaderProgram();
+  ShaderProgram *getShaderProgram();
 };

@@ -28,5 +28,5 @@ public:
 
   void unbind();
 
-  void uniformMatrix4fv(const std::string &name, glm::mat4 &uniform);
+  void uniformMatrix4fv(const std::string &name, const glm::mat4 &uniform);
 };

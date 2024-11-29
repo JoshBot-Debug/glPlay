@@ -22,7 +22,7 @@ private:
 public:
   Mesh() {}
 
-  void resizeVertices(size_t count) { vertices.resize(count); }
+  void resize(size_t count) { vertices.resize(count); }
 
   Vertex &getVertex(unsigned int index) { return vertices[index]; }
 

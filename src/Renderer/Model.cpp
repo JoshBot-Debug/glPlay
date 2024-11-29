@@ -79,12 +79,12 @@ void Model::loadFBX(const std::string &path, std::vector<Mesh> &meshes)
     aiMesh *mesh = scene->mMeshes[i];
     Mesh &m = meshes[i];
 
-    m.resizeVertices(mesh->mNumVertices);
+    m.resize(mesh->mNumVertices);
 
     // Process vertices
     for (unsigned int j = 0; j < mesh->mNumVertices; ++j)
     {
-      Vertex v = m.getVertex(j);
+      Vertex &v = m.getVertex(j);
 
       const aiVector3D &vertex = mesh->mVertices[j];
       v.position.x = vertex.x;

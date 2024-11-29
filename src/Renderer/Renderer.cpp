@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "Debug.h"
+#include "Window/Window.h"
 
 Renderer::Renderer() : vbo(BufferTarget::ARRAY_BUFFER), ebo(BufferTarget::ELEMENT_ARRAY_BUFFER), ibo(BufferTarget::ARRAY_BUFFER)
 {
@@ -11,9 +12,9 @@ Renderer::Renderer() : vbo(BufferTarget::ARRAY_BUFFER), ebo(BufferTarget::ELEMEN
   ebo.generate();
   ibo.generate();
 
-  vbo.set(0, nullptr);
-  ebo.set(0, nullptr);
-  ibo.set(0, nullptr);
+  // vbo.set(0, nullptr);
+  // ebo.set(0, nullptr);
+  // ibo.set(0, nullptr);
 
   vao.bind();
 
@@ -33,8 +34,9 @@ Renderer::~Renderer()
 {
 }
 
-void Renderer::setCamera(const Camera *camera)
+void Renderer::setCamera(Camera *camera)
 {
+  this->camera = camera;
 }
 
 void Renderer::addLight(const Light *light)
@@ -77,11 +79,17 @@ void Renderer::addModel(const Model *model)
   LOG("Index size: ", sizeof(unsigned int));
   LOG_BREAK_AFTER;
 
-  vbo.resize(sizeof(Vertex) * vertices.size());
-  ebo.resize(sizeof(unsigned int) * indices.size());
+  vbo.resize(vertices.size() * sizeof(Vertex));
+  ebo.resize(indices.size() * sizeof(unsigned int));
 
   vbo.update(vertices.size() - model->getVertices().size(), model->getVertices());
   ebo.update(indices.size() - model->getIndices().size(), model->getIndices());
+
+  // TODO Need to improve
+  vbo.bind();
+  vao.set(0, 3, VertexType::FLOAT, false, sizeof(Vertex), (void *)offsetof(Vertex, position));
+  vao.set(1, 3, VertexType::FLOAT, false, sizeof(Vertex), (void *)offsetof(Vertex, normal));
+  vao.set(2, 2, VertexType::FLOAT, false, sizeof(Vertex), (void *)offsetof(Vertex, texCoord));
 
   this->indices = indices.size();
 }
@@ -136,12 +144,17 @@ InstanceManager &Renderer::get<Instance>(const std::string &name)
   return instances[name];
 }
 
-void Renderer::updateCamera() const
+void Renderer::update()
 {
-}
+  const auto &dimensions = Window::GetDimensions();
+  camera->setDimensions(dimensions.x, dimensions.y);
 
-void Renderer::updateLights() const
-{
+  shader->uniformMatrix4fv("u_ViewProjection", camera->getUniformMatrix4fv());
+
+  // TODO Need to do a dirty check here
+  // And do all the updates in one call
+  for (const auto &im : instances)
+    ibo.update(im.second.offset * sizeof(Instance), sizeof(im.second.instance), &im.second.instance);
 }
 
 void Renderer::updateInstance(const std::string &modelName, const void *buffer)
@@ -158,15 +171,11 @@ void Renderer::bindFramebuffer(const std::string &name)
 
 void Renderer::draw(const std::string &modelName, const Primitive &primitive)
 {
+  update();
+
   vao.bind();
   ebo.bind();
   glDrawElementsInstanced((unsigned int)primitive, indices, GL_UNSIGNED_INT, 0, instances.size());
-
-  LOG_BREAK_BEFORE;
-  LOG("Draw");
-  LOG("Indices:", indices);
-  LOG("Instances:", instances.size());
-  LOG_BREAK_AFTER;
 }
 
 void Renderer::applyPostProcessingEffects()

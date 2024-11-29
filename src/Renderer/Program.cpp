@@ -5,7 +5,6 @@
 
 Program::Program()
 {
-
   program = glCreateProgram();
 
   LOG_BREAK_BEFORE;

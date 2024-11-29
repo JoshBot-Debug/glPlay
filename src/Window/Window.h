@@ -3,6 +3,7 @@
 #include <string>
 #include <iostream>
 
+#include <glm/glm.hpp>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
@@ -30,9 +31,15 @@ class Window : Scene
 private:
   GLFWwindow *window;
 
+  static glm::ivec2 dimensions;
+
+  static void setFrameBufferSize(GLFWwindow *window, int w, int h);
+
 public:
   Window(const WindowOptions &options);
   ~Window();
 
   void open();
+
+  static const glm::ivec2 &GetDimensions();
 };

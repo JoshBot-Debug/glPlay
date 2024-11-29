@@ -1,4 +1,5 @@
 #include "ArrayBuffer.h"
+#include "Debug.h"
 
 ArrayBuffer::~ArrayBuffer()
 {
