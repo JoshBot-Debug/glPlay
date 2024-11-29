@@ -11,7 +11,7 @@ void InstancedMesh::unbind()
 
 void InstancedMesh::createInstanceBuffer(unsigned int bufferId, unsigned int count, size_t size, VertexDraw draw)
 {
-  ibos.emplace(bufferId, InstanceBuffer(VertexBuffer(), count, size, draw));
+  ibos.emplace(bufferId, InstanceBuffer(ArrayBuffer(BufferTarget::ARRAY_BUFFER), count, size, draw));
   ibos.at(bufferId).ibo.generate();
   ibos.at(bufferId).ibo.set(count * size, nullptr, draw);
 }

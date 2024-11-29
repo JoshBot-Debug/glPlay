@@ -4,6 +4,9 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
+#include "Input.h"
+#include "Time.h"
+
 void setFrameBufferSize(GLFWwindow *window, int width, int height)
 {
   glViewport(0, 0, width, height);
@@ -14,19 +17,38 @@ void errorCallback(int error, const char *description)
   std::cerr << "GLFW Error " << error << ":" << description << std::endl;
 }
 
-void Window::beginLoop()
+void GLAPIENTRY debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, const void *userParam)
+{
+  std::cerr << "OpenGL Debug Message (" << id << "): " << message << std::endl;
+  std::cerr << "Source: " << source << ", Type: " << type << ", Severity: " << severity << std::endl;
+}
+
+static void glDebug()
+{
+  glEnable(GL_DEBUG_OUTPUT);
+  glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+
+  glDebugMessageCallback(debugCallback, nullptr);
+  glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
+}
+
+void Window::open()
 {
   this->onInitialize();
 
+  glfwShowWindow(window);
+
   while (!glfwWindowShouldClose(window))
   {
-    glfwPollEvents();
-
     if (glfwGetWindowAttrib(window, GLFW_ICONIFIED) != 0)
     {
       ImGui_ImplGlfw_Sleep(10);
       continue;
     }
+
+    Time::UpdateDeltaTime();
+
+    glfwPollEvents();
 
     this->onUpdate();
 
@@ -52,21 +74,15 @@ Window::Window(const WindowOptions &options)
   if (!glfwInit())
     std::cerr << "GLFW initialization failed!" << std::endl;
 
-  const int init = glewInit();
+  const char *glsl_version = "#version 330 core";
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-  if (init != GLEW_OK)
-    std::cerr << "GLEW initialization failed! Error code: " << init << std::endl;
-
-  // If we want compatibility
-  // GL 3.0 + GLSL 130
-  // const char* glsl_version = "#version 130";
-  // glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  // glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-
-  // GL 4.6 + GLSL 460
-  const char *glsl_version = "#version 460";
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+  glfwWindowHint(GLFW_DEPTH_BITS, 24);
+  glfwWindowHint(GLFW_STENCIL_BITS, 8);
+  glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
+  glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 
   window = glfwCreateWindow(options.width, options.height, options.title.c_str(), nullptr, nullptr);
   if (!window)
@@ -77,6 +93,15 @@ Window::Window(const WindowOptions &options)
 
   glfwMakeContextCurrent(window);
   glfwSetFramebufferSizeCallback(window, setFrameBufferSize);
+
+  const int init = glewInit();
+
+  if (init != GLEW_OK)
+    std::cerr << "GLEW initialization failed! Error code: " << init << std::endl;
+
+  std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
+
+  glDebug();
 
   if (options.enableVSync)
     glfwSwapInterval(1);
@@ -104,6 +129,8 @@ Window::Window(const WindowOptions &options)
 
   ImGui_ImplGlfw_InitForOpenGL(window, true);
   ImGui_ImplOpenGL3_Init(glsl_version);
+
+  Input::SetWindowContext(window);
 }
 
 Window::~Window()

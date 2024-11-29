@@ -4,8 +4,6 @@
 
 #include "Renderer/Renderer.h"
 
-const WindowOptions options = {.title = "OpenGL", .width = 800, .height = 600, .imguiEnableDocking = true};
-
 class App : Window
 {
 private:

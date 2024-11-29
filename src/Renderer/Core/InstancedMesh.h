@@ -5,13 +5,12 @@
 #include <unordered_map>
 
 #include "VertexArray.h"
-#include "VertexBuffer.h"
-#include "ElementBuffer.h"
+#include "ArrayBuffer.h"
 
 struct InstanceBufferAttrib
 {
   size_t stride;        // The byte offset between consecutive elements in the buffer.
-  VertexType type;  // The type of data in the buffer (e.g., float, int).
+  VertexType type;      // The type of data in the buffer (e.g., float, int).
   unsigned int size;    // The size of each attribute in the buffer.
   unsigned int index;   // The index in the vertex attribute array.
   bool normalized;      // Whether the attribute is normalized when being interpreted.
@@ -21,13 +20,13 @@ struct InstanceBufferAttrib
 
 struct InstanceBuffer
 {
-  VertexBuffer ibo;            // The vertex buffer object that holds the buffer data.
+  ArrayBuffer ibo;             // The vertex buffer object that holds the buffer data.
   unsigned int count;          // The number of elements in the buffer.
   size_t size;                 // The size of each element in the buffer.
   VertexDraw draw;             // Specifies the drawing style (e.g., DYNAMIC, STATIC).
   InstanceBufferAttrib attrib; // The attributes of the instance buffer.
 
-  InstanceBuffer(VertexBuffer &&ibo, unsigned int count, size_t size, VertexDraw draw) : ibo(std::move(ibo)), count(count), size(size), draw(draw) {}
+  InstanceBuffer(ArrayBuffer &&ibo, unsigned int count, size_t size, VertexDraw draw) : ibo(std::move(ibo)), count(count), size(size), draw(draw) {}
 
   void setInstanceBufferAttrib(unsigned int &index, unsigned int &size, VertexType &type, bool &normalized, size_t &stride, const void *pointer, unsigned int &divisor)
   {
@@ -44,9 +43,9 @@ struct InstanceBuffer
 class InstancedMesh
 {
 private:
-  VertexArray vao;   // Vertext array
-  VertexBuffer vbo;  // Vertext buffer
-  ElementBuffer ebo; // Element buffer
+  VertexArray vao; // Vertext array
+  ArrayBuffer vbo; // Vertext buffer
+  ArrayBuffer ebo; // Element buffer
 
   size_t indices; // The number of indices to draw
 
@@ -66,7 +65,7 @@ public:
    *                in the vertex buffer and are used to define the drawing order of primitives.
    */
   template <typename T>
-  InstancedMesh(std::vector<T> vertices, std::vector<unsigned int> indices)
+  InstancedMesh(std::vector<T> vertices, std::vector<unsigned int> indices) : vbo(BufferTarget::ARRAY_BUFFER), ebo(BufferTarget::ELEMENT_ARRAY_BUFFER)
   {
     vao.generate();
     vao.bind();

@@ -5,10 +5,13 @@
 class Program
 {
 private:
+  unsigned int program;
   
 public:
-  Program() = default;
-  ~Program() = default;
+  Program();
+  ~Program();
 
-  void link(const Shader *shader);
+  bool link(Shader *shader);
+
+  const unsigned int getProgram();
 };

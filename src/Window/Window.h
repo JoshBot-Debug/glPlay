@@ -1,9 +1,10 @@
 #pragma once
 
 #include <string>
+#include <iostream>
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include <iostream>
 
 #include "Scene.h"
 
@@ -33,5 +34,5 @@ public:
   Window(const WindowOptions &options);
   ~Window();
 
-  void beginLoop();
+  void open();
 };

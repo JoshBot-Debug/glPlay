@@ -6,43 +6,50 @@
 
 #include "Common.h"
 
-class VertexBuffer
+enum class BufferTarget
+{
+  ARRAY_BUFFER = GL_ARRAY_BUFFER,
+  ELEMENT_ARRAY_BUFFER = GL_ELEMENT_ARRAY_BUFFER,
+};
+
+class ArrayBuffer
 {
 private:
-  unsigned int vbo = 0;
+  BufferTarget target;
+  unsigned int buffer = 0;
 
 public:
-  VertexBuffer() = default;
+  ArrayBuffer(BufferTarget target) : target(target) {};
 
   /**
-   * Destructor for the VertexBuffer.
+   * Destructor for the ArrayBuffer.
    *
-   * This function deletes the OpenGL buffer object (VBO) when the VertexBuffer is destroyed.
-   * It ensures that the VBO is properly cleaned up to free OpenGL resources.
+   * This function deletes the OpenGL buffer object (buffer) when the ArrayBuffer is destroyed.
+   * It ensures that the buffer is properly cleaned up to free OpenGL resources.
    *
-   * If the VBO is valid (not zero), it calls `glDeleteBuffers` to delete the buffer from the GPU memory.
+   * If the buffer is valid (not zero), it calls `glDeleteBuffers` to delete the buffer from the GPU memory.
    */
-  ~VertexBuffer();
+  ~ArrayBuffer();
 
   /**
    * Disable copy constructor
    */
-  VertexBuffer(const VertexBuffer &) = delete;
+  ArrayBuffer(const ArrayBuffer &) = delete;
 
   /**
    * Disable assignment operator
    */
-  VertexBuffer &operator=(const VertexBuffer &) = delete;
+  ArrayBuffer &operator=(const ArrayBuffer &) = delete;
 
   /**
    * Define a move constructor
    */
-  VertexBuffer(VertexBuffer &&other) noexcept {};
+  ArrayBuffer(ArrayBuffer &&other) noexcept {};
 
   /**
    * Generates a buffer if it doesn't already exist.
    *
-   * This function checks if the vertex buffer object (VBO) is already generated,
+   * This function checks if the vertex buffer object (buffer) is already generated,
    * and if not, it calls OpenGL to generate one.
    */
   void generate();
@@ -58,8 +65,8 @@ public:
   template <typename T>
   void set(const std::vector<T> &data, VertexDraw draw = VertexDraw::STATIC)
   {
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(T), data.data(), (unsigned int)draw);
+    glBindBuffer((unsigned int)target, buffer);
+    glBufferData((unsigned int)target, data.size() * sizeof(T), data.data(), (unsigned int)draw);
   }
 
   /**
@@ -82,8 +89,8 @@ public:
   template <typename T>
   void update(unsigned int offset, const std::vector<T> &data)
   {
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferSubData(GL_ARRAY_BUFFER, offset * data.size() * sizeof(T), data.size() * sizeof(T), data.data());
+    glBindBuffer((unsigned int)target, buffer);
+    glBufferSubData((unsigned int)target, offset * sizeof(T), data.size() * sizeof(T), data.data());
   }
 
   /**
@@ -104,12 +111,12 @@ public:
   void resize(size_t size, VertexDraw draw = VertexDraw::STATIC);
 
   /**
-   * Binds the buffer to the GL_ARRAY_BUFFER target.
+   * Binds the buffer.
    */
   void bind() const;
 
   /**
-   * Unbinds the buffer from the GL_ARRAY_BUFFER target.
+   * Unbinds the buffer.
    */
   void unbind() const;
 

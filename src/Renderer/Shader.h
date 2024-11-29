@@ -1,9 +1,10 @@
 #pragma once
 
-#include <GL/gl.h>
+#include <GL/glew.h>
 #include <string>
 
-enum class ShaderType: unsigned int {
+enum class ShaderType : unsigned int
+{
   VERTEX_SHADER = GL_VERTEX_SHADER,
   FRAGMENT_SHADER = GL_FRAGMENT_SHADER
 };
@@ -11,10 +12,19 @@ enum class ShaderType: unsigned int {
 class Shader
 {
 private:
+  unsigned int shader = -1;
   const ShaderType type;
   const std::string path;
+
+  bool compile(const std::string &path, const ShaderType &type);
 
 public:
   Shader(const std::string &path, const ShaderType &type);
   ~Shader() = default;
+
+  bool recompile();
+
+  const unsigned int getShader();
+
+  void destroy();
 };
