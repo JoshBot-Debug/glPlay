@@ -104,6 +104,9 @@ Window::Window(const WindowOptions &options)
   glfwSetFramebufferSizeCallback(window, setFrameBufferSize);
   glfwGetFramebufferSize(window, &dimensions.x, &dimensions.y);
 
+  if (options.maximized)
+    glfwMaximizeWindow(window);
+
   const int init = glewInit();
 
   if (init != GLEW_OK)

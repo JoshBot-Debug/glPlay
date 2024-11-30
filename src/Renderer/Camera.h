@@ -4,7 +4,8 @@
 
 #include <glm/glm.hpp>
 
-enum class CameraType {
+enum class CameraType
+{
   Orthographic,
   Perspective
 };
@@ -12,28 +13,27 @@ enum class CameraType {
 class Camera
 {
 private:
-  CameraType type;
-
   float width = 1.0f;
   float height = 1.0f;
-  
+
+  glm::mat4 view = glm::mat4(1.0f);
+  glm::mat4 projection = glm::mat4(0.0f);
+
+public:
+  CameraType type;
+
   float offsetX = 1.0f;
   float offsetY = 1.0f;
 
   glm::vec3 rotation = glm::vec3(0.0f);
   glm::vec3 position = glm::vec3(0.0f);
 
-  glm::mat4 view = glm::mat4(1.0f);
-  glm::mat4 projection = glm::mat4(0.0f);
-
-  float fov = 45.0f;
-  float farPlane = 100.0f;
+  float fov = 90.0f;
+  float farPlane = 10.0f;
   float nearPlane = 0.1f;
 
-private:
   void update();
 
-public:
   void setType(CameraType type);
 
   void setSize(float width, float height);

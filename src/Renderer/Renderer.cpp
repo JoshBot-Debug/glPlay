@@ -148,6 +148,7 @@ void Renderer::update()
 {
   const auto &dimensions = Window::GetDimensions();
   camera->setSize(dimensions.x, dimensions.y);
+  camera->update();
 
   shader->uniformMatrix4fv("u_ViewProjection", camera->getViewProjectionMatrix());
 

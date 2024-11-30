@@ -17,11 +17,11 @@ void main(){
   // float diff=max(dot(norm,lightDir),0.);
   // vec3 diffuse=diff*f_Color;
   
-  float ambientStrength=1.;
+  // float ambientStrength=1.;
   // vec4 ambient=ambientStrength*u_LightColor;
-  vec4 ambient=ambientStrength*vec4(0.1,0.1,0.1,1.0);
+  // vec4 ambient=ambientStrength*vec4(0.1,0.1,0.1,1.0);
   
-  FragColor=ambient*f_Color;
+  // FragColor=ambient*f_Color;
   
-  // FragColor=vec4(f_Color);
+  FragColor=vec4(f_Color);
 }

@@ -7,14 +7,29 @@ void Camera::update()
   if (type == CameraType::Perspective)
   {
     glm::vec3 front;
-    front.x = cos(glm::radians(rotation.y)) * cos(glm::radians(rotation.x));
+    front.z = cos(glm::radians(rotation.y)) * cos(glm::radians(rotation.x)) * -1.0f;
     front.y = sin(glm::radians(rotation.x));
-    front.z = sin(glm::radians(rotation.y)) * cos(glm::radians(rotation.x));
+    front.x = sin(glm::radians(rotation.y)) * cos(glm::radians(rotation.x));
 
-    glm::vec3 up = glm::normalize(glm::cross(glm::vec3(1.0f, 0.0f, 0.0f), front));
+    // Step 2: Calculate the right and up vectors
+    glm::vec3 right = glm::normalize(glm::cross(front, glm::vec3(0.0f, 1.0f, 0.0f))); // Right = cross(front, world up)
+    glm::vec3 up = glm::normalize(glm::cross(right, front));                          // Up = cross(right, front)
 
-    view = glm::lookAt(position, position + front, up);
-    projection = glm::perspective(glm::radians(fov), (float)width / (float)height, nearPlane, farPlane);
+    // Step 3: Apply the roll rotation (around the front vector)
+    glm::mat4 rollMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(rotation.z), front);
+
+    // Apply the roll matrix to the up and right vectors
+    right = glm::normalize(glm::vec3(rollMatrix * glm::vec4(right, 0.0f)));
+    up = glm::normalize(glm::vec3(rollMatrix * glm::vec4(up, 0.0f)));
+
+    // Step 4: Apply the camera offset to the position
+    glm::vec3 cameraPosition = position + glm::vec3(offsetX, offsetY, 0.0f);
+
+    // Step 5: Update the view matrix using glm::lookAt
+    view = glm::lookAt(cameraPosition, cameraPosition + front, up);
+
+    // Step 6: Update the projection matrix using glm::perspective
+    projection = glm::perspective(glm::radians(fov), width / height, nearPlane, farPlane);
   }
 
   if (type == CameraType::Orthographic)
@@ -44,22 +59,27 @@ void Camera::setSize(float width, float height)
 {
   this->width = width;
   this->height = height;
-  update();
 }
 
 void Camera::setOffset(float offsetX, float offsetY)
 {
   this->offsetX = offsetX;
   this->offsetY = offsetY;
-  update();
 }
 
 void Camera::setPosition(float x, float y, float z)
 {
-  position.x = x - (width * offsetX);
-  position.y = y - (height * offsetY);
+  if (type == CameraType::Orthographic)
+  {
+    position.x = x - (width * offsetX);
+    position.y = y - (height * offsetY);
+    position.z = z;
+    return;
+  }
+
+  position.x = x;
+  position.y = y;
   position.z = z;
-  update();
 }
 
 void Camera::setRotation(float pitch, float yaw, float roll)
@@ -67,7 +87,6 @@ void Camera::setRotation(float pitch, float yaw, float roll)
   rotation.x = pitch;
   rotation.y = yaw;
   rotation.z = roll;
-  update();
 }
 
 void Camera::translate(float deltaX, float deltaY, float deltaZ)
@@ -75,7 +94,6 @@ void Camera::translate(float deltaX, float deltaY, float deltaZ)
   position.x += deltaX;
   position.y += deltaY;
   position.z += deltaZ;
-  update();
 }
 
 void Camera::rotate(float deltaPitch, float deltaYaw, float deltaRoll)
@@ -83,7 +101,6 @@ void Camera::rotate(float deltaPitch, float deltaYaw, float deltaRoll)
   rotation.x += deltaPitch;
   rotation.y += deltaYaw;
   rotation.z += deltaRoll;
-  update();
 }
 
 void Camera::setProjectionParams(float fov, float nearPlane, float farPlane)
@@ -91,7 +108,6 @@ void Camera::setProjectionParams(float fov, float nearPlane, float farPlane)
   this->fov = fov;
   this->nearPlane = nearPlane;
   this->farPlane = farPlane;
-  update();
 }
 
 const glm::mat4 &Camera::getViewProjectionMatrix() const

@@ -65,11 +65,11 @@ mat4 translate(mat4 m,vec3 t){
 void main(){
   mat4 model=mat4(1.);
   
-  model=translate(model,in_Translate);
+  model=scale(model,in_Scale);
   model=rotateX(model,radians(in_Rotation.x));
   model=rotateY(model,radians(in_Rotation.y));
   model=rotateZ(model,radians(in_Rotation.z));
-  model=scale(model,in_Scale);
+  model=translate(model,in_Translate);
   
   f_Color=in_Color;
   f_Normal=in_Normal;

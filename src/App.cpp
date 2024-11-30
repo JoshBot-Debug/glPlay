@@ -12,7 +12,7 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
-const WindowOptions options = {.title = "glPlay", .width = 800, .height = 600, .enableDepth = true, .enableVSync = true, .imguiEnableDocking = true};
+const WindowOptions options = {.title = "glPlay", .width = 800, .height = 600, .enableDepth = true, .enableVSync = true, .imguiEnableDocking = true, .maximized = true};
 
 /**
  * TODO need to add a ViewportManager class that holds all this information\
@@ -20,16 +20,16 @@ const WindowOptions options = {.title = "glPlay", .width = 800, .height = 600, .
  */
 App::App() : Window(options)
 {
+  debugMenu.setCamera(&camera);
+
   /**
    * Setup a camera
    * Specify the type, and other properties.
    */
-  Camera *camera = new Camera();
-  camera->setType(CameraType::Orthographic);
-  // camera->setType(CameraType::Perspective);
-  // camera->setRotation(1.0f, 0.0f, 0.0f);
-  // camera->setPosition(0.0f, 0.0f, -20.0f);
-  camera->setOffset(0.5f, 0.5f);
+  camera.setType(CameraType::Perspective);
+  camera.setOffset(0.5f, 0.5f);
+  camera.setPosition(2.0f, 2.0f, 10.0f);
+  camera.setRotation(10.0f, 0.0f, 0.0f);
 
   /**
    * Setup a light source
@@ -77,31 +77,14 @@ App::App() : Window(options)
   /**
    * Setup the renderer
    */
-  renderer.setCamera(camera);
+  renderer.setCamera(&camera);
   // renderer.addLight(light);
   renderer.addModel(model);
   renderer.addShaderProgram(shaderProgram);
 
   Instance &i1 = renderer.add<Instance>("i1");
-  i1.translate.x = -100.0f;
-  i1.scale.x = 50.0f;
-  i1.scale.y = 50.0f;
-  // i1.scale.z = 50.0f;
-
-  i1.color.r = 1.0f;
-  i1.color.g = 0.0f;
-  i1.color.b = 0.0f;
-
-  Instance &i2 = renderer.add<Instance>("i2");
-  i2.translate.x = 100.0f;
-
-  i2.scale.x = 50.0f;
-  i2.scale.y = 50.0f;
-  // i2.scale.z = 50.0f;
-
-  i2.color.r = 0.0f;
-  i2.color.g = 0.0f;
-  i2.color.b = 1.0f;
+  
+  debugMenu.addInstance("1", &i1);
 
   // Begins the onDraw loop
   open();
@@ -111,7 +94,7 @@ App::App() : Window(options)
 // {
 //   if(Input::KeyPress(KeyboardKey::UP))
 //   {
-    
+
 //   }
 // }
 
@@ -124,4 +107,6 @@ void App::onDraw()
   shader->bind("default");
 
   renderer.draw("plane");
+
+  debugMenu.draw();
 }

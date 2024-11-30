@@ -24,6 +24,7 @@ struct WindowOptions
   bool imguiEnableDocking = false;
 
   bool darkMode = false;
+  bool maximized = false;
 };
 
 class Window : Scene
