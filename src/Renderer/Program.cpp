@@ -17,19 +17,18 @@ Program::~Program()
 {
   if (program != 0)
   {
-
     glDeleteProgram(program);
     LOG_BREAK_BEFORE;
     LOG("Deleted shader program");
     LOG("Program:", program);
     LOG_BREAK_AFTER;
+    program = 0;
   }
 }
 
 bool Program::link(Shader *shader)
 {
-  if (program == 0)
-    std::cerr << "Failed to create shader program." << std::endl;
+  shaders.insert(shader);
 
   glAttachShader(program, shader->getShader());
 
@@ -50,13 +49,29 @@ bool Program::link(Shader *shader)
     LOG_BREAK_AFTER;
 
     delete[] log;
+
     glDeleteProgram(program);
+    program = 0;
+    
     return false;
   }
 
   shader->destroy();
 
   return true;
+}
+
+void Program::recompile()
+{
+  glDeleteProgram(program);
+
+  program = glCreateProgram();
+
+  for (const auto &shader : shaders)
+  {
+    shader->recompile();
+    link(shader);
+  }
 }
 
 const unsigned int Program::getProgram()

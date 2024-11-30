@@ -12,7 +12,7 @@ enum class ShaderType : unsigned int
 class Shader
 {
 private:
-  unsigned int shader = -1;
+  unsigned int shader = 0;
   const ShaderType type;
   const std::string path;
 

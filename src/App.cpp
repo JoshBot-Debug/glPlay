@@ -35,8 +35,8 @@ App::App() : Window(options)
    * Setup a light source
    * Specify the type and other properties.
    */
-  // Light *light = new Light();
-  // light->setType(LightType::Ambient);
+  Light *light = new Light();
+  light->setType(LightType::Ambient);
 
   /**
    * Load the model foo
@@ -85,6 +85,7 @@ App::App() : Window(options)
   Instance &i1 = renderer.add<Instance>("i1");
   
   debugMenu.addInstance("1", &i1);
+  debugMenu.addShaderProgram(shaderProgram);
 
   // Begins the onDraw loop
   open();

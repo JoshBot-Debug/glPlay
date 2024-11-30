@@ -5,6 +5,7 @@
 
 #include "Renderer/Camera.h"
 #include "Renderer/Instance.h"
+#include "Renderer/Shader.h"
 #include "imgui.h"
 
 inline const char *cameraTypes[] =
@@ -16,6 +17,7 @@ class DebugMenu
 {
 private:
   Camera *camera;
+  ShaderProgram *shaderProgram;
   std::unordered_map<std::string, Instance *> instances;
 
 public:
@@ -26,12 +28,27 @@ public:
     this->camera = camera;
   }
 
+  void addShaderProgram(ShaderProgram *shaderProgram)
+  {
+    this->shaderProgram = shaderProgram;
+  }
+
   void addInstance(const std::string &name, Instance *instance)
   {
     this->instances[name] = instance;
   }
 
-  void instanceControls()
+  void shaderMenu()
+  {
+    ImGui::Begin("Shaders");
+
+    if (ImGui::Button("Recompile shaders"))
+      shaderProgram->recompile();
+
+    ImGui::End();
+  }
+
+  void instanceMenu()
   {
     for (const auto &pair : instances)
     {
@@ -66,7 +83,7 @@ public:
     }
   }
 
-  void cameraControls()
+  void cameraMenu()
   {
     ImGui::Begin("Camera");
 
@@ -103,9 +120,11 @@ public:
   {
     ImGui::Begin("Debug Menu");
 
-    this->cameraControls();
+    this->shaderMenu();
 
-    this->instanceControls();
+    this->cameraMenu();
+
+    this->instanceMenu();
 
     ImGui::End();
   }

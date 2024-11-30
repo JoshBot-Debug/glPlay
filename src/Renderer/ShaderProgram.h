@@ -24,6 +24,8 @@ public:
 
   Program *createProgram(const std::string &name);
 
+  void recompile();
+
   void bind(const std::string &name);
 
   void unbind();

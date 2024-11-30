@@ -1,10 +1,19 @@
 #include "ShaderProgram.h"
 
+#include <iostream>
+
 #include "Debug.h"
 
 Program *ShaderProgram::createProgram(const std::string &name)
 {
   return &programs[name];
+}
+
+void ShaderProgram::recompile()
+{
+  program.reset();
+  for (auto &program : programs)
+    program.second.recompile();
 }
 
 void ShaderProgram::bind(const std::string &name)

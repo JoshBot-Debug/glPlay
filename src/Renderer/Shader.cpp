@@ -81,5 +81,5 @@ void Shader::destroy()
   LOG("Deleted shader:", shader);
   LOG_BREAK_AFTER;
 
-  shader = -1;
+  shader = 0;
 }
