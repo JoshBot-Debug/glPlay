@@ -26,6 +26,7 @@ App::App() : Window(options)
    */
   Camera *camera = new Camera();
   camera->setType(CameraType::Orthographic);
+  camera->setOffset(0.5f, 0.5f);
 
   /**
    * Setup a light source
@@ -37,7 +38,7 @@ App::App() : Window(options)
   /**
    * Load the model foo
    */
-  Model *model = new Model("plane", "assets/model/plane.fbx");
+  Model *model = new Model("plane", "assets/model/cube.fbx");
 
   /**
    * Load all shaders for every purpose
@@ -71,68 +72,53 @@ App::App() : Window(options)
   // model->setMaterial(material);
 
   /**
-   * Create a frame buffer
-   */
-  // FrameBuffer *scene = new FrameBuffer("scene");
-
-  /**
    * Setup the renderer
    */
   renderer.setCamera(camera);
   // renderer.addLight(light);
   renderer.addModel(model);
-  // renderer.addFrameBuffer(scene);
   renderer.addShaderProgram(shaderProgram);
 
-  /**
-   * Somewhere in the program, we will create instances.
-   * This accept an argument instance that contains transforms, color, etc.
-   * The argument will be a pointer.
-   *
-   * You will update the Structs information and the renderer will update the unforms if changes were made before drawing
-   */
-  InstanceManager &i1 = renderer.add<Instance>("i1");
-  i1.instance.translate.x = -100.0f;
-  i1.instance.scale.x = 50.0f;
-  i1.instance.scale.y = 50.0f;
+  Instance &i1 = renderer.add<Instance>("i1");
+  i1.translate.x = -100.0f;
+  i1.scale.x = 50.0f;
+  i1.scale.y = 50.0f;
+  // i1.scale.z = 50.0f;
 
-  i1.instance.color.r = 1.0f;
-  i1.instance.color.g = 0.0f;
-  i1.instance.color.b = 0.0f;
+  i1.color.r = 1.0f;
+  i1.color.g = 0.0f;
+  i1.color.b = 0.0f;
 
+  Instance &i2 = renderer.add<Instance>("i2");
+  i2.translate.x = 100.0f;
 
-  InstanceManager &i2 = renderer.add<Instance>("i2");
-  i2.instance.translate.x = 100.0f;
+  i2.scale.x = 50.0f;
+  i2.scale.y = 50.0f;
+  // i2.scale.z = 50.0f;
 
-  i2.instance.scale.x = 50.0f;
-  i2.instance.scale.y = 50.0f;
-
-  i2.instance.color.r = 0.0f;
-  i2.instance.color.g = 0.0f;
-  i2.instance.color.b = 1.0f;
+  i2.color.r = 0.0f;
+  i2.color.g = 0.0f;
+  i2.color.b = 1.0f;
 
   // Begins the onDraw loop
   open();
 }
 
+// void App::onUpdate()
+// {
+//   if(Input::KeyPress(KeyboardKey::UP))
+//   {
+    
+//   }
+// }
+
 void App::onDraw()
 {
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  
-  // Bind the "default" shader
+
   ShaderProgram *shader = renderer.getShaderProgram();
   shader->bind("default");
 
-  // Bind the framebuffer to render the scene to an offscreen texture
-  // Optional
-  // renderer.bindFramebuffer("scene");
-
   renderer.draw("plane");
-
-  // Bind the default framebuffer to display the scene
-  // renderer.bindFramebuffer("default");
-
-  // Apply post-processing effects (e.g., bloom, blur, etc.)
-  // renderer.applyPostProcessingEffects();
 }

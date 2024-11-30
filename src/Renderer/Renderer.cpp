@@ -104,7 +104,7 @@ void Renderer::addShaderProgram(ShaderProgram *shaderProgram)
 }
 
 template <>
-InstanceManager &Renderer::add<Instance>(const std::string &name)
+Instance &Renderer::add<Instance>(const std::string &name)
 {
   InstanceManager &iManager = instances[name];
   iManager.offset = instances.size() - 1;
@@ -135,21 +135,21 @@ InstanceManager &Renderer::add<Instance>(const std::string &name)
 
   ibo.update(iManager.offset * sizeof(Instance), sizeof(iManager.instance), &iManager.instance);
 
-  return iManager;
+  return iManager.instance;
 }
 
 template <>
-InstanceManager &Renderer::get<Instance>(const std::string &name)
+Instance &Renderer::get<Instance>(const std::string &name)
 {
-  return instances[name];
+  return instances[name].instance;
 }
 
 void Renderer::update()
 {
   const auto &dimensions = Window::GetDimensions();
-  camera->setDimensions(dimensions.x, dimensions.y);
+  camera->setSize(dimensions.x, dimensions.y);
 
-  shader->uniformMatrix4fv("u_ViewProjection", camera->getUniformMatrix4fv());
+  shader->uniformMatrix4fv("u_ViewProjection", camera->getViewProjectionMatrix());
 
   // TODO Need to do a dirty check here
   // And do all the updates in one call

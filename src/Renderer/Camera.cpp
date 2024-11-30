@@ -2,59 +2,75 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
-void Camera::setType(const CameraType &type)
+void Camera::update()
+{
+  if (type == CameraType::Perspective)
+  {
+    glm::vec3 front;
+    front.x = cos(glm::radians(rotation.y)) * cos(glm::radians(rotation.x));
+    front.y = sin(glm::radians(rotation.x));
+    front.z = sin(glm::radians(rotation.y)) * cos(glm::radians(rotation.x));
+
+    glm::vec3 up = glm::normalize(glm::cross(glm::vec3(1.0f, 0.0f, 0.0f), front));
+
+    view = glm::lookAt(position, position + front, up);
+    projection = glm::perspective(glm::radians(fov), (float)width / (float)height, nearPlane, farPlane);
+  }
+
+  if (type == CameraType::Orthographic)
+  {
+    float w = width * offsetX;
+    float h = height * offsetY;
+
+    projection = glm::ortho(-w, +w, -h, +h, -1.0f, 1.0f);
+
+    view = glm::mat4(1.0f);
+    view = glm::translate(view, -position);
+
+    view = glm::rotate(view, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+    view = glm::rotate(view, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+    view = glm::rotate(view, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+  }
+
+  projection *= view;
+}
+
+void Camera::setType(CameraType type)
 {
   this->type = type;
 }
 
-void Camera::update()
-{
-  /**
-   * Set the origin to the center of the screen
-   */
-  float wSize = width / 2;
-  float hSize = height / 2;
-  projection = glm::ortho(-wSize, +wSize, -hSize, +hSize, -1.0f, 1.0f);
-
-  glm::mat4 model = glm::mat4(1.0f);
-
-  glm::mat4 translation = glm::translate(model, glm::vec3(-position.x, -position.y, 0.0f));
-
-  glm::mat4 rotationX = glm::rotate(model, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-  glm::mat4 rotationY = glm::rotate(model, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-  glm::mat4 rotationZ = glm::rotate(model, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
-
-  glm::mat4 rotation = rotationZ * rotationY * rotationX;
-
-  viewProjection = projection * (translation * rotation);
-}
-
-Camera::Camera()
-{
-  projection = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f);
-  viewProjection = projection * glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
-}
-
-void Camera::setDimensions(int width, int height)
+void Camera::setSize(float width, float height)
 {
   this->width = width;
   this->height = height;
   update();
 }
 
+void Camera::setOffset(float offsetX, float offsetY)
+{
+  this->offsetX = offsetX;
+  this->offsetY = offsetY;
+  update();
+}
+
 void Camera::setPosition(float x, float y, float z)
 {
-  /**
-   * Set the origin to the center of the screen
-   * x0 & y0 will be the center of the screen
-   */
-  position.x = x - (width / 2);
-  position.y = y - (height / 2);
+  position.x = x - (width * offsetX);
+  position.y = y - (height * offsetY);
   position.z = z;
   update();
 }
 
-void Camera::move(float deltaX, float deltaY, float deltaZ)
+void Camera::setRotation(float pitch, float yaw, float roll)
+{
+  rotation.x = pitch;
+  rotation.y = yaw;
+  rotation.z = roll;
+  update();
+}
+
+void Camera::translate(float deltaX, float deltaY, float deltaZ)
 {
   position.x += deltaX;
   position.y += deltaY;
@@ -62,25 +78,23 @@ void Camera::move(float deltaX, float deltaY, float deltaZ)
   update();
 }
 
-void Camera::setRotation(float x, float y, float z)
+void Camera::rotate(float deltaPitch, float deltaYaw, float deltaRoll)
 {
-  rotation.x = x;
-  rotation.y = y;
-  rotation.z = z;
+  rotation.x += deltaPitch;
+  rotation.y += deltaYaw;
+  rotation.z += deltaRoll;
   update();
 }
 
-const glm::mat4 &Camera::getUniformMatrix4fv() const
+void Camera::setProjectionParams(float fov, float nearPlane, float farPlane)
 {
-  return viewProjection;
+  this->fov = fov;
+  this->nearPlane = nearPlane;
+  this->farPlane = farPlane;
+  update();
 }
 
-const glm::vec3 &Camera::getPosition() const
+const glm::mat4 &Camera::getViewProjectionMatrix() const
 {
-  return position;
-}
-
-const glm::vec3 &Camera::getRotation() const
-{
-  return rotation;
+  return projection;
 }
