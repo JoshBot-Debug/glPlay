@@ -26,6 +26,9 @@ App::App() : Window(options)
    */
   Camera *camera = new Camera();
   camera->setType(CameraType::Orthographic);
+  // camera->setType(CameraType::Perspective);
+  // camera->setRotation(1.0f, 0.0f, 0.0f);
+  // camera->setPosition(0.0f, 0.0f, -20.0f);
   camera->setOffset(0.5f, 0.5f);
 
   /**

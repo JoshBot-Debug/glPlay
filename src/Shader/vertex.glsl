@@ -10,6 +10,8 @@ layout(location=5)in vec3 in_Scale;
 layout(location=6)in vec4 in_Color;
 
 out vec4 f_Color;
+out vec3 f_Normal;
+out vec3 f_Position;
 
 uniform mat4 u_ViewProjection;
 
@@ -70,5 +72,8 @@ void main(){
   model=scale(model,in_Scale);
   
   f_Color=in_Color;
+  f_Normal=in_Normal;
+  f_Position=vec3(model*vec4(in_Position,1.));
+  
   gl_Position=u_ViewProjection*model*vec4(in_Position,1.);
 }
