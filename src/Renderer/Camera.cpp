@@ -11,24 +11,18 @@ void Camera::update()
     front.y = sin(glm::radians(rotation.x));
     front.x = sin(glm::radians(rotation.y)) * cos(glm::radians(rotation.x));
 
-    // Step 2: Calculate the right and up vectors
-    glm::vec3 right = glm::normalize(glm::cross(front, glm::vec3(0.0f, 1.0f, 0.0f))); // Right = cross(front, world up)
-    glm::vec3 up = glm::normalize(glm::cross(right, front));                          // Up = cross(right, front)
+    glm::vec3 right = glm::normalize(glm::cross(front, glm::vec3(0.0f, 1.0f, 0.0f)));
+    glm::vec3 up = glm::normalize(glm::cross(right, front));
 
-    // Step 3: Apply the roll rotation (around the front vector)
     glm::mat4 rollMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(rotation.z), front);
 
-    // Apply the roll matrix to the up and right vectors
     right = glm::normalize(glm::vec3(rollMatrix * glm::vec4(right, 0.0f)));
     up = glm::normalize(glm::vec3(rollMatrix * glm::vec4(up, 0.0f)));
 
-    // Step 4: Apply the camera offset to the position
     glm::vec3 cameraPosition = position + glm::vec3(offsetX, offsetY, 0.0f);
 
-    // Step 5: Update the view matrix using glm::lookAt
     view = glm::lookAt(cameraPosition, cameraPosition + front, up);
 
-    // Step 6: Update the projection matrix using glm::perspective
     projection = glm::perspective(glm::radians(fov), width / height, nearPlane, farPlane);
   }
 
