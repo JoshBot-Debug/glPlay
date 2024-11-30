@@ -93,6 +93,9 @@ Window::Window(const WindowOptions &options)
   glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
   glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 
+  if (options.MSAA)
+    glfwWindowHint(GLFW_SAMPLES, options.MSAA);
+
   window = glfwCreateWindow(options.width, options.height, options.title.c_str(), nullptr, nullptr);
   if (!window)
   {
@@ -106,6 +109,9 @@ Window::Window(const WindowOptions &options)
 
   if (options.maximized)
     glfwMaximizeWindow(window);
+
+  if (options.MSAA)
+    glEnable(GL_MULTISAMPLE);
 
   const int init = glewInit();
 

@@ -18,6 +18,7 @@ struct WindowOptions
 
   bool enableDepth = false;
   bool enableVSync = false;
+  int MSAA = 0;
 
   bool imguiEnableKeyboard = false;
   bool imguiEnableGamepad = false;

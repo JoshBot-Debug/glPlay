@@ -12,7 +12,7 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
-const WindowOptions options = {.title = "glPlay", .width = 800, .height = 600, .enableDepth = true, .enableVSync = true, .imguiEnableDocking = true, .maximized = true};
+const WindowOptions options = {.title = "glPlay", .width = 800, .height = 600, .enableDepth = true, .enableVSync = true, .MSAA = 16, .imguiEnableDocking = true, .maximized = true};
 
 /**
  * TODO need to add a ViewportManager class that holds all this information\
@@ -83,7 +83,7 @@ App::App() : Window(options)
   renderer.addShaderProgram(shaderProgram);
 
   Instance &i1 = renderer.add<Instance>("i1");
-  
+
   debugMenu.addInstance("1", &i1);
   debugMenu.addShaderProgram(shaderProgram);
 
