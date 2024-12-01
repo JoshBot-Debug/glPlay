@@ -8,22 +8,23 @@ Program::Program()
   program = glCreateProgram();
 
   LOG_BREAK_BEFORE;
-  LOG("Created shader program");
-  LOG("Program:", program);
+  LOG("Program created:", program);
   LOG_BREAK_AFTER;
 }
 
 Program::~Program()
 {
-  if (program != 0)
-  {
-    glDeleteProgram(program);
-    LOG_BREAK_BEFORE;
-    LOG("Deleted shader program");
-    LOG("Program:", program);
-    LOG_BREAK_AFTER;
-    program = 0;
-  }
+  for (const auto &shader : shaders)
+    shader->destroy();
+
+  if (program == 0)
+    return;
+
+  glDeleteProgram(program);
+  LOG_BREAK_BEFORE;
+  LOG("Program deleted:", program);
+  LOG_BREAK_AFTER;
+  program = 0;
 }
 
 bool Program::link(Shader *shader)
@@ -44,7 +45,7 @@ bool Program::link(Shader *shader)
     glGetProgramInfoLog(program, length, &length, log);
 
     LOG_BREAK_BEFORE;
-    LOG("Shader program linking failed");
+    LOG("Program linking failed");
     LOG("ERROR:", log);
     LOG_BREAK_AFTER;
 
@@ -52,9 +53,13 @@ bool Program::link(Shader *shader)
 
     glDeleteProgram(program);
     program = 0;
-    
+
     return false;
   }
+
+  LOG_BREAK_BEFORE;
+  LOG("Program linked shaded");
+  LOG_BREAK_AFTER;
 
   shader->destroy();
 

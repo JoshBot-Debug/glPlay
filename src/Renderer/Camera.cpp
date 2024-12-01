@@ -97,7 +97,7 @@ void Camera::rotate(float deltaPitch, float deltaYaw, float deltaRoll)
   rotation.z += deltaRoll;
 }
 
-void Camera::setProjectionParams(float fov, float nearPlane, float farPlane)
+void Camera::setProjection(float fov, float nearPlane, float farPlane)
 {
   this->fov = fov;
   this->nearPlane = nearPlane;

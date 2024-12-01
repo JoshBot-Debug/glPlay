@@ -20,8 +20,6 @@ private:
   std::vector<unsigned int> indices;
 
 public:
-  Mesh() {}
-
   void resize(size_t count) { vertices.resize(count); }
 
   Vertex &getVertex(unsigned int index) { return vertices[index]; }
@@ -30,15 +28,9 @@ public:
 
   const std::vector<unsigned int> &getIndices() const { return indices; }
 
-  void addVertex(const Vertex &vertex)
-  {
-    vertices.push_back(vertex);
-  }
+  void addVertex(const Vertex &vertex) { vertices.push_back(vertex); }
 
-  void addIndex(unsigned int index)
-  {
-    indices.push_back(index);
-  }
+  void addIndex(unsigned int index) { indices.push_back(index); }
 
   void clear()
   {

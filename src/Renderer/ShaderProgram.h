@@ -19,8 +19,7 @@ private:
   std::unordered_map<std::string, unsigned int> uniforms;
 
 public:
-  ShaderProgram() = default;
-  ~ShaderProgram() = default;
+  ~ShaderProgram();
 
   Program *createProgram(const std::string &name);
 

@@ -10,10 +10,10 @@ uniform vec4 u_LightColor;
 uniform vec3 u_LightPosition;
 
 void main(){
-
+  
   // float ambientStrength=1.;
   // vec4 ambient=ambientStrength*u_LightColor;
   // FragColor=ambient*f_Color;
   
-  FragColor=vec4(1.0,0.0,0.0,1.0);
+  FragColor=vec4(1.,0.,0.,1.);
 }

@@ -4,36 +4,47 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <cstring>
 
 #include "Debug.h"
 
-bool Shader::compile(const std::string &path, const ShaderType &type)
+inline const char *readFile(const std::string &filepath)
 {
-  std::ifstream stream(path);
+  std::ifstream stream(filepath);
 
   if (!stream.is_open())
   {
     LOG_BREAK_BEFORE;
-    LOG("Failed to open shader file:", path);
+    LOG("Failed to open file:", filepath);
     LOG_BREAK_AFTER;
-    return false;
+    return nullptr;
   }
 
   std::stringstream sStream;
   sStream << stream.rdbuf();
   stream.close();
 
-  std::string shaderStr = sStream.str();
-  const char *shaderCStr = shaderStr.c_str();
+  std::string fileContents = sStream.str();
+
+  char *result = new char[fileContents.size() + 1];
+
+  std::strcpy(result, fileContents.c_str());
+
+  return result;
+}
+
+bool Shader::compile(const std::string &filepath, const ShaderType &type)
+{
+  const char *source = readFile(filepath);
+
+  if (!source)
+    return false;
 
   shader = glCreateShader((unsigned int)type);
-  glShaderSource(shader, 1, &shaderCStr, nullptr);
+  glShaderSource(shader, 1, &source, nullptr);
   glCompileShader(shader);
 
-  LOG_BREAK_BEFORE;
-  LOG("Created shader", path);
-  LOG("Shader:", shader);
-  LOG_BREAK_AFTER;
+  delete[] source;
 
   int success;
   glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
@@ -45,8 +56,7 @@ bool Shader::compile(const std::string &path, const ShaderType &type)
     glGetShaderInfoLog(shader, length, &length, log);
 
     LOG_BREAK_BEFORE;
-    LOG("Shader compilation failed", path);
-    LOG("Shader file:", path);
+    LOG("Compilation failed", filepath);
     LOG("ERROR:", log);
     LOG_BREAK_AFTER;
 
@@ -54,6 +64,11 @@ bool Shader::compile(const std::string &path, const ShaderType &type)
     glDeleteShader(shader);
     return false;
   }
+
+  LOG_BREAK_BEFORE;
+  LOG("Shader file:", filepath);
+  LOG("Shader created:", shader);
+  LOG_BREAK_AFTER;
 
   return true;
 }
@@ -63,8 +78,17 @@ Shader::Shader(const std::string &path, const ShaderType &type) : path(path), ty
   compile(path, type);
 }
 
+Shader::~Shader()
+{
+  destroy();
+}
+
 bool Shader::recompile()
 {
+  LOG_BREAK_BEFORE;
+  LOG("Shader recompile");
+  LOG_BREAK_AFTER;
+  glDeleteShader(shader);
   return compile(path, type);
 }
 
@@ -75,10 +99,18 @@ const unsigned int Shader::getShader()
 
 void Shader::destroy()
 {
+  if (shader == 0)
+  {
+    LOG_BREAK_BEFORE;
+    LOG("Shader not set (delete skipped):", shader);
+    LOG_BREAK_AFTER;
+    return;
+  }
+
   glDeleteShader(shader);
 
   LOG_BREAK_BEFORE;
-  LOG("Deleted shader:", shader);
+  LOG("Shader deleted:", shader);
   LOG_BREAK_AFTER;
 
   shader = 0;

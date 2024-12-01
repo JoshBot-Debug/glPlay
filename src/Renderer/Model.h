@@ -18,9 +18,7 @@ private:
 
 public:
   Model(const std::string &name, const std::string &path);
-
-  ~Model() = default;
-
+  
   void setMaterial(const Material *material);
   
   const std::vector<Vertex> getVertices() const;

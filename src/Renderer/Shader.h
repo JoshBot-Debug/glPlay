@@ -16,11 +16,12 @@ private:
   const ShaderType type;
   const std::string path;
 
-  bool compile(const std::string &path, const ShaderType &type);
+  bool compile(const std::string &filepath, const ShaderType &type);
 
 public:
-  Shader(const std::string &path, const ShaderType &type);
-  ~Shader() = default;
+  Shader(const std::string &filepath, const ShaderType &type);
+
+  ~Shader();
 
   bool recompile();
 

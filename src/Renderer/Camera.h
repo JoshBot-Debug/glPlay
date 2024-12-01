@@ -13,14 +13,14 @@ enum class CameraType
 class Camera
 {
 private:
-  float width = 1.0f;
-  float height = 1.0f;
-
   glm::mat4 view = glm::mat4(1.0f);
   glm::mat4 projection = glm::mat4(0.0f);
 
 public:
   CameraType type;
+
+  float width = 1.0f;
+  float height = 1.0f;
 
   float offsetX = 1.0f;
   float offsetY = 1.0f;
@@ -44,11 +44,11 @@ public:
 
   void setRotation(float pitch, float yaw, float roll);
 
+  void setProjection(float fov, float nearPlane, float farPlane);
+
   void translate(float deltaX, float deltaY, float deltaZ);
 
   void rotate(float deltaPitch, float deltaYaw, float deltaRoll);
-
-  void setProjectionParams(float fov, float nearPlane, float farPlane);
 
   const glm::mat4 &getViewProjectionMatrix() const;
 };
