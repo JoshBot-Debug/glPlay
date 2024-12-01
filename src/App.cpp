@@ -20,8 +20,6 @@ const WindowOptions options = {.title = "glPlay", .width = 800, .height = 600, .
  */
 App::App() : Window(options)
 {
-  debugMenu.setCamera(&camera);
-
   /**
    * Setup a camera
    * Specify the type, and other properties.
@@ -84,6 +82,7 @@ App::App() : Window(options)
 
   Instance &i1 = renderer.add<Instance>("i1");
 
+  debugMenu.setCamera(&camera);
   debugMenu.addInstance("1", &i1);
   debugMenu.addShaderProgram(shaderProgram);
 
