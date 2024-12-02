@@ -90,13 +90,10 @@ App::App() : Window(options)
   open();
 }
 
-// void App::onUpdate()
-// {
-//   if(Input::KeyPress(KeyboardKey::UP))
-//   {
-
-//   }
-// }
+void App::onUpdate()
+{
+  debugMenu.update();
+}
 
 void App::onDraw()
 {

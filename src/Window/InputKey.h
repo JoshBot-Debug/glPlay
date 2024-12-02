@@ -23,10 +23,6 @@ enum class MouseButton: int
   BUTTON_6 = GLFW_MOUSE_BUTTON_6,
   BUTTON_7 = GLFW_MOUSE_BUTTON_7,
   BUTTON_8 = GLFW_MOUSE_BUTTON_8,
-
-  // Button states (for ease of use, we can include these in the enum)
-  RELEASED = GLFW_RELEASE,
-  PRESSED = GLFW_PRESS
 };
 
 enum class KeyboardKey: int

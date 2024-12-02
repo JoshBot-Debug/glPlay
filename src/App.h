@@ -22,6 +22,6 @@ public:
   App();
   ~App() = default;
 
-  // void onUpdate() override;
+  void onUpdate() override;
   void onDraw() override;
 };

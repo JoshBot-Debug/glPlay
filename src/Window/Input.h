@@ -2,15 +2,18 @@
 
 #include "InputKey.h"
 
+#include <glm/glm.hpp>
 #include <iostream>
 
 class Input
 {
 private:
   static GLFWwindow *window;
-
+  
 public:
   static void SetWindowContext(GLFWwindow *window);
+
+  static const glm::vec2 MousePosition();
 
   /**
    * @param key Expects a KeyboardKey or MouseButton

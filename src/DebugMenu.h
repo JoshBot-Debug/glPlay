@@ -3,6 +3,8 @@
 #include <string>
 #include <unordered_map>
 
+#include "Window/Time.h"
+#include "Window/Input.h"
 #include "Renderer/Camera.h"
 #include "Renderer/Instance.h"
 #include "Renderer/Shader.h"
@@ -19,6 +21,8 @@ private:
   Camera *camera;
   ShaderProgram *shaderProgram;
   std::unordered_map<std::string, Instance *> instances;
+
+  glm::vec2 mouse;
 
 public:
   DebugMenu() {}
@@ -114,6 +118,41 @@ public:
     ImGui::DragFloat("Far", &camera->farPlane, 0.1f);
 
     ImGui::End();
+  }
+
+  void update()
+  {
+    ImGuiIO &io = ImGui::GetIO();
+
+    if (io.WantCaptureKeyboard || io.WantCaptureMouse)
+      return;
+
+    float speed = 10.0f;
+    double delta = Time::GetDeltaTime();
+
+    glm::vec3 translate(0.0f);
+
+    if (Input::KeyPress(KeyboardKey::UP))
+      translate.y += speed * delta;
+
+    if (Input::KeyPress(KeyboardKey::DOWN))
+      translate.y -= speed * delta;
+
+    if (Input::KeyPress(KeyboardKey::RIGHT))
+      translate.x += speed * delta;
+
+    if (Input::KeyPress(KeyboardKey::LEFT))
+      translate.x -= speed * delta;
+
+    if (Input::KeyPress(MouseButton::LEFT))
+    {
+      glm::vec2 dm = glm::mix(glm::vec2(0.0f), Input::MousePosition() - mouse, 0.1f);
+      camera->rotate(-dm.y, dm.x, 0.0f);
+    }
+
+    camera->translate(translate.x, translate.y, translate.z);
+
+    mouse = Input::MousePosition();
   }
 
   void draw()

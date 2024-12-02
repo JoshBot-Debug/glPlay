@@ -7,9 +7,9 @@ void Camera::update()
   if (type == CameraType::Perspective)
   {
     glm::vec3 front;
-    front.z = cos(glm::radians(rotation.y)) * cos(glm::radians(rotation.x)) * -1.0f;
-    front.y = sin(glm::radians(rotation.x));
     front.x = sin(glm::radians(rotation.y)) * cos(glm::radians(rotation.x));
+    front.y = sin(glm::radians(rotation.x));
+    front.z = cos(glm::radians(rotation.y)) * cos(glm::radians(rotation.x)) * -1.0f;
 
     glm::vec3 right = glm::normalize(glm::cross(front, glm::vec3(0.0f, 1.0f, 0.0f)));
     glm::vec3 up = glm::normalize(glm::cross(right, front));
