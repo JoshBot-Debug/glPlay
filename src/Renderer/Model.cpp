@@ -11,7 +11,54 @@ Model::Model(const std::string &name, const std::string &path) : name(name), pat
   loadFBX(path, meshes);
 }
 
-void Model::setMaterial(const Material *material) {}
+void Model::setMaterial(Material *material)
+{
+  this->material = material;
+}
+
+void Model::addTexture(Texture *texture)
+{
+  textures.push_back(texture);
+}
+
+void Model::bindTextures() const
+{
+  for (size_t i = 0; i < textures.size(); i++)
+  {
+    glActiveTexture(GL_TEXTURE0 + i);
+    textures[i]->bind();
+  }
+}
+
+std::vector<InstanceManager *> Model::getInstanceManagers()
+{
+  std::vector<InstanceManager *> ims;
+
+  for (auto &im : instanceManagers)
+    ims.push_back(&im.second);
+
+  return ims;
+}
+
+InstanceManager *Model::getInstanceManager(const std::string &name)
+{
+  return &instanceManagers[name];
+}
+
+const void Model::setIndicesOffset(size_t size)
+{
+  indicesOffset = size;
+}
+
+const size_t Model::getIndicesOffset() const
+{
+  return indicesOffset;
+}
+
+const size_t Model::getInstancesCount()
+{
+  return instanceManagers.size();
+}
 
 const std::vector<Vertex> Model::getVertices() const
 {
@@ -37,6 +84,7 @@ const std::vector<unsigned int> Model::getIndices() const
   std::vector<unsigned int> indices;
 
   size_t count = 0;
+  
   for (const auto &mesh : meshes)
     count += mesh.getIndices().size();
 

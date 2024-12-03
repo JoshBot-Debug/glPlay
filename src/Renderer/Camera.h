@@ -50,5 +50,5 @@ public:
 
   void rotate(float deltaPitch, float deltaYaw, float deltaRoll);
 
-  const glm::mat4 &getViewProjectionMatrix() const;
+  const glm::mat4 &getViewProjectionMatrix();
 };

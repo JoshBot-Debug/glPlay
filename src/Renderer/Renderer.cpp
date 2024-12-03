@@ -12,10 +12,6 @@ Renderer::Renderer() : vbo(BufferTarget::ARRAY_BUFFER), ebo(BufferTarget::ELEMEN
   ebo.generate();
   ibo.generate();
 
-  // vbo.set(0, nullptr);
-  // ebo.set(0, nullptr);
-  // ibo.set(0, nullptr);
-
   vao.bind();
 
   vbo.bind();
@@ -39,59 +35,47 @@ void Renderer::setCamera(Camera *camera)
   this->camera = camera;
 }
 
-void Renderer::addLight(const Light *light)
+void Renderer::addLight(Light *light)
 {
 }
 
-void Renderer::addModel(const Model *model)
+void Renderer::addModel(Model *model)
 {
   vao.bind();
 
-  models.push_back(model);
-
-  std::vector<Vertex> vertices;
-  std::vector<unsigned int> indices;
+  models.insert({model->getName(), model});
 
   size_t vCount = 0;
   size_t iCount = 0;
-  for (const auto &model : models)
-  {
-    vCount += model->getVertices().size();
-    iCount += model->getIndices().size();
-  }
 
-  vertices.reserve(vCount);
-  indices.reserve(iCount);
-
-  for (const auto &model : models)
+  for (const auto &pair : models)
   {
-    const auto &v = model->getVertices();
-    const auto &i = model->getIndices();
-    vertices.insert(vertices.begin(), v.begin(), v.end());
-    indices.insert(indices.begin(), i.begin(), i.end());
+    vCount += pair.second->getVertices().size();
+    iCount += pair.second->getIndices().size();
   }
 
   LOG_BREAK_BEFORE;
   LOG("Model:", model->getName());
-  LOG("Vertices: ", vertices.size());
-  LOG("Indices: ", indices.size());
-  LOG("Vertex size: ", sizeof(Vertex));
-  LOG("Index size: ", sizeof(unsigned int));
+  LOG("Vertices:", vCount);
+  LOG("Indices:", iCount);
+  LOG("Vertex size:", sizeof(Vertex));
+  LOG("Index size:", sizeof(unsigned int));
   LOG_BREAK_AFTER;
 
-  vbo.resize(vertices.size() * sizeof(Vertex));
-  ebo.resize(indices.size() * sizeof(unsigned int));
+  vbo.resize(vCount * sizeof(Vertex));
+  ebo.resize(iCount * sizeof(unsigned int));
 
-  vbo.update(vertices.size() - model->getVertices().size(), model->getVertices());
-  ebo.update(indices.size() - model->getIndices().size(), model->getIndices());
+  vbo.update(vCount - model->getVertices().size(), model->getVertices());
+  ebo.update(iCount - model->getIndices().size(), model->getIndices());
 
-  // TODO Need to improve
   vbo.bind();
   vao.set(0, 3, VertexType::FLOAT, false, sizeof(Vertex), (void *)offsetof(Vertex, position));
   vao.set(1, 3, VertexType::FLOAT, false, sizeof(Vertex), (void *)offsetof(Vertex, normal));
   vao.set(2, 2, VertexType::FLOAT, false, sizeof(Vertex), (void *)offsetof(Vertex, texCoord));
 
-  this->indices = indices.size();
+  model->setIndicesOffset(nextIndicesOffset);
+
+  nextIndicesOffset = iCount * sizeof(unsigned int);
 }
 
 void Renderer::addFrameBuffer(const FrameBuffer *frameBuffer)
@@ -104,13 +88,14 @@ void Renderer::addShaderProgram(ShaderProgram *shaderProgram)
 }
 
 template <>
-Instance &Renderer::add<Instance>(const std::string &name)
+Instance &Renderer::add<Instance>(const std::string &model, const std::string &name)
 {
-  InstanceManager &iManager = instances[name];
-  iManager.offset = instances.size() - 1;
+
+  InstanceManager *iManager = models[model]->getInstanceManager(name);
+  iManager->offset = (nextInstanceOffset += 1);
 
   // TODO max instances is doubled every time it's resized, not a greate idea but it works for now
-  if (instances.size() >= maxInstances)
+  if ((nextInstanceOffset + 1) >= maxInstances)
   {
     LOG_BREAK_BEFORE;
     LOG("Resizing instance vertex buffer");
@@ -124,8 +109,6 @@ Instance &Renderer::add<Instance>(const std::string &name)
     LOG("Max instances size:", maxInstances * sizeof(Instance));
     LOG_BREAK_AFTER;
 
-    // TODO This is done above, need to refactor
-    // Setup vertex attrib pointers
     vao.bind();
     vao.set(3, 3, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, translate), 1);
     vao.set(4, 3, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, rotation), 1);
@@ -133,50 +116,45 @@ Instance &Renderer::add<Instance>(const std::string &name)
     vao.set(6, 4, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, color), 1);
   }
 
-  ibo.update(iManager.offset * sizeof(Instance), sizeof(iManager.instance), &iManager.instance);
+  ibo.update(iManager->offset * sizeof(Instance), sizeof(iManager->instance), &iManager->instance);
 
-  return iManager.instance;
+  return iManager->instance;
 }
 
 template <>
-Instance &Renderer::get<Instance>(const std::string &name)
+Instance &Renderer::get<Instance>(const std::string &model, const std::string &name)
 {
-  return instances[name].instance;
+  return models[model]->getInstanceManager(name)->instance;
 }
 
 void Renderer::update()
 {
   const auto &dimensions = Window::GetDimensions();
   camera->setSize(dimensions.x, dimensions.y);
-  camera->update();
 
   shader->uniformMatrix4fv("u_ViewProjection", camera->getViewProjectionMatrix());
 
   // TODO Need to do a dirty check here
   // And do all the updates in one call
-  for (const auto &im : instances)
-    ibo.update(im.second.offset * sizeof(Instance), sizeof(im.second.instance), &im.second.instance);
-}
-
-void Renderer::updateInstance(const std::string &modelName, const void *buffer)
-{
-}
-
-void Renderer::updateInstance(const std::string &modelName, const std::string &instanceName, const void *buffer)
-{
+  for (const auto &pair : models)
+    for (const auto &im : pair.second->getInstanceManagers())
+      ibo.update(im->offset * sizeof(Instance), sizeof(im->instance), &im->instance);
 }
 
 void Renderer::bindFramebuffer(const std::string &name)
 {
 }
 
-void Renderer::draw(const std::string &modelName, const Primitive &primitive)
+void Renderer::draw(const Primitive &primitive)
 {
   update();
 
-  vao.bind();
-  ebo.bind();
-  glDrawElementsInstanced((unsigned int)primitive, indices, GL_UNSIGNED_INT, 0, instances.size());
+  for (const auto &pair : models)
+  {
+    Model *model = pair.second;
+    model->bindTextures();
+    glDrawElementsInstanced((unsigned int)primitive, model->getIndices().size(), GL_UNSIGNED_INT, (const void *)model->getIndicesOffset(), model->getInstancesCount());
+  }
 }
 
 void Renderer::applyPostProcessingEffects()

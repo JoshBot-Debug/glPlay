@@ -106,7 +106,7 @@ void Shader::destroy()
     LOG_BREAK_AFTER;
     return;
   }
-
+  
   glDeleteShader(shader);
 
   LOG_BREAK_BEFORE;

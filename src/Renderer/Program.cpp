@@ -19,7 +19,8 @@ Program::~Program()
 
   if (program == 0)
     return;
-
+  
+  glUseProgram(0);
   glDeleteProgram(program);
   LOG_BREAK_BEFORE;
   LOG("Program deleted:", program);
@@ -58,7 +59,7 @@ bool Program::link(Shader *shader)
   }
 
   LOG_BREAK_BEFORE;
-  LOG("Program linked shaded");
+  LOG("Program linked shaded: ", shader->getShader());
   LOG_BREAK_AFTER;
 
   shader->destroy();

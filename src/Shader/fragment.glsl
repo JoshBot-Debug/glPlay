@@ -3,11 +3,12 @@
 in vec4 f_Color;
 in vec3 f_Normal;
 in vec3 f_Position;
+in vec2 f_TexCoord;
 
 out vec4 FragColor;
 
 uniform vec4 u_LightColor;
-uniform vec3 u_LightPosition;
+uniform sampler2D u_Texture;
 
 void main(){
   
@@ -15,5 +16,5 @@ void main(){
   // vec4 ambient=ambientStrength*u_LightColor;
   // FragColor=ambient*f_Color;
   
-  FragColor=vec4(1.,0.,0.,1.);
+  FragColor=texture(u_Texture, f_TexCoord)*f_Color;
 }

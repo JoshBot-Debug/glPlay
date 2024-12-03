@@ -33,13 +33,14 @@ App::App() : Window(options)
    * Setup a light source
    * Specify the type and other properties.
    */
-  Light *light = new Light();
-  light->setType(LightType::Ambient);
+  // Light *light = new Light();
+  // light->setType(LightType::Ambient);
 
   /**
    * Load the model foo
    */
-  Model *model = new Model("plane", "assets/model/cube.fbx");
+  Model *sphere = new Model("sphere", "assets/model/sphere.fbx");
+  Model *cube = new Model("cube", "assets/model/cube-textured.fbx");
 
   /**
    * Load all shaders for every purpose
@@ -59,7 +60,8 @@ App::App() : Window(options)
   /**
    * Load all textures
    */
-  // Texture *diffuseTexture = new Texture("foo-diffused-texture", "/path/to/texture");
+  Texture *wallTexture = new Texture("wall-texture", "assets/textures/wall.jpg");
+  Texture *brickTexture = new Texture("brick-texture", "assets/textures/brick.jpg");
 
   /**
    * Create all materials
@@ -71,19 +73,25 @@ App::App() : Window(options)
   // material->setShininess(32.0f);
 
   // model->setMaterial(material);
+  sphere->addTexture(brickTexture);
+  cube->addTexture(wallTexture);
 
   /**
    * Setup the renderer
    */
   renderer.setCamera(&camera);
   // renderer.addLight(light);
-  renderer.addModel(model);
+  renderer.addModel(cube);
+  renderer.addModel(sphere);
   renderer.addShaderProgram(shaderProgram);
 
-  Instance &i1 = renderer.add<Instance>("i1");
+  Instance &i1 = renderer.add<Instance>("sphere", "i1");
+  Instance &i2 = renderer.add<Instance>("cube", "i2");
+  i2.translate.x = 6.0f;
 
   debugMenu.setCamera(&camera);
-  debugMenu.addInstance("1", &i1);
+  debugMenu.addInstance("i1", &i1);
+  debugMenu.addInstance("i2", &i2);
   debugMenu.addShaderProgram(shaderProgram);
 
   // Begins the onDraw loop
@@ -103,7 +111,7 @@ void App::onDraw()
   ShaderProgram *shader = renderer.getShaderProgram();
   shader->bind("default");
 
-  renderer.draw("plane");
+  renderer.draw();
 
   debugMenu.draw();
 }

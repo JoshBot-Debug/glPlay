@@ -7,6 +7,9 @@
 #include "Input.h"
 #include "Time.h"
 
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb/stb_image.h>
+
 glm::ivec2 Window::dimensions = glm::ivec2(-1, -1);
 
 void errorCallback(int error, const char *description)

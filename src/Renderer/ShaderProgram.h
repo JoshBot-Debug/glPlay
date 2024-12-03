@@ -19,8 +19,6 @@ private:
   std::unordered_map<std::string, unsigned int> uniforms;
 
 public:
-  ~ShaderProgram();
-
   Program *createProgram(const std::string &name);
 
   void recompile();
@@ -28,6 +26,8 @@ public:
   void bind(const std::string &name);
 
   void unbind();
+
+  void uniform1i(const std::string &name, int location);
 
   void uniformMatrix4fv(const std::string &name, const glm::mat4 &uniform);
 };

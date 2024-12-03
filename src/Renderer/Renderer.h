@@ -21,16 +21,16 @@ class Renderer
 private:
   Camera *camera;
   ShaderProgram *shader;
-  std::vector<const Model *> models;
-  std::unordered_map<std::string, InstanceManager> instances;
+  std::unordered_map<std::string, Model *> models;
 
   VertexArray vao; // Vertext array
   ArrayBuffer vbo; // Vertext buffer
   ArrayBuffer ebo; // Element buffer
   ArrayBuffer ibo; // Instance buffer
 
-  size_t indices;          // The number of indices to draw
-  size_t maxInstances = 1; // The number of indices to draw
+  size_t maxInstances = 1;       // The number of indices to draw
+  size_t nextInstanceOffset = -1; // The next offset in the instance vertex buffer
+  size_t nextIndicesOffset = 0; // The next offset in the instance vertex buffer
 
 private:
   void update();
@@ -41,23 +41,20 @@ public:
 
   void setCamera(Camera *camera);
 
-  void addLight(const Light *light);
-  void addModel(const Model *model);
+  void addLight(Light *light);
+  void addModel(Model *model);
   void addFrameBuffer(const FrameBuffer *frameBuffer);
   void addShaderProgram(ShaderProgram *shaderProgram);
 
   template <typename T>
-  Instance &add(const std::string &name);
+  Instance &add(const std::string &model, const std::string &name);
 
   template <typename T>
-  Instance &get(const std::string &name);
-
-  void updateInstance(const std::string &modelName, const void *buffer);
-  void updateInstance(const std::string &modelName, const std::string &instanceName, const void *buffer);
+  Instance &get(const std::string &model, const std::string &name);
 
   void bindFramebuffer(const std::string &name);
 
-  void draw(const std::string &modelName, const Primitive &primitive = Primitive::TRIANGLES);
+  void draw(const Primitive &primitive = Primitive::TRIANGLES);
 
   void applyPostProcessingEffects();
 

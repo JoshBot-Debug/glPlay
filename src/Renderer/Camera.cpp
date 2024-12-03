@@ -104,7 +104,8 @@ void Camera::setProjection(float fov, float nearPlane, float farPlane)
   this->farPlane = farPlane;
 }
 
-const glm::mat4 &Camera::getViewProjectionMatrix() const
+const glm::mat4 &Camera::getViewProjectionMatrix()
 {
+  update();
   return projection;
 }
