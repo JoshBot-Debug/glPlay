@@ -31,6 +31,7 @@ private:
   size_t maxInstances = 1;       // The number of indices to draw
   size_t nextInstanceOffset = -1; // The next offset in the instance vertex buffer
   size_t nextIndicesOffset = 0; // The next offset in the instance vertex buffer
+  size_t nextVerticesOffset = 0; // The next offset in the instance vertex buffer
 
 private:
   void update();
@@ -43,20 +44,15 @@ public:
 
   void addLight(Light *light);
   void addModel(Model *model);
-  void addFrameBuffer(const FrameBuffer *frameBuffer);
   void addShaderProgram(ShaderProgram *shaderProgram);
 
   template <typename T>
-  Instance &add(const std::string &model, const std::string &name);
+  T &add(const std::string &model, const std::string &name);
 
   template <typename T>
-  Instance &get(const std::string &model, const std::string &name);
-
-  void bindFramebuffer(const std::string &name);
+  T &get(const std::string &model, const std::string &name);
 
   void draw(const Primitive &primitive = Primitive::TRIANGLES);
-
-  void applyPostProcessingEffects();
 
   ShaderProgram *getShaderProgram();
 };

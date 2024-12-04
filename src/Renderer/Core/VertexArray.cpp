@@ -26,6 +26,7 @@ void VertexArray::set(unsigned int index, unsigned int size, VertexType type, bo
 }
 
 void VertexArray::bind() const { glBindVertexArray(vao); }
+
 void VertexArray::unbind() const { glBindVertexArray(0); }
 
 unsigned int VertexArray::get() const { return vao; }

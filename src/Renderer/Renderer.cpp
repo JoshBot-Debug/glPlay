@@ -65,21 +65,19 @@ void Renderer::addModel(Model *model)
   vbo.resize(vCount * sizeof(Vertex));
   ebo.resize(iCount * sizeof(unsigned int));
 
-  vbo.update(vCount - model->getVertices().size(), model->getVertices());
-  ebo.update(iCount - model->getIndices().size(), model->getIndices());
+  int vertexOffset = vCount - model->getVertices().size();
+  int indiceOffset = iCount - model->getIndices().size();
+
+  vbo.update(vertexOffset, model->getVertices());
+  ebo.update(indiceOffset, model->getIndices());
 
   vbo.bind();
   vao.set(0, 3, VertexType::FLOAT, false, sizeof(Vertex), (void *)offsetof(Vertex, position));
   vao.set(1, 3, VertexType::FLOAT, false, sizeof(Vertex), (void *)offsetof(Vertex, normal));
   vao.set(2, 2, VertexType::FLOAT, false, sizeof(Vertex), (void *)offsetof(Vertex, texCoord));
 
-  model->setIndicesOffset(nextIndicesOffset);
-
-  nextIndicesOffset = iCount * sizeof(unsigned int);
-}
-
-void Renderer::addFrameBuffer(const FrameBuffer *frameBuffer)
-{
+  model->setIndiceOffset(indiceOffset);
+  model->setVertexOffset(vertexOffset);
 }
 
 void Renderer::addShaderProgram(ShaderProgram *shaderProgram)
@@ -88,10 +86,10 @@ void Renderer::addShaderProgram(ShaderProgram *shaderProgram)
 }
 
 template <>
-Instance &Renderer::add<Instance>(const std::string &model, const std::string &name)
+Instance &Renderer::add<Instance>(const std::string &modelName, const std::string &name)
 {
-
-  InstanceManager *iManager = models[model]->getInstanceManager(name);
+  Model *model = models[modelName];
+  InstanceManager *iManager = model->getInstanceManager(name);
   iManager->offset = (nextInstanceOffset += 1);
 
   // TODO max instances is doubled every time it's resized, not a greate idea but it works for now
@@ -117,6 +115,7 @@ Instance &Renderer::add<Instance>(const std::string &model, const std::string &n
   }
 
   ibo.update(iManager->offset * sizeof(Instance), sizeof(iManager->instance), &iManager->instance);
+  // model->setInstanceOffset();
 
   return iManager->instance;
 }
@@ -141,24 +140,52 @@ void Renderer::update()
       ibo.update(im->offset * sizeof(Instance), sizeof(im->instance), &im->instance);
 }
 
-void Renderer::bindFramebuffer(const std::string &name)
-{
-}
-
 void Renderer::draw(const Primitive &primitive)
 {
   update();
+
+  const int eboSize = ebo.getBufferSize();
+  const std::vector<unsigned int> eboData = ebo.getBufferData<unsigned int>();
+
+  LOG_BREAK_BEFORE;
+  LOG("EBO Size:", eboSize);
+  LOG("EBO data.size:", eboData.size());
+
+  std::vector<unsigned int> square(eboData.begin() + 2880, eboData.begin() + 2916);
+  std::vector<unsigned int> circle(eboData.begin(), eboData.begin() + 2880);
+
+  // glDrawElementsInstancedBaseVertexBaseInstance((unsigned int)primitive, 2880, GL_UNSIGNED_INT, (const void *)(0 * sizeof(unsigned int)), 2, 0, 0);
+  glDrawElementsInstancedBaseVertexBaseInstance((unsigned int)primitive, 36, GL_UNSIGNED_INT, (const void *)(2880 * sizeof(unsigned int)), 2, 1984, 0);
+
+  // glDrawElementsInstancedBaseVertex((unsigned int)primitive, 36, GL_UNSIGNED_INT, (const void *)(2880 * sizeof(unsigned int)), 1, 1984);
+  // glDrawElementsInstancedBaseVertex((unsigned int)primitive, 2880, GL_UNSIGNED_INT, (const void *)(0 * sizeof(unsigned int)), 1, 0);
+
+  // for (size_t i = 0; i < eboData.size(); i++)
+  //   LOG("EBO v", i + 1, ":", eboData[i]);
 
   for (const auto &pair : models)
   {
     Model *model = pair.second;
     model->bindTextures();
-    glDrawElementsInstanced((unsigned int)primitive, model->getIndices().size(), GL_UNSIGNED_INT, (const void *)model->getIndicesOffset(), model->getInstancesCount());
-  }
-}
 
-void Renderer::applyPostProcessingEffects()
-{
+    // glDrawElementsInstancedBaseVertex((unsigned int)primitive, model->getIndices().size(), GL_UNSIGNED_INT, (const void *)(model->getIndiceOffset() * sizeof(unsigned int)), model->getInstancesCount(), model->getVertexOffset());
+
+    // LOG("Model ebo size:", model->getIndices().size());
+    // LOG("Model ebo offset(bytes):", model->getIndiceOffset());
+    // LOG("Model vbo offset(bytes):", model->getVertexOffset());
+    // LOG("Model instances:", model->getInstancesCount());
+  }
+
+  const int iboSize = ibo.getBufferSize();
+  const std::vector<float> iboData = ibo.getBufferData<float>();
+
+  LOG("IBO Size:", iboSize);
+  LOG("IBO data.size:", iboData.size());
+
+  // for (size_t i = 0; i < iboData.size() / 2; i++)
+  //   LOG("IBO v", i + 1, ":", iboData[i]);
+
+  LOG_BREAK_AFTER;
 }
 
 ShaderProgram *Renderer::getShaderProgram()

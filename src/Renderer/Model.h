@@ -20,7 +20,10 @@ private:
 
   Material *material;
 
-  size_t indicesOffset = 0;
+  unsigned int indiceOffset = 0;
+  unsigned int vertexOffset = 0;
+  unsigned int instanceOffset = 0;
+
   std::unordered_map<std::string, InstanceManager> instanceManagers;
 
 private:
@@ -39,11 +42,15 @@ public:
 
   InstanceManager *getInstanceManager(const std::string &name);
 
-  const void setIndicesOffset(size_t offset);
+  const void setIndiceOffset(unsigned int offset);
+  const void setVertexOffset(unsigned int offset);
+  const void setInstanceOffset(unsigned int offset);
 
-  const size_t getIndicesOffset() const;
+  const unsigned int getIndiceOffset() const;
+  const unsigned int getVertexOffset() const;
+  const unsigned int getInstanceOffset() const;
 
-  const size_t getInstancesCount();
+  const size_t getInstancesCount() const;
 
   const std::vector<Vertex> getVertices() const;
 

@@ -24,10 +24,7 @@ void Model::addTexture(Texture *texture)
 void Model::bindTextures() const
 {
   for (size_t i = 0; i < textures.size(); i++)
-  {
-    glActiveTexture(GL_TEXTURE0 + i);
-    textures[i]->bind();
-  }
+    textures[i]->bind(i);
 }
 
 std::vector<InstanceManager *> Model::getInstanceManagers()
@@ -45,17 +42,37 @@ InstanceManager *Model::getInstanceManager(const std::string &name)
   return &instanceManagers[name];
 }
 
-const void Model::setIndicesOffset(size_t size)
+const void Model::setIndiceOffset(unsigned int offset)
 {
-  indicesOffset = size;
+  indiceOffset = offset;
 }
 
-const size_t Model::getIndicesOffset() const
+const void Model::setVertexOffset(unsigned int offset)
 {
-  return indicesOffset;
+  vertexOffset = offset;
 }
 
-const size_t Model::getInstancesCount()
+const void Model::setInstanceOffset(unsigned int offset)
+{
+  instanceOffset = offset;
+}
+
+const unsigned int Model::getIndiceOffset() const
+{
+  return indiceOffset;
+}
+
+const unsigned int Model::getVertexOffset() const
+{
+  return vertexOffset;
+}
+
+const unsigned int Model::getInstanceOffset() const
+{
+  return instanceOffset;
+}
+
+const size_t Model::getInstancesCount() const
 {
   return instanceManagers.size();
 }
@@ -84,7 +101,7 @@ const std::vector<unsigned int> Model::getIndices() const
   std::vector<unsigned int> indices;
 
   size_t count = 0;
-  
+
   for (const auto &mesh : meshes)
     count += mesh.getIndices().size();
 

@@ -126,4 +126,25 @@ public:
    * @return The OpenGL ID of the buffer.
    */
   unsigned int get() const;
+
+  /**
+   * @returns the size of the buffer object in bytes.
+   */
+  int getBufferSize() const;
+
+  /**
+   * @returns the data in the buffer.
+   */
+  template <typename T>
+  std::vector<T> getBufferData() const
+  {
+    const int size = getBufferSize();
+    const int items = size / sizeof(T);
+
+    std::vector<T> data(items);
+
+    glGetBufferSubData((unsigned int)target, 0, size, data.data());
+
+    return data;
+  };
 };

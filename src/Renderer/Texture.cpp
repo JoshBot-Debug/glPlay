@@ -63,10 +63,12 @@ void Texture::setBorderColor(float color[4]) const
   glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, color);
 }
 
-void Texture::bind() const
+void Texture::bind(int activate) const
 {
   if (texture == 0)
     return;
+  if (activate > -1)
+    glActiveTexture(GL_TEXTURE0 + activate);
   glBindTexture(GL_TEXTURE_2D, texture);
 }
 

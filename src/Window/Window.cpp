@@ -38,6 +38,9 @@ void Window::open()
 
   glfwShowWindow(window);
 
+  if (options.maximized)
+    glfwMaximizeWindow(window);
+
   while (!glfwWindowShouldClose(window))
   {
     if (glfwGetWindowAttrib(window, GLFW_ICONIFIED) != 0)
@@ -79,7 +82,7 @@ void Window::setFrameBufferSize(GLFWwindow *window, int w, int h)
   dimensions.y = h;
 }
 
-Window::Window(const WindowOptions &options)
+Window::Window(const WindowOptions &options): options(options)
 {
   glfwSetErrorCallback(errorCallback);
 

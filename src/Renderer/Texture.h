@@ -37,6 +37,6 @@ public:
   void setMipmapLevel(int base, int max) const;
   void setBorderColor(float color[4]) const;
 
-  void bind() const;
+  void bind(int activate = -1) const;
   void unbind() const;
 };

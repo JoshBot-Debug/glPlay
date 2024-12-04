@@ -12,13 +12,13 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
-const WindowOptions options = {.title = "glPlay", .width = 800, .height = 600, .enableDepth = true, .enableVSync = true, .MSAA = 16, .imguiEnableDocking = true, .maximized = true};
+const WindowOptions opts = {.title = "glPlay", .width = 800, .height = 600, .enableDepth = true, .enableVSync = true, .MSAA = 16, .imguiEnableDocking = true, .maximized = true};
 
 /**
  * TODO need to add a ViewportManager class that holds all this information\
  * so that it can be edited/controlled from all menus and property panels.
  */
-App::App() : Window(options)
+App::App() : Window(opts)
 {
   /**
    * Setup a camera
@@ -81,8 +81,8 @@ App::App() : Window(options)
    */
   renderer.setCamera(&camera);
   // renderer.addLight(light);
-  renderer.addModel(cube);
   renderer.addModel(sphere);
+  renderer.addModel(cube);
   renderer.addShaderProgram(shaderProgram);
 
   Instance &i1 = renderer.add<Instance>("sphere", "i1");

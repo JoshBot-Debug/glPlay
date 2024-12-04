@@ -33,6 +33,8 @@ class Window : Scene
 private:
   GLFWwindow *window;
 
+  const WindowOptions &options;
+
   static glm::ivec2 dimensions;
 
   static void setFrameBufferSize(GLFWwindow *window, int w, int h);

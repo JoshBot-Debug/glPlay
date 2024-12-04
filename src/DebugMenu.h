@@ -79,9 +79,10 @@ public:
 
       ImGui::SeparatorText("Color");
 
-      ImGui::DragFloat("Color X", &instance->color.x, 0.1f, 0.0f, 1.0f);
-      ImGui::DragFloat("Color Y", &instance->color.y, 0.1f, 0.0f, 1.0f);
-      ImGui::DragFloat("Color Z", &instance->color.z, 0.1f, 0.0f, 1.0f);
+      ImGui::DragFloat("Color R", &instance->color.r, 0.1f, 0.0f, 1.0f);
+      ImGui::DragFloat("Color G", &instance->color.g, 0.1f, 0.0f, 1.0f);
+      ImGui::DragFloat("Color B", &instance->color.b, 0.1f, 0.0f, 1.0f);
+      ImGui::DragFloat("Color A", &instance->color.a, 0.1f, 0.0f, 1.0f);
 
       ImGui::End();
     }

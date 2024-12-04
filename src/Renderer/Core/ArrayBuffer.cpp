@@ -66,3 +66,13 @@ void ArrayBuffer::bind() const { glBindBuffer((unsigned int)target, buffer); }
 void ArrayBuffer::unbind() const { glBindBuffer((unsigned int)target, 0); }
 
 unsigned int ArrayBuffer::get() const { return buffer; }
+
+int ArrayBuffer::getBufferSize() const
+{
+  glBindBuffer((unsigned int)target, buffer);
+
+  int size = 0;
+  glGetBufferParameteriv((unsigned int)target, GL_BUFFER_SIZE, &size);
+
+  return size;
+}
