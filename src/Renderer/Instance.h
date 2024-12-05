@@ -4,9 +4,9 @@
 #include <glm/gtx/transform.hpp>
 
 struct Instance {
-  glm::vec3 translate = glm::vec3(0.0f, 0.0f, 0.0f);
+  glm::vec3 translate = glm::vec3(0.0f);
 
-  glm::vec3 rotation = glm::vec3(0.0f, 0.0f, 0.0f);
+  glm::vec3 rotation = glm::vec3(0.0f);
 
   glm::vec3 scale = glm::vec3(1.0f);
 

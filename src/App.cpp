@@ -1,10 +1,4 @@
 #include "App.h"
-#include "Renderer/Shader.h"
-#include "Renderer/Camera.h"
-#include "Renderer/Model.h"
-#include "Renderer/Shader.h"
-#include "Renderer/Texture.h"
-#include "Renderer/Material.h"
 #include "Window/Input.h"
 #include "Window/Time.h"
 

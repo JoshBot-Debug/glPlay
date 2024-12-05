@@ -147,8 +147,8 @@ void Renderer::draw(const Primitive &primitive)
   std::vector<unsigned int> square(eboData.begin() + 2880, eboData.begin() + 2916);
   std::vector<unsigned int> circle(eboData.begin(), eboData.begin() + 2880);
 
-  // glDrawElementsInstancedBaseVertexBaseInstance((unsigned int)primitive, 2880, GL_UNSIGNED_INT, (const void *)(0 * sizeof(unsigned int)), 2, 0, 0);
-  glDrawElementsInstancedBaseVertexBaseInstance((unsigned int)primitive, 36, GL_UNSIGNED_INT, (const void *)(2880 * sizeof(unsigned int)), 2, 1984, 0);
+  glDrawElementsInstancedBaseVertexBaseInstance((unsigned int)primitive, 2880, GL_UNSIGNED_INT, (const void *)(0 * sizeof(unsigned int)), 1, 0, 0);
+  glDrawElementsInstancedBaseVertexBaseInstance((unsigned int)primitive, 36, GL_UNSIGNED_INT, (const void *)(2880 * sizeof(unsigned int)), 1, 1984, 1);
 
   // glDrawElementsInstancedBaseVertex((unsigned int)primitive, 36, GL_UNSIGNED_INT, (const void *)(2880 * sizeof(unsigned int)), 1, 1984);
   // glDrawElementsInstancedBaseVertex((unsigned int)primitive, 2880, GL_UNSIGNED_INT, (const void *)(0 * sizeof(unsigned int)), 1, 0);

@@ -5,7 +5,6 @@
 
 #include <GL/glew.h>
 
-#include "Camera.h"
 #include "Model.h"
 #include "Camera.h"
 #include "Shader.h"

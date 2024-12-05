@@ -82,7 +82,7 @@ void Window::setFrameBufferSize(GLFWwindow *window, int w, int h)
   dimensions.y = h;
 }
 
-Window::Window(const WindowOptions &options): options(options)
+Window::Window(const WindowOptions &options) : options(options)
 {
   glfwSetErrorCallback(errorCallback);
 
@@ -127,6 +127,11 @@ Window::Window(const WindowOptions &options): options(options)
 
   if (options.enableDepth)
     glEnable(GL_DEPTH_TEST);
+
+  const GLFWvidmode *screen = glfwGetVideoMode(glfwGetPrimaryMonitor());
+  int windowWidth, windowHeight;
+  glfwGetWindowSize(window, &windowWidth, &windowHeight);
+  glfwSetWindowPos(window, (screen->width - windowWidth) / 2, (screen->height - windowHeight) / 2);
 
   IMGUI_CHECKVERSION();
 
