@@ -1,9 +1,9 @@
 #pragma once
 
+#include <vector>
 #include <glm/gtx/transform.hpp>
 
 struct Instance {
-
   glm::vec3 translate = glm::vec3(0.0f, 0.0f, 0.0f);
 
   glm::vec3 rotation = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -15,7 +15,6 @@ struct Instance {
 
 struct InstanceManager
 {
-  Instance instance; 
-
+  Instance instance;
   unsigned int offset;
 };

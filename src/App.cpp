@@ -1,12 +1,10 @@
 #include "App.h"
 #include "Renderer/Shader.h"
 #include "Renderer/Camera.h"
-#include "Renderer/Light.h"
 #include "Renderer/Model.h"
-#include "Renderer/ShaderProgram.h"
+#include "Renderer/Shader.h"
 #include "Renderer/Texture.h"
 #include "Renderer/Material.h"
-#include "Renderer/FrameBuffer.h"
 #include "Window/Input.h"
 #include "Window/Time.h"
 
@@ -42,21 +40,16 @@ App::App() : Window(opts)
   Model *sphere = new Model("sphere", "assets/model/sphere.fbx");
   Model *cube = new Model("cube", "assets/model/cube-textured.fbx");
 
-  /**
-   * Load all shaders for every purpose
-   */
-  Shader *vShader = new Shader("src/Shader/vertex.glsl", ShaderType::VERTEX_SHADER);
-  Shader *fShader = new Shader("src/Shader/fragment.glsl", ShaderType::FRAGMENT_SHADER);
+  Shader *shader = renderer.getShader();
+
+  unsigned int vertex = shader->compile("src/Shader/vertex.glsl", ShaderType::VERTEX_SHADER);
+  unsigned int fragment = shader->compile("src/Shader/fragment.glsl", ShaderType::FRAGMENT_SHADER);
 
   /**
-   * Create a shader program
-   * We'd create as many different programs as we want
+   * Create a shader program & link some shaders
    */
-  ShaderProgram *shaderProgram = new ShaderProgram();
-  Program *program = shaderProgram->createProgram("default");
-  program->link(vShader);
-  program->link(fShader);
-
+  shader->createProgram("default", {vertex, fragment});
+  
   /**
    * Load all textures
    */
@@ -83,7 +76,6 @@ App::App() : Window(opts)
   // renderer.addLight(light);
   renderer.addModel(sphere);
   renderer.addModel(cube);
-  renderer.addShaderProgram(shaderProgram);
 
   Instance &i1 = renderer.add<Instance>("sphere", "i1");
   Instance &i2 = renderer.add<Instance>("cube", "i2");
@@ -92,7 +84,7 @@ App::App() : Window(opts)
   debugMenu.setCamera(&camera);
   debugMenu.addInstance("i1", &i1);
   debugMenu.addInstance("i2", &i2);
-  debugMenu.addShaderProgram(shaderProgram);
+  debugMenu.addShader(shader);
 
   // Begins the onDraw loop
   open();
@@ -108,8 +100,7 @@ void App::onDraw()
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  ShaderProgram *shader = renderer.getShaderProgram();
-  shader->bind("default");
+  renderer.getShader()->bind("default");
 
   renderer.draw();
 

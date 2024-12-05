@@ -19,7 +19,7 @@ class DebugMenu
 {
 private:
   Camera *camera;
-  ShaderProgram *shaderProgram;
+  Shader *shader;
   std::unordered_map<std::string, Instance *> instances;
 
   glm::vec2 mouse;
@@ -32,9 +32,9 @@ public:
     this->camera = camera;
   }
 
-  void addShaderProgram(ShaderProgram *shaderProgram)
+  void addShader(Shader *shader)
   {
-    this->shaderProgram = shaderProgram;
+    this->shader = shader;
   }
 
   void addInstance(const std::string &name, Instance *instance)
@@ -47,7 +47,7 @@ public:
     ImGui::Begin("Shaders");
 
     if (ImGui::Button("Recompile shaders"))
-      shaderProgram->recompile();
+      shader->recompile();
 
     ImGui::End();
   }
@@ -133,17 +133,17 @@ public:
 
     glm::vec3 translate(0.0f);
 
-    if (Input::KeyPress(KeyboardKey::UP))
-      translate.y += speed * delta;
+    if (Input::KeyPress(KeyboardKey::W))
+      translate.z -= speed * delta;
 
-    if (Input::KeyPress(KeyboardKey::DOWN))
-      translate.y -= speed * delta;
+    if (Input::KeyPress(KeyboardKey::S))
+      translate.z += speed * delta;
 
-    if (Input::KeyPress(KeyboardKey::RIGHT))
-      translate.x += speed * delta;
-
-    if (Input::KeyPress(KeyboardKey::LEFT))
+    if (Input::KeyPress(KeyboardKey::A))
       translate.x -= speed * delta;
+
+    if (Input::KeyPress(KeyboardKey::D))
+      translate.x += speed * delta;
 
     if (Input::KeyPress(MouseButton::LEFT))
     {

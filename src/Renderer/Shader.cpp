@@ -3,7 +3,6 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <string>
 #include <cstring>
 
 #include "Debug.h"
@@ -33,14 +32,15 @@ inline const char *readFile(const std::string &filepath)
   return result;
 }
 
-bool Shader::compile(const std::string &filepath, const ShaderType &type)
+inline unsigned int compileShader(const char *filepath, const ShaderType &type)
 {
   const char *source = readFile(filepath);
 
   if (!source)
-    return false;
+    return 0;
 
-  shader = glCreateShader((unsigned int)type);
+  unsigned int shader = glCreateShader((unsigned int)type);
+
   glShaderSource(shader, 1, &source, nullptr);
   glCompileShader(shader);
 
@@ -62,56 +62,164 @@ bool Shader::compile(const std::string &filepath, const ShaderType &type)
 
     delete[] log;
     glDeleteShader(shader);
-    return false;
+    return 0;
   }
 
   LOG_BREAK_BEFORE;
-  LOG("Shader file:", filepath);
-  LOG("Shader created:", shader);
+  LOG("Shader created:", filepath, " : ", shader);
   LOG_BREAK_AFTER;
 
-  return true;
+  return shader;
 }
 
-Shader::Shader(const std::string &path, const ShaderType &type) : path(path), type(type)
+inline unsigned int createShaderProgram(const std::vector<unsigned int> &link)
 {
-  compile(path, type);
+  unsigned int id = glCreateProgram();
+
+  for (size_t i = 0; i < link.size(); i++)
+    glAttachShader(id, link[i]);
+
+  glLinkProgram(id);
+
+  int success;
+  glGetProgramiv(id, GL_LINK_STATUS, &success);
+
+  if (!success)
+  {
+    int length = 0;
+    glGetProgramiv(id, GL_INFO_LOG_LENGTH, &length);
+
+    std::vector<char> log(length);
+    glGetProgramInfoLog(id, length, &length, log.data());
+
+    LOG_BREAK_BEFORE;
+    LOG("Program linking failed");
+    LOG("ERROR:", log.data());
+    LOG_BREAK_AFTER;
+
+    glDeleteProgram(id);
+    return 0;
+  }
+
+  for (size_t i = 0; i < link.size(); i++)
+    glDeleteShader(link[i]);
+
+  return id;
 }
 
 Shader::~Shader()
 {
-  destroy();
+  glUseProgram(0);
+  program = 0;
+  for (const auto &program : programs)
+    glDeleteProgram(program.second.id);
 }
 
-bool Shader::recompile()
+unsigned int Shader::compile(const char *filepath, const ShaderType &type)
 {
-  LOG_BREAK_BEFORE;
-  LOG("Shader recompile");
-  LOG_BREAK_AFTER;
-  glDeleteShader(shader);
-  return compile(path, type);
+  unsigned int id = compileShader(filepath, type);
+
+  if (id)
+    shaders.emplace_back(id, filepath, type);
+
+  return id;
 }
 
-const unsigned int Shader::getShader()
+void Shader::recompile()
 {
-  return shader;
+  for (auto &program : programs)
+  {
+    std::vector<unsigned int> ids;
+
+    for (auto &file : program.second.shaders)
+    {
+      file->id = compileShader(file->path, file->type);
+      if (file->id)
+        ids.push_back(file->id);
+    }
+
+    program.second.id = createShaderProgram(ids);
+  }
 }
 
-void Shader::destroy()
+unsigned int Shader::createProgram(const std::string &program, const std::vector<unsigned int> &link)
 {
-  if (shader == 0)
+  unsigned int id = createShaderProgram(link);
+
+  std::vector<ShaderFile *> shaderFiles;
+
+  for (size_t i = 0; i < link.size(); i++)
+    for (size_t j = 0; j < shaders.size(); j++)
+      if (shaders[j].id == link[i])
+        shaderFiles.push_back(&shaders[j]);
+
+  programs.emplace(program, Program(id, shaderFiles));
+
+  return id;
+}
+
+void Shader::bind(const std::string &program)
+{
+  glUseProgram(programs[program].id);
+  this->program = programs[program].id;
+}
+
+void Shader::unbind()
+{
+  glUseProgram(0);
+  program = 0;
+}
+
+void Shader::uniform1i(const std::string &name, int location)
+{
+  try
+  {
+    if (!program)
+    {
+      LOG_BREAK_BEFORE;
+      LOG("Error! No shader program bound");
+      LOG("Cannot set uniform", name);
+      LOG_BREAK_AFTER;
+      return;
+    }
+
+    if (!uniforms[name])
+      uniforms[name] = glGetUniformLocation(program, name.c_str());
+
+    glUniform1i(uniforms[name], location);
+  }
+  catch (const std::exception &e)
   {
     LOG_BREAK_BEFORE;
-    LOG("Shader not set (delete skipped):", shader);
+    LOG("Failed to set uniform:", name);
+    LOG("Bound program:", program);
     LOG_BREAK_AFTER;
-    return;
   }
-  
-  glDeleteShader(shader);
+}
 
-  LOG_BREAK_BEFORE;
-  LOG("Shader deleted:", shader);
-  LOG_BREAK_AFTER;
+void Shader::uniformMatrix4fv(const std::string &name, const glm::mat4 &uniform)
+{
+  try
+  {
+    if (!program)
+    {
+      LOG_BREAK_BEFORE;
+      LOG("Error! No shader program bound");
+      LOG("Cannot set uniform", name);
+      LOG_BREAK_AFTER;
+      return;
+    }
 
-  shader = 0;
+    if (!uniforms[name])
+      uniforms[name] = glGetUniformLocation(program, name.c_str());
+
+    glUniformMatrix4fv(uniforms[name], 1, GL_FALSE, &uniform[0][0]);
+  }
+  catch (const std::exception &e)
+  {
+    LOG_BREAK_BEFORE;
+    LOG("Failed to set uniform:", name);
+    LOG("Bound program:", program);
+    LOG_BREAK_AFTER;
+  }
 }

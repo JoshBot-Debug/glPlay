@@ -31,7 +31,7 @@ std::vector<InstanceManager *> Model::getInstanceManagers()
 {
   std::vector<InstanceManager *> ims;
 
-  for (auto &im : instanceManagers)
+  for (auto &im : InstanceManagers)
     ims.push_back(&im.second);
 
   return ims;
@@ -39,42 +39,42 @@ std::vector<InstanceManager *> Model::getInstanceManagers()
 
 InstanceManager *Model::getInstanceManager(const std::string &name)
 {
-  return &instanceManagers[name];
+  return &InstanceManagers[name];
 }
 
 const void Model::setIndiceOffset(unsigned int offset)
 {
-  indiceOffset = offset;
+  this->offset.indice = offset;
 }
 
 const void Model::setVertexOffset(unsigned int offset)
 {
-  vertexOffset = offset;
+  this->offset.vertex = offset;
 }
 
 const void Model::setInstanceOffset(unsigned int offset)
 {
-  instanceOffset = offset;
+  this->offset.instance = offset;
 }
 
 const unsigned int Model::getIndiceOffset() const
 {
-  return indiceOffset;
+  return this->offset.indice;
 }
 
 const unsigned int Model::getVertexOffset() const
 {
-  return vertexOffset;
+  return this->offset.vertex;
 }
 
 const unsigned int Model::getInstanceOffset() const
 {
-  return instanceOffset;
+  return this->offset.instance;
 }
 
-const size_t Model::getInstancesCount() const
+const size_t Model::getInstanceCount() const
 {
-  return instanceManagers.size();
+  return InstanceManagers.size();
 }
 
 const std::vector<Vertex> Model::getVertices() const

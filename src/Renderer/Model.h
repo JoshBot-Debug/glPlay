@@ -9,6 +9,14 @@
 #include "Mesh.h"
 #include "Instance.h"
 
+
+struct BufferOffset
+{
+  unsigned int vertex = 0;   // The offset in the vertex array buffer where the data begins
+  unsigned int indice = 0;   // The offset in the element array buffer where the data begins
+  unsigned int instance = 0; // The offset in the instance vertex array buffer where the data begins
+};
+
 class Model
 {
 private:
@@ -20,11 +28,9 @@ private:
 
   Material *material;
 
-  unsigned int indiceOffset = 0;
-  unsigned int vertexOffset = 0;
-  unsigned int instanceOffset = 0;
+  BufferOffset offset; // The offsets of the data in all buffers
 
-  std::unordered_map<std::string, InstanceManager> instanceManagers;
+  std::unordered_map<std::string, InstanceManager> InstanceManagers;
 
 private:
   void loadFBX(const std::string &filename, std::vector<Mesh> &meshes);
@@ -50,7 +56,7 @@ public:
   const unsigned int getVertexOffset() const;
   const unsigned int getInstanceOffset() const;
 
-  const size_t getInstancesCount() const;
+  const size_t getInstanceCount() const;
 
   const std::vector<Vertex> getVertices() const;
 

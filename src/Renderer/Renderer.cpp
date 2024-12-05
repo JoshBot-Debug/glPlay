@@ -35,10 +35,6 @@ void Renderer::setCamera(Camera *camera)
   this->camera = camera;
 }
 
-void Renderer::addLight(Light *light)
-{
-}
-
 void Renderer::addModel(Model *model)
 {
   vao.bind();
@@ -80,31 +76,28 @@ void Renderer::addModel(Model *model)
   model->setVertexOffset(vertexOffset);
 }
 
-void Renderer::addShaderProgram(ShaderProgram *shaderProgram)
-{
-  shader = shaderProgram;
-}
-
 template <>
 Instance &Renderer::add<Instance>(const std::string &modelName, const std::string &name)
 {
   Model *model = models[modelName];
+  // model->setInstanceOffset();
+  
   InstanceManager *iManager = model->getInstanceManager(name);
-  iManager->offset = (nextInstanceOffset += 1);
+  iManager->offset = iboInfo.count;
 
-  // TODO max instances is doubled every time it's resized, not a greate idea but it works for now
-  if ((nextInstanceOffset + 1) >= maxInstances)
+  // TODO max instances is doubled every time it's resized, not a great idea but it works for now
+  if ((iboInfo.count += 1) >= iboInfo.reservedCount)
   {
     LOG_BREAK_BEFORE;
     LOG("Resizing instance vertex buffer");
     LOG("Name:", name);
-    LOG("Previous max instances:", maxInstances);
-    LOG("Previous max instances size:", maxInstances * sizeof(Instance));
+    LOG("Previous max instances:", iboInfo.reservedCount);
+    LOG("Previous max instances size:", iboInfo.reservedCount * sizeof(Instance));
 
-    ibo.resize((maxInstances *= 2) * sizeof(Instance), VertexDraw::DYNAMIC);
+    ibo.resize((iboInfo.reservedCount *= 2) * sizeof(Instance), VertexDraw::DYNAMIC);
 
-    LOG("Max instances:", maxInstances);
-    LOG("Max instances size:", maxInstances * sizeof(Instance));
+    LOG("Max instances:", iboInfo.reservedCount);
+    LOG("Max instances size:", iboInfo.reservedCount * sizeof(Instance));
     LOG_BREAK_AFTER;
 
     vao.bind();
@@ -131,7 +124,7 @@ void Renderer::update()
   const auto &dimensions = Window::GetDimensions();
   camera->setSize(dimensions.x, dimensions.y);
 
-  shader->uniformMatrix4fv("u_ViewProjection", camera->getViewProjectionMatrix());
+  shader.uniformMatrix4fv("u_ViewProjection", camera->getViewProjectionMatrix());
 
   // TODO Need to do a dirty check here
   // And do all the updates in one call
@@ -147,9 +140,9 @@ void Renderer::draw(const Primitive &primitive)
   const int eboSize = ebo.getBufferSize();
   const std::vector<unsigned int> eboData = ebo.getBufferData<unsigned int>();
 
-  LOG_BREAK_BEFORE;
-  LOG("EBO Size:", eboSize);
-  LOG("EBO data.size:", eboData.size());
+  // LOG_BREAK_BEFORE;
+  // LOG("EBO Size:", eboSize);
+  // LOG("EBO data.size:", eboData.size());
 
   std::vector<unsigned int> square(eboData.begin() + 2880, eboData.begin() + 2916);
   std::vector<unsigned int> circle(eboData.begin(), eboData.begin() + 2880);
@@ -179,16 +172,16 @@ void Renderer::draw(const Primitive &primitive)
   const int iboSize = ibo.getBufferSize();
   const std::vector<float> iboData = ibo.getBufferData<float>();
 
-  LOG("IBO Size:", iboSize);
-  LOG("IBO data.size:", iboData.size());
+  // LOG("IBO Size:", iboSize);
+  // LOG("IBO data.size:", iboData.size());
 
   // for (size_t i = 0; i < iboData.size() / 2; i++)
   //   LOG("IBO v", i + 1, ":", iboData[i]);
 
-  LOG_BREAK_AFTER;
+  // LOG_BREAK_AFTER;
 }
 
-ShaderProgram *Renderer::getShaderProgram()
+Shader *Renderer::getShader()
 {
-  return shader;
+  return &shader;
 }

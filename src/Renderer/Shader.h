@@ -1,7 +1,10 @@
 #pragma once
 
 #include <GL/glew.h>
+#include <glm/glm.hpp>
+#include <vector>
 #include <string>
+#include <unordered_map>
 
 enum class ShaderType : unsigned int
 {
@@ -9,23 +12,42 @@ enum class ShaderType : unsigned int
   FRAGMENT_SHADER = GL_FRAGMENT_SHADER
 };
 
+struct ShaderFile
+{
+  unsigned int id;
+  const char *path;
+  const ShaderType type;
+};
+
+struct Program
+{
+  unsigned int id;
+  std::vector<ShaderFile *> shaders;
+};
+
 class Shader
 {
 private:
-  unsigned int shader = 0;
-  const ShaderType type;
-  const std::string path;
+  unsigned int program = 0;
 
-  bool compile(const std::string &filepath, const ShaderType &type);
+  std::vector<ShaderFile> shaders;
+  std::unordered_map<std::string, unsigned int> uniforms;
+  std::unordered_map<std::string, Program> programs;
 
 public:
-  Shader(const std::string &filepath, const ShaderType &type);
-
   ~Shader();
 
-  bool recompile();
+  unsigned int compile(const char *filepath, const ShaderType &type);
 
-  const unsigned int getShader();
+  void recompile();
 
-  void destroy();
+  unsigned int createProgram(const std::string &program, const std::vector<unsigned int> &link);
+
+  void bind(const std::string &program);
+
+  void unbind();
+
+  void uniform1i(const std::string &name, int location);
+
+  void uniformMatrix4fv(const std::string &name, const glm::mat4 &uniform);
 };

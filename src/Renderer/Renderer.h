@@ -6,21 +6,25 @@
 #include <GL/glew.h>
 
 #include "Camera.h"
-#include "Light.h"
 #include "Model.h"
 #include "Camera.h"
-#include "ShaderProgram.h"
-#include "FrameBuffer.h"
+#include "Shader.h"
 #include "Instance.h"
 #include "Core/VertexArray.h"
 #include "Core/ArrayBuffer.h"
 #include "Core/Common.h"
 
+struct IBOInfo
+{
+  unsigned int count = 0;         // The number of instances in the buffer
+  unsigned int reservedCount = 1; // The number of instances space reserved in the buffer
+};
+
 class Renderer
 {
 private:
   Camera *camera;
-  ShaderProgram *shader;
+  Shader shader;
   std::unordered_map<std::string, Model *> models;
 
   VertexArray vao; // Vertext array
@@ -28,10 +32,7 @@ private:
   ArrayBuffer ebo; // Element buffer
   ArrayBuffer ibo; // Instance buffer
 
-  size_t maxInstances = 1;       // The number of indices to draw
-  size_t nextInstanceOffset = -1; // The next offset in the instance vertex buffer
-  size_t nextIndicesOffset = 0; // The next offset in the instance vertex buffer
-  size_t nextVerticesOffset = 0; // The next offset in the instance vertex buffer
+  IBOInfo iboInfo;
 
 private:
   void update();
@@ -42,9 +43,7 @@ public:
 
   void setCamera(Camera *camera);
 
-  void addLight(Light *light);
   void addModel(Model *model);
-  void addShaderProgram(ShaderProgram *shaderProgram);
 
   template <typename T>
   T &add(const std::string &model, const std::string &name);
@@ -54,5 +53,5 @@ public:
 
   void draw(const Primitive &primitive = Primitive::TRIANGLES);
 
-  ShaderProgram *getShaderProgram();
+  Shader *getShader();
 };
