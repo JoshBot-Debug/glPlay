@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include <unordered_map>
+#include <vector>
 
 #include <GL/glew.h>
 
@@ -24,7 +24,7 @@ class Renderer
 private:
   Camera *camera;
   Shader shader;
-  std::unordered_map<std::string, Model *> models;
+  std::vector<Model *> models;
 
   VertexArray vao; // Vertext array
   ArrayBuffer vbo; // Vertext buffer
@@ -43,12 +43,6 @@ public:
   void setCamera(Camera *camera);
 
   void addModel(Model *model);
-
-  template <typename T>
-  T &add(const std::string &model, const std::string &name);
-
-  template <typename T>
-  T &get(const std::string &model, const std::string &name);
 
   void draw(const Primitive &primitive = Primitive::TRIANGLES);
 

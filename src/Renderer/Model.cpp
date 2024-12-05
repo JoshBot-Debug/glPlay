@@ -6,7 +6,7 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-Model::Model(const std::string &name, const std::string &path) : name(name), path(path)
+Model::Model(const std::string &path) : path(path)
 {
   loadFBX(path, meshes);
 }
@@ -114,11 +114,6 @@ const std::vector<unsigned int> Model::getIndices() const
   }
 
   return indices;
-}
-
-const std::string &Model::getName() const
-{
-  return name;
 }
 
 void Model::loadFBX(const std::string &path, std::vector<Mesh> &meshes)

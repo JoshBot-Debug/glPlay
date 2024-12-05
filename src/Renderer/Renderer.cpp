@@ -39,19 +39,18 @@ void Renderer::addModel(Model *model)
 {
   vao.bind();
 
-  models.insert({model->getName(), model});
+  models.push_back(model);
 
   size_t vCount = 0;
   size_t iCount = 0;
 
-  for (const auto &pair : models)
+  for (const auto &model : models)
   {
-    vCount += pair.second->getVertices().size();
-    iCount += pair.second->getIndices().size();
+    vCount += model->getVertices().size();
+    iCount += model->getIndices().size();
   }
 
   LOG_BREAK_BEFORE;
-  LOG("Model:", model->getName());
   LOG("Vertices:", vCount);
   LOG("Indices:", iCount);
   LOG("Vertex size:", sizeof(Vertex));
@@ -76,48 +75,43 @@ void Renderer::addModel(Model *model)
   model->setVertexOffset(vertexOffset);
 }
 
-template <>
-Instance &Renderer::add<Instance>(const std::string &modelName, const std::string &name)
-{
-  Model *model = models[modelName];
-  // model->setInstanceOffset();
+// template <>
+// Instance &Renderer::add<Instance>(const std::string &modelName, const std::string &name)
+// {
+//   Model *model = models[modelName];
+//   // model->setInstanceOffset();
   
-  InstanceManager *iManager = model->getInstanceManager(name);
-  iManager->offset = iboInfo.count;
+//   InstanceManager *iManager = model->getInstanceManager(name);
+//   iManager->offset = iboInfo.count;
 
-  // TODO max instances is doubled every time it's resized, not a great idea but it works for now
-  if ((iboInfo.count += 1) >= iboInfo.reservedCount)
-  {
-    LOG_BREAK_BEFORE;
-    LOG("Resizing instance vertex buffer");
-    LOG("Name:", name);
-    LOG("Previous max instances:", iboInfo.reservedCount);
-    LOG("Previous max instances size:", iboInfo.reservedCount * sizeof(Instance));
+//   // TODO max instances is doubled every time it's resized, not a great idea but it works for now
+//   if ((iboInfo.count += 1) >= iboInfo.reservedCount)
+//   {
+//     LOG_BREAK_BEFORE;
+//     LOG("Resizing instance vertex buffer");
+//     LOG("Name:", name);
+//     LOG("Previous max instances:", iboInfo.reservedCount);
+//     LOG("Previous max instances size:", iboInfo.reservedCount * sizeof(Instance));
 
-    ibo.resize((iboInfo.reservedCount *= 2) * sizeof(Instance), VertexDraw::DYNAMIC);
+//     ibo.resize((iboInfo.reservedCount *= 2) * sizeof(Instance), VertexDraw::DYNAMIC);
 
-    LOG("Max instances:", iboInfo.reservedCount);
-    LOG("Max instances size:", iboInfo.reservedCount * sizeof(Instance));
-    LOG_BREAK_AFTER;
+//     LOG("Max instances:", iboInfo.reservedCount);
+//     LOG("Max instances size:", iboInfo.reservedCount * sizeof(Instance));
+//     LOG_BREAK_AFTER;
 
-    vao.bind();
-    vao.set(3, 3, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, translate), 1);
-    vao.set(4, 3, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, rotation), 1);
-    vao.set(5, 3, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, scale), 1);
-    vao.set(6, 4, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, color), 1);
-  }
+//     vao.bind();
+//     vao.set(3, 3, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, translate), 1);
+//     vao.set(4, 3, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, rotation), 1);
+//     vao.set(5, 3, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, scale), 1);
+//     vao.set(6, 4, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, color), 1);
+//   }
 
-  ibo.update(iManager->offset * sizeof(Instance), sizeof(iManager->instance), &iManager->instance);
-  // model->setInstanceOffset();
+//   ibo.update(iManager->offset * sizeof(Instance), sizeof(iManager->instance), &iManager->instance);
+//   // model->setInstanceOffset();
 
-  return iManager->instance;
-}
+//   return iManager->instance;
+// }
 
-template <>
-Instance &Renderer::get<Instance>(const std::string &model, const std::string &name)
-{
-  return models[model]->getInstanceManager(name)->instance;
-}
 
 void Renderer::update()
 {
@@ -128,8 +122,8 @@ void Renderer::update()
 
   // TODO Need to do a dirty check here
   // And do all the updates in one call
-  for (const auto &pair : models)
-    for (const auto &im : pair.second->getInstanceManagers())
+  for (const auto &model : models)
+    for (const auto &im : model->getInstanceManagers())
       ibo.update(im->offset * sizeof(Instance), sizeof(im->instance), &im->instance);
 }
 
@@ -156,9 +150,8 @@ void Renderer::draw(const Primitive &primitive)
   // for (size_t i = 0; i < eboData.size(); i++)
   //   LOG("EBO v", i + 1, ":", eboData[i]);
 
-  for (const auto &pair : models)
+  for (const auto &model : models)
   {
-    Model *model = pair.second;
     model->bindTextures();
 
     // glDrawElementsInstancedBaseVertex((unsigned int)primitive, model->getIndices().size(), GL_UNSIGNED_INT, (const void *)(model->getIndiceOffset() * sizeof(unsigned int)), model->getInstancesCount(), model->getVertexOffset());

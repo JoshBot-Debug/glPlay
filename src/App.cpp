@@ -31,8 +31,8 @@ App::App() : Window(opts)
   /**
    * Load the model foo
    */
-  Model *sphere = new Model("sphere", "assets/model/sphere.fbx");
-  Model *cube = new Model("cube", "assets/model/cube-textured.fbx");
+  Model *sphere = new Model("assets/model/sphere.fbx");
+  Model *cube = new Model("assets/model/cube-textured.fbx");
 
   Shader *shader = renderer.getShader();
 
@@ -71,13 +71,13 @@ App::App() : Window(opts)
   renderer.addModel(sphere);
   renderer.addModel(cube);
 
-  Instance &i1 = renderer.add<Instance>("sphere", "i1");
-  Instance &i2 = renderer.add<Instance>("cube", "i2");
-  i2.translate.x = 6.0f;
+  // Instance &i1 = renderer.add<Instance>("sphere", "i1");
+  // Instance &i2 = renderer.add<Instance>("cube", "i2");
+  // i2.translate.x = 6.0f;
 
   debugMenu.setCamera(&camera);
-  debugMenu.addInstance("i1", &i1);
-  debugMenu.addInstance("i2", &i2);
+  // debugMenu.addInstance("i1", &i1);
+  // debugMenu.addInstance("i2", &i2);
   debugMenu.addShader(shader);
 
   // Begins the onDraw loop
