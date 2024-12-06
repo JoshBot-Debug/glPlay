@@ -45,7 +45,7 @@ public:
    *
    * @returns The ID of the compiled shader.
    */
-  unsigned int compile(const char *filepath, const ShaderType &type);
+  const unsigned int compile(const char *filepath, const ShaderType &type);
 
   /**
    * Recompiles the currently loaded shader. Typically used when the shader file
@@ -60,7 +60,7 @@ public:
    *
    * @returns An ID that can be used to bind the program
    */
-  unsigned int createProgram(const std::vector<unsigned int> &link);
+  const unsigned int createProgram(const std::vector<unsigned int> &link);
 
   /**
    * Binds the specified shader program to the OpenGL pipeline.

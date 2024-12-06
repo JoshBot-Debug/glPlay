@@ -85,7 +85,10 @@ App::App() : Window(opts)
 
 void App::onUpdate()
 {
+  engine.getCamera<Camera>()->setViewportSize(Window::GetDimensions());
+
   engine.update();
+
   // debugMenu.update();
 }
 
@@ -95,6 +98,8 @@ void App::onDraw()
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   engine.getShader()->bind(0);
+
+  engine.begin();
 
   engine.draw();
 

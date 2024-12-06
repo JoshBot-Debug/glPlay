@@ -24,6 +24,12 @@ void PerspectiveCamera::update()
   projection = glm::perspective(glm::radians(fov), width / height, nearPlane, farPlane);
 }
 
+void PerspectiveCamera::setViewportSize(const glm::vec2 &size)
+{
+  this->width = width;
+  this->height = height;
+}
+
 void PerspectiveCamera::setViewportSize(float width, float height)
 {
   this->width = width;

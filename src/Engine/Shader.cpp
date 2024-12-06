@@ -113,7 +113,7 @@ Shader::~Shader()
     glDeleteProgram(program.id);
 }
 
-unsigned int Shader::compile(const char *filepath, const ShaderType &type)
+const unsigned int Shader::compile(const char *filepath, const ShaderType &type)
 {
   unsigned int id = compileShader(filepath, type);
 
@@ -137,7 +137,7 @@ void Shader::recompile()
   program->id = createShaderProgram(ids);
 }
 
-unsigned int Shader::createProgram(const std::vector<unsigned int> &link)
+const unsigned int Shader::createProgram(const std::vector<unsigned int> &link)
 {
   unsigned int id = createShaderProgram(link);
 

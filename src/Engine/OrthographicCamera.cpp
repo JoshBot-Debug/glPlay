@@ -17,6 +17,13 @@ void OrthographicCamera::update()
   view = glm::rotate(view, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 }
 
+
+void OrthographicCamera::setViewportSize(const glm::vec2 &size)
+{
+  this->width = size.x;
+  this->height = size.y;
+}
+
 void OrthographicCamera::setViewportSize(float width, float height)
 {
   this->width = width;
@@ -55,13 +62,6 @@ void OrthographicCamera::rotate(float deltaPitch, float deltaYaw, float deltaRol
   rotation.x += deltaPitch;
   rotation.y += deltaYaw;
   rotation.z += deltaRoll;
-}
-
-void OrthographicCamera::setProjection(float fov, float nearPlane, float farPlane)
-{
-  this->fov = fov;
-  this->nearPlane = nearPlane;
-  this->farPlane = farPlane;
 }
 
 const glm::mat4 OrthographicCamera::getViewProjectionMatrix() const

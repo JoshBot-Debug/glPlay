@@ -21,7 +21,7 @@ private:
   std::vector<Texture2D *> textures;
 
 public:
-  Engine(): shader(new Shader()) {};
+  Engine() : shader(new Shader()) {};
 
   ~Engine()
   {
@@ -64,7 +64,7 @@ public:
   template <typename T>
   T *getCamera()
   {
-    return camera;
+    return dynamic_cast<T *>(camera);
   }
 
   /**
@@ -151,7 +151,18 @@ public:
     return materials;
   }
 
-  void update() { renderer.update(camera); };
+  void update() {
+    // TODO Need to do a dirty check here
+    // And do all the updates in one call
+    // for (const auto &model : models)
+    //   for (const auto &im : model->getInstanceManagers())
+    //     ibo.update(im->offset * sizeof(Instance), sizeof(im->instance), &im->instance);
+  };
+
+  void begin()
+  {
+    shader->setUniformMatrix4fv("u_ViewProjection", camera->getViewProjectionMatrix());
+  };
 
   void draw(const Primitive &primitive = Primitive::TRIANGLES) { renderer.draw(primitive); };
 };

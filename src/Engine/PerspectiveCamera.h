@@ -25,21 +25,23 @@ public:
   float farPlane = 100.0f;
   float nearPlane = 0.1f;
 
-  void update();
+  void update() override;
+
+  void setViewportSize(const glm::vec2 &size) override;
 
   void setViewportSize(float width, float height) override;
 
-  void setOffset(float offsetX, float offsetY);
+  void setOffset(float offsetX, float offsetY) override;
 
-  void setPosition(float x, float y, float z);
+  void setPosition(float x, float y, float z) override;
 
-  void setRotation(float pitch, float yaw, float roll);
+  void setRotation(float pitch, float yaw, float roll) override;
 
   void setProjection(float fov, float nearPlane, float farPlane);
 
-  void translate(float deltaX, float deltaY, float deltaZ);
+  void translate(float deltaX, float deltaY, float deltaZ) override;
 
-  void rotate(float deltaPitch, float deltaYaw, float deltaRoll);
+  void rotate(float deltaPitch, float deltaYaw, float deltaRoll) override;
 
   const glm::mat4 getViewProjectionMatrix() const override;
 };

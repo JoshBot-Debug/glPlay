@@ -37,7 +37,5 @@ public:
 
   ~Renderer() {}
 
-  void update(Camera *camera) {};
-
   void draw(const Primitive &primitive = Primitive::TRIANGLES) {};
 };
