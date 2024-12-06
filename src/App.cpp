@@ -2,6 +2,11 @@
 #include "Window/Input.h"
 #include "Window/Time.h"
 
+#include "Engine/Camera/PerspectiveCamera.h"
+#include "Engine/Shader/Shader.h"
+
+#include "Engine/Core/ArrayBuffer.h"
+
 #include <glm/gtc/matrix_transform.hpp>
 
 const WindowOptions opts = {.title = "glPlay", .width = 800, .height = 600, .enableDepth = true, .enableVSync = true, .MSAA = 16, .imguiEnableDocking = true, .maximized = true};
@@ -12,14 +17,15 @@ const WindowOptions opts = {.title = "glPlay", .width = 800, .height = 600, .ena
  */
 App::App() : Window(opts)
 {
+  // PerspectiveCamera *camera = engine.createCamera<PerspectiveCamera>();
+
   /**
    * Setup a camera
    * Specify the type, and other properties.
    */
-  camera.setType(CameraType::Perspective);
-  camera.setOffset(0.5f, 0.5f);
-  camera.setPosition(2.0f, 2.0f, 10.0f);
-  camera.setRotation(10.0f, 0.0f, 0.0f);
+  // camera->setOffset(0.5f, 0.5f);
+  // camera->setPosition(2.0f, 2.0f, 10.0f);
+  // camera->setRotation(10.0f, 0.0f, 0.0f);
 
   /**
    * Setup a light source
@@ -31,24 +37,21 @@ App::App() : Window(opts)
   /**
    * Load the model foo
    */
-  Model *sphere = new Model("assets/model/sphere.fbx");
-  Model *cube = new Model("assets/model/cube-textured.fbx");
+  // Model *sphere = new Model("assets/model/sphere.fbx");
+  // Model *cube = new Model("assets/model/cube-textured.fbx");
 
-  Shader *shader = renderer.getShader();
+  // Shader *shader = engine.getShader();
 
-  unsigned int vertex = shader->compile("src/Shader/vertex.glsl", ShaderType::VERTEX_SHADER);
-  unsigned int fragment = shader->compile("src/Shader/fragment.glsl", ShaderType::FRAGMENT_SHADER);
+  // unsigned int vertex = shader->compile("src/Shader/vertex.glsl", ShaderType::VERTEX_SHADER);
+  // unsigned int fragment = shader->compile("src/Shader/fragment.glsl", ShaderType::FRAGMENT_SHADER);
 
-  /**
-   * Create a shader program & link some shaders
-   */
-  shader->createProgram("default", {vertex, fragment});
-  
+  // shader->createProgram({vertex, fragment});
+
   /**
    * Load all textures
    */
-  Texture *wallTexture = new Texture("wall-texture", "assets/textures/wall.jpg");
-  Texture *brickTexture = new Texture("brick-texture", "assets/textures/brick.jpg");
+  // Texture *wallTexture = new Texture("wall-texture", "assets/textures/wall.jpg");
+  // Texture *brickTexture = new Texture("brick-texture", "assets/textures/brick.jpg");
 
   /**
    * Create all materials
@@ -59,26 +62,30 @@ App::App() : Window(opts)
   // material->setRoughness(0.8f);
   // material->setShininess(32.0f);
 
-  // model->setMaterial(material);
-  sphere->addTexture(brickTexture);
-  cube->addTexture(wallTexture);
+  // Batch *batch = engine.createBatch();
+
+  // Model *sphere = batch->addModel("assets/model/sphere.fbx");
+  // Model *cube = batch->addModel("assets/model/cube-textured.fbx");
+
+  // sphere->setTexture(wallTexture);
+  // cube->setTexture(brickTexture);
 
   /**
    * Setup the renderer
    */
-  renderer.setCamera(&camera);
+  // renderer.setCamera(&camera);
   // renderer.addLight(light);
-  renderer.addModel(sphere);
-  renderer.addModel(cube);
+  // renderer.addModel(sphere);
+  // renderer.addModel(cube);
 
   // Instance &i1 = renderer.add<Instance>("sphere", "i1");
   // Instance &i2 = renderer.add<Instance>("cube", "i2");
   // i2.translate.x = 6.0f;
 
-  debugMenu.setCamera(&camera);
+  // debugMenu.setCamera(camera);
   // debugMenu.addInstance("i1", &i1);
   // debugMenu.addInstance("i2", &i2);
-  debugMenu.addShader(shader);
+  // debugMenu.addShader(shader);
 
   // Begins the onDraw loop
   open();
@@ -86,7 +93,7 @@ App::App() : Window(opts)
 
 void App::onUpdate()
 {
-  debugMenu.update();
+  // debugMenu.update();
 }
 
 void App::onDraw()
@@ -94,9 +101,9 @@ void App::onDraw()
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  renderer.getShader()->bind("default");
+  // engine.getShader()->bind(0);
 
-  renderer.draw();
+  // engine.draw();
 
-  debugMenu.draw();
+  // debugMenu.draw();
 }

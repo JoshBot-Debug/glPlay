@@ -103,12 +103,11 @@ public:
   void update(size_t offset, size_t size, const void *data);
 
   /**
-   * Resizes the buffer and copies the existing data to the new buffer.
+   * Gets the OpenGL ID of the buffer.
    *
-   * @param size The new size for the buffer (in bytes).
-   * @param draw Specifies how the buffer will be used (static, dynamic, etc.). Default is STATIC.
+   * @return The OpenGL ID of the buffer.
    */
-  void resize(size_t size, VertexDraw draw = VertexDraw::STATIC);
+  unsigned int get() const;
 
   /**
    * Binds the buffer.
@@ -119,13 +118,6 @@ public:
    * Unbinds the buffer.
    */
   void unbind() const;
-
-  /**
-   * Gets the OpenGL ID of the buffer.
-   *
-   * @return The OpenGL ID of the buffer.
-   */
-  unsigned int get() const;
 
   /**
    * @returns the size of the buffer object in bytes.
@@ -147,4 +139,12 @@ public:
 
     return data;
   };
+
+  /**
+   * Resizes the buffer and copies the existing data to the new buffer.
+   *
+   * @param size The new size for the buffer (in bytes).
+   * @param draw Specifies how the buffer will be used (static, dynamic, etc.). Default is STATIC.
+   */
+  void resize(size_t size, VertexDraw draw = VertexDraw::STATIC);
 };

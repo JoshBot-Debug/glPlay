@@ -3,16 +3,16 @@
 #include <string>
 #include <vector>
 
-#include "Shader.h"
-#include "Camera.h"
-#include "Model.h"
+#include "Shader/Shader.h"
+#include "Camera/Camera.h"
+#include "Batch/Batch.h"
 
 class Engine
 {
 private:
-  Shader *shader;
+  Shader shader;
   Camera *camera;
-  std::vector<Model> models;
+  std::vector<Batch> batches;
 
 public:
   Engine() = default;
@@ -24,7 +24,7 @@ public:
    * @returns Camera pointer
    */
   template <typename T>
-  const T *createCamera() const
+  T *createCamera()
   {
     static_assert(std::is_base_of<Camera, T>::value, "T must implement the Camera interface.");
     camera = new T();
@@ -32,28 +32,22 @@ public:
   }
 
   /**
-   * Creates an instance of Model and returns the ID
-   * @param T An instance of Model
-   * @returns Model ID
+   * Creates an instance of Batch, used to batch models to together
+   *
+   * @returns A pointer to a Batch
    */
-  template <typename T>
-  const unsigned int createModel() const
+  Batch *createBatch()
   {
-    static_assert(std::is_base_of<Model, T>::value, "T must implement the Model interface.");
-    models.push_back(new T());
-    return models.size() - 1;
+    batches.emplace_back(batches.size());
+    return &batches[batches.size() - 1];
   }
 
   /**
-   * Creates an instance of Model and returns the ID
-   * @param T An instance of Model
-   * @returns Model ID
+   * Get the shader manager to create shader programs
+   * @returns The shader manager
    */
-  template <typename T>
-  const unsigned int createShader() const
+  Shader *getShader()
   {
-    static_assert(std::is_base_of<Shader, T>::value, "T must implement the Shader interface.");
-    shader = new T();
-    return shader;
+    return &shader;
   }
 };

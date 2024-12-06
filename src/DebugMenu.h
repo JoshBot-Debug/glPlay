@@ -5,9 +5,8 @@
 
 #include "Window/Time.h"
 #include "Window/Input.h"
-#include "Renderer/Camera.h"
-#include "Renderer/Instance.h"
-#include "Renderer/Shader.h"
+#include "Engine/Engine.h"
+#include "Engine/Camera/PerspectiveCamera.h"
 #include "imgui.h"
 
 inline const char *cameraTypes[] =
@@ -18,82 +17,79 @@ inline const char *cameraTypes[] =
 class DebugMenu
 {
 private:
-  Camera *camera;
+  PerspectiveCamera *camera;
   Shader *shader;
-  std::unordered_map<std::string, Instance *> instances;
+  // std::unordered_map<std::string, Instance *> instances;
 
   glm::vec2 mouse;
 
 public:
   DebugMenu() {}
 
-  void setCamera(Camera *camera)
-  {
-    this->camera = camera;
-  }
+  // void setCamera(Camera *camera)
+  // {
+  //   this->camera = camera;
+  // }
 
-  void addShader(Shader *shader)
-  {
-    this->shader = shader;
-  }
+  // void addShader(Shader *shader)
+  // {
+  //   this->shader = shader;
+  // }
 
-  void addInstance(const std::string &name, Instance *instance)
-  {
-    this->instances[name] = instance;
-  }
+  // void addInstance(const std::string &name, Instance *instance)
+  // {
+  //   this->instances[name] = instance;
+  // }
 
-  void shaderMenu()
-  {
-    ImGui::Begin("Shaders");
+  // void shaderMenu()
+  // {
+  //   ImGui::Begin("Shaders");
 
-    if (ImGui::Button("Recompile shaders"))
-      shader->recompile();
+  //   if (ImGui::Button("Recompile shaders"))
+  //     shader->recompile();
 
-    ImGui::End();
-  }
+  //   ImGui::End();
+  // }
 
-  void instanceMenu()
-  {
-    for (const auto &pair : instances)
-    {
-      Instance *instance = pair.second;
-      ImGui::Begin(("Instance " + pair.first).c_str());
+  // void instanceMenu()
+  // {
+  //   for (const auto &pair : instances)
+  //   {
+  //     Instance *instance = pair.second;
+  //     ImGui::Begin(("Instance " + pair.first).c_str());
 
-      ImGui::SeparatorText("Translate");
+  //     ImGui::SeparatorText("Translate");
 
-      ImGui::DragFloat("Translate X", &instance->translate.x, 0.1f);
-      ImGui::DragFloat("Translate Y", &instance->translate.y, 0.1f);
-      ImGui::DragFloat("Translate Z", &instance->translate.z, 0.1f);
+  //     ImGui::DragFloat("Translate X", &instance->translate.x, 0.1f);
+  //     ImGui::DragFloat("Translate Y", &instance->translate.y, 0.1f);
+  //     ImGui::DragFloat("Translate Z", &instance->translate.z, 0.1f);
 
-      ImGui::SeparatorText("Rotation");
+  //     ImGui::SeparatorText("Rotation");
 
-      ImGui::DragFloat("Rotation X", &instance->rotation.x, 0.1f);
-      ImGui::DragFloat("Rotation Y", &instance->rotation.y, 0.1f);
-      ImGui::DragFloat("Rotation Z", &instance->rotation.z, 0.1f);
+  //     ImGui::DragFloat("Rotation X", &instance->rotation.x, 0.1f);
+  //     ImGui::DragFloat("Rotation Y", &instance->rotation.y, 0.1f);
+  //     ImGui::DragFloat("Rotation Z", &instance->rotation.z, 0.1f);
 
-      ImGui::SeparatorText("Scale");
+  //     ImGui::SeparatorText("Scale");
 
-      ImGui::DragFloat("Scale X", &instance->scale.x, 0.1f);
-      ImGui::DragFloat("Scale Y", &instance->scale.y, 0.1f);
-      ImGui::DragFloat("Scale Z", &instance->scale.z, 0.1f);
+  //     ImGui::DragFloat("Scale X", &instance->scale.x, 0.1f);
+  //     ImGui::DragFloat("Scale Y", &instance->scale.y, 0.1f);
+  //     ImGui::DragFloat("Scale Z", &instance->scale.z, 0.1f);
 
-      ImGui::SeparatorText("Color");
+  //     ImGui::SeparatorText("Color");
 
-      ImGui::DragFloat("Color R", &instance->color.r, 0.1f, 0.0f, 1.0f);
-      ImGui::DragFloat("Color G", &instance->color.g, 0.1f, 0.0f, 1.0f);
-      ImGui::DragFloat("Color B", &instance->color.b, 0.1f, 0.0f, 1.0f);
-      ImGui::DragFloat("Color A", &instance->color.a, 0.1f, 0.0f, 1.0f);
+  //     ImGui::DragFloat("Color R", &instance->color.r, 0.1f, 0.0f, 1.0f);
+  //     ImGui::DragFloat("Color G", &instance->color.g, 0.1f, 0.0f, 1.0f);
+  //     ImGui::DragFloat("Color B", &instance->color.b, 0.1f, 0.0f, 1.0f);
+  //     ImGui::DragFloat("Color A", &instance->color.a, 0.1f, 0.0f, 1.0f);
 
-      ImGui::End();
-    }
-  }
+  //     ImGui::End();
+  //   }
+  // }
 
   void cameraMenu()
   {
     ImGui::Begin("Camera");
-
-    ImGui::SeparatorText("General");
-    ImGui::Combo("Camera Type", &(int &)camera->type, cameraTypes, IM_ARRAYSIZE(cameraTypes), IM_ARRAYSIZE(cameraTypes));
 
     ImGui::SeparatorText("Position");
 
@@ -160,11 +156,11 @@ public:
   {
     ImGui::Begin("Debug Menu");
 
-    this->shaderMenu();
+    // this->shaderMenu();
 
     this->cameraMenu();
 
-    this->instanceMenu();
+    // this->instanceMenu();
 
     ImGui::End();
   }

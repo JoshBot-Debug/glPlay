@@ -132,7 +132,7 @@ void Renderer::draw(const Primitive &primitive)
   update();
 
   const int eboSize = ebo.getBufferSize();
-  const std::vector<unsigned int> eboData = ebo.getBufferData<unsigned int>();
+  const std::vector<unsigned int> eboData = ebo.getBufferData();
 
   // LOG_BREAK_BEFORE;
   // LOG("EBO Size:", eboSize);
@@ -163,7 +163,7 @@ void Renderer::draw(const Primitive &primitive)
   }
 
   const int iboSize = ibo.getBufferSize();
-  const std::vector<float> iboData = ibo.getBufferData<float>();
+  const std::vector<Instance> iboData = ibo.getBufferData();
 
   // LOG("IBO Size:", iboSize);
   // LOG("IBO data.size:", iboData.size());

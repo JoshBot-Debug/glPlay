@@ -25,6 +25,23 @@ void ArrayBuffer::update(size_t offset, size_t size, const void *data)
   glBufferSubData((unsigned int)target, offset, size, data);
 }
 
+unsigned int ArrayBuffer::get() const { return buffer; }
+
+void ArrayBuffer::bind() const { glBindBuffer((unsigned int)target, buffer); }
+
+void ArrayBuffer::unbind() const { glBindBuffer((unsigned int)target, 0); }
+
+int ArrayBuffer::getBufferSize() const
+{
+  glBindBuffer((unsigned int)target, buffer);
+
+  int size = 0;
+  glGetBufferParameteriv((unsigned int)target, GL_BUFFER_SIZE, &size);
+
+  return size;
+}
+
+
 void ArrayBuffer::resize(size_t size, VertexDraw draw)
 {
   /**
@@ -59,20 +76,4 @@ void ArrayBuffer::resize(size_t size, VertexDraw draw)
   glDeleteBuffers(1, &buffer);
 
   buffer = nbuffer;
-}
-
-void ArrayBuffer::bind() const { glBindBuffer((unsigned int)target, buffer); }
-
-void ArrayBuffer::unbind() const { glBindBuffer((unsigned int)target, 0); }
-
-unsigned int ArrayBuffer::get() const { return buffer; }
-
-int ArrayBuffer::getBufferSize() const
-{
-  glBindBuffer((unsigned int)target, buffer);
-
-  int size = 0;
-  glGetBufferParameteriv((unsigned int)target, GL_BUFFER_SIZE, &size);
-
-  return size;
 }

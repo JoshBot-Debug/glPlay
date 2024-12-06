@@ -2,21 +2,21 @@
 
 #include <Window/Window.h>
 
-#include "ECS/Registry.h"
-#include "Renderer/Renderer.h"
-#include "Scene/AnimatorViewport.h"
+// #include "ECS/Registry.h"
+// #include "Engine/Engine.h"
 
-#include "DebugMenu.h"
+// #include "Scene/AnimatorViewport.h"
+
+// #include "DebugMenu.h"
 
 class App : Window
 {
 private:
-  Renderer renderer;
-  Registry registry;
-  AnimatorViewport animatorViewport;
+  // Engine engine;
+  // Registry registry;
+  // AnimatorViewport animatorViewport;
 
-  Camera camera;
-  DebugMenu debugMenu;
+  // DebugMenu debugMenu;
 
 public:
   App();
