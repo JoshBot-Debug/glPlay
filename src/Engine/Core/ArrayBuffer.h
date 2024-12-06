@@ -15,18 +15,18 @@ enum class BufferTarget
 
 struct BufferPartition
 {
-  size_t size;  // size of the partition in bytes
-  size_t used;  // bytes beign used
-  size_t chunk; // size of one chunk in bytes
+  unsigned int size;  // size of the partition in bytes
+  unsigned int used;  // bytes beign used
+  unsigned int chunk; // size of one chunk in bytes
 
-  BufferPartition(size_t size, size_t used, size_t chunk) : size(size), used(used), chunk(chunk) {}
+  BufferPartition(unsigned int size, unsigned int used, unsigned int chunk) : size(size), used(used), chunk(chunk) {}
 };
 
-inline size_t getBufferPartitionOffsetSize(const std::vector<BufferPartition> &partitions, unsigned int partitionIndex)
+inline unsigned int getBufferPartitionOffsetSize(const std::vector<BufferPartition> &partitions, unsigned int partitionIndex)
 {
-  size_t size = 0;
+  unsigned int size = 0;
 
-  for (size_t i = 0; i < partitionIndex; i++)
+  for (unsigned int i = 0; i < partitionIndex; i++)
     size += partitions[i].size;
 
   return size;
@@ -35,12 +35,14 @@ inline size_t getBufferPartitionOffsetSize(const std::vector<BufferPartition> &p
 class ArrayBuffer
 {
 private:
+  unsigned int buffer = 0;
+
   BufferTarget target;
+
   VertexDraw draw;
 
   unsigned int resizeFactor = 0;
 
-  unsigned int buffer = 0;
   std::vector<BufferPartition> partitions;
 
 public:
@@ -106,7 +108,7 @@ public:
   template <typename T>
   void set(const std::vector<T> &data, const std::vector<BufferPartition> partitions = {})
   {
-    size_t size = data.size() * sizeof(T);
+    unsigned int size = data.size() * sizeof(T);
 
     if (partitions.size())
       this->partitions = partitions;
@@ -125,7 +127,7 @@ public:
    * @param data A pointer to the raw data to be uploaded to the buffer.
    * @param draw Specifies how the buffer will be used (static, dynamic, etc.). Default is STATIC.
    */
-  void set(size_t chunk, unsigned int count, const void *data, const std::vector<BufferPartition> partitions = {});
+  void set(unsigned int chunk, unsigned int count, const void *data, const std::vector<BufferPartition> partitions = {});
 
   /**
    * Updates part of the buffer with a vector of generic data type.
@@ -150,7 +152,7 @@ public:
    * @param size The size of the data to update in bytes.
    * @param data A pointer to the raw data to upload to the buffer.
    */
-  void update(size_t chunk, unsigned int offset, size_t size, const void *data, unsigned int partitionID = 0);
+  void update(unsigned int chunk, unsigned int offset, unsigned int size, const void *data, unsigned int partitionID = 0);
 
   /**
    * Insert or updates part of the buffer with a vector of generic data type.
@@ -237,7 +239,7 @@ public:
    *
    * @param size The new size for the buffer (in bytes).
    */
-  void resize(size_t size);
+  void resize(unsigned int size);
 
   /**
    * Expands a partition by resizing the buffer
@@ -246,7 +248,7 @@ public:
    * @param size The size (in bytes) by which you want to expand this partition
    * @param offset The offset (in bytes) by from where in the partition you want to resize
    */
-  void resize(unsigned int partition, size_t size, size_t offset);
+  void resize(unsigned int partition, unsigned int size, unsigned int offset);
 
   /**
    * Creates a new partition. This function will resize the buffer
@@ -254,5 +256,5 @@ public:
    * @param chunk The size of one chunk in bytes.
    * @param count The number of chunks you are reserving space for
    */
-  unsigned int addPartition(size_t chunk, unsigned int count);
+  unsigned int addPartition(unsigned int chunk, unsigned int count);
 };

@@ -17,9 +17,9 @@ void ArrayBuffer::generate()
     glGenBuffers(1, &buffer);
 }
 
-void ArrayBuffer::set(size_t chunk, unsigned int count, const void *data, const std::vector<BufferPartition> partitions)
+void ArrayBuffer::set(unsigned int chunk, unsigned int count, const void *data, const std::vector<BufferPartition> partitions)
 {
-  size_t size = count * chunk;
+  unsigned int size = count * chunk;
 
   if (partitions.size())
     this->partitions = partitions;
@@ -30,7 +30,7 @@ void ArrayBuffer::set(size_t chunk, unsigned int count, const void *data, const 
   glBufferData((unsigned int)target, size, data, (unsigned int)draw);
 }
 
-void ArrayBuffer::update(size_t chunk, unsigned int offset, size_t size, const void *data, unsigned int partition)
+void ArrayBuffer::update(unsigned int chunk, unsigned int offset, unsigned int size, const void *data, unsigned int partition)
 {
   glBindBuffer((unsigned int)target, buffer);
   glBufferSubData((unsigned int)target, (offset * chunk) + getBufferPartitionOffsetSize(partitions, partition), size, data);
@@ -52,7 +52,7 @@ int ArrayBuffer::getBufferSize() const
   return size;
 }
 
-void ArrayBuffer::resize(size_t size)
+void ArrayBuffer::resize(unsigned int size)
 {
   int currentSize;
   glBindBuffer(GL_COPY_READ_BUFFER, buffer);
@@ -70,7 +70,7 @@ void ArrayBuffer::resize(size_t size)
   buffer = next;
 }
 
-void ArrayBuffer::resize(unsigned int partition, size_t size, size_t offset)
+void ArrayBuffer::resize(unsigned int partition, unsigned int size, unsigned int offset)
 {
   int currentSize;
   glBindBuffer(GL_COPY_READ_BUFFER, buffer);
@@ -99,7 +99,7 @@ void ArrayBuffer::resize(unsigned int partition, size_t size, size_t offset)
   partitions[partition].size += size;
 }
 
-unsigned int ArrayBuffer::addPartition(size_t chunk, unsigned int count)
+unsigned int ArrayBuffer::addPartition(unsigned int chunk, unsigned int count)
 {
   this->partitions.emplace_back(chunk * count, 0, chunk);
 
