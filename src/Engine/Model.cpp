@@ -6,24 +6,24 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+#include "Debug.h"
+
 void loadModel(const char *path, std::vector<Mesh> &meshes)
 {
-  // Initialize Assimp importer
   Assimp::Importer importer;
 
-  // Load the model (FBX file)
   const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipWindingOrder | aiProcess_GenSmoothNormals);
 
   if (!scene)
   {
-    std::cerr << "Failed to load FBX model: " << importer.GetErrorString() << std::endl;
+    LOG_BREAK_BEFORE;
+    LOG("Failed to load model:", importer.GetErrorString());
+    LOG_BREAK_AFTER;
     return;
   }
 
-  // Reserve space in the vector
   meshes.resize(scene->mNumMeshes);
 
-  // Iterate over each mesh in the scene
   for (unsigned int i = 0; i < scene->mNumMeshes; ++i)
   {
     aiMesh *mesh = scene->mMeshes[i];
@@ -31,7 +31,6 @@ void loadModel(const char *path, std::vector<Mesh> &meshes)
 
     m.resize(mesh->mNumVertices);
 
-    // Process vertices
     for (unsigned int j = 0; j < mesh->mNumVertices; ++j)
     {
       Vertex &v = m.getVertex(j);
@@ -73,6 +72,12 @@ Model::Model(unsigned int id, const char *filepath) : id(id)
   loadModel(filepath, meshes);
 }
 
+Model::~Model()
+{
+  textures.clear();
+  material = nullptr;
+}
+
 void Model::setMaterial(Material *material)
 {
   this->material = material;
@@ -89,21 +94,20 @@ void Model::bindTextures() const
     textures[i]->bind(i);
 }
 
-template <>
-unsigned int Model::createInstance<Instance>(Instance &&instance)
+unsigned int Model::createInstance()
 {
-  instances.emplace_back(std::forward<Instance>(instance));
+  instances.push_back(new Instance());
   return instances.size() - 1;
 }
 
 Instance *Model::getInstance(unsigned int id)
 {
-  return nullptr;
+  return instances.at(id);
 }
 
-std::vector<Instance *> Model::getInstances()
+std::vector<Instance *> &Model::getInstances()
 {
-  return std::vector<Instance *>();
+  return instances;
 }
 
 const void Model::setIndiceOffset(unsigned int offset)

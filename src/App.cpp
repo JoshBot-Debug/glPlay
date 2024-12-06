@@ -17,12 +17,11 @@ const WindowOptions opts = {.title = "glPlay", .width = 800, .height = 600, .ena
  */
 App::App() : Window(opts)
 {
-  PerspectiveCamera *camera = engine.createCamera<PerspectiveCamera>();
-
   /**
    * Setup a camera
    * Specify the type, and other properties.
    */
+  PerspectiveCamera *camera = engine.createCamera<PerspectiveCamera>();
   camera->setOffset(0.5f, 0.5f);
   camera->setPosition(2.0f, 2.0f, 10.0f);
   camera->setRotation(10.0f, 0.0f, 0.0f);
@@ -40,12 +39,12 @@ App::App() : Window(opts)
   Model *sphere = engine.createModel("assets/model/sphere.fbx");
   Model *cube = engine.createModel("assets/model/cube-textured.fbx");
 
-
+  /**
+   * Setup the shader
+   */
   Shader *shader = engine.getShader();
-
   unsigned int vertex = shader->compile("src/Shader/vertex.glsl", ShaderType::VERTEX_SHADER);
   unsigned int fragment = shader->compile("src/Shader/fragment.glsl", ShaderType::FRAGMENT_SHADER);
-
   shader->createProgram({vertex, fragment});
 
   /**
@@ -86,6 +85,7 @@ App::App() : Window(opts)
 
 void App::onUpdate()
 {
+  engine.update();
   // debugMenu.update();
 }
 
@@ -94,9 +94,9 @@ void App::onDraw()
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  // engine.getShader()->bind(0);
+  engine.getShader()->bind(0);
 
-  // engine.draw();
+  engine.draw();
 
   // debugMenu.draw();
 }

@@ -3,22 +3,46 @@
 #include <string>
 #include <vector>
 
+#include "Renderer.h"
 #include "Model.h"
 #include "Shader.h"
 #include "Camera.h"
 #include "Texture2D.h"
+#include "Material.h"
 
 class Engine
 {
 private:
-  Shader shader;
+  Renderer renderer;
+  Shader *shader;
   Camera *camera;
-  std::vector<Model> models;
-  std::vector<Texture2D> textures;
+  std::vector<Model *> models;
+  std::vector<Material *> materials;
+  std::vector<Texture2D *> textures;
 
 public:
-  Engine() = default;
-  ~Engine() = default;
+  Engine(): shader(new Shader()) {};
+
+  ~Engine()
+  {
+    for (const auto *ptr : models)
+      delete ptr;
+    for (const auto *ptr : textures)
+      delete ptr;
+    for (const auto *ptr : materials)
+      delete ptr;
+    delete camera;
+    delete shader;
+  };
+
+  /**
+   * Get the shader manager to create shader programs
+   * @returns The shader manager
+   */
+  Shader *getShader()
+  {
+    return shader;
+  }
 
   /**
    * Creates an instance of Camera and returns a pointer
@@ -34,35 +58,6 @@ public:
   }
 
   /**
-   * @returns A pointer to a Model
-   */
-  Model *createModel(const char *path)
-  {
-    unsigned int id = models.size() + 1;
-    models.emplace_back(id, path);
-    return &models[id];
-  }
-
-  /**
-   * @returns A pointer to a Model
-   */
-  Texture2D *createTexture2D(const char *path)
-  {
-    unsigned int id = textures.size() + 1;
-    textures.emplace_back(id, path);
-    return &textures[id];
-  }
-
-  /**
-   * Get the shader manager to create shader programs
-   * @returns The shader manager
-   */
-  Shader *getShader()
-  {
-    return &shader;
-  }
-
-  /**
    * Get the camera
    * @returns The camera
    */
@@ -73,38 +68,90 @@ public:
   }
 
   /**
+   * @returns A pointer to a Model
+   */
+  Model *createModel(const char *path)
+  {
+    unsigned int id = models.size();
+    models.push_back(new Model(id, path));
+    return models[id];
+  }
+
+  /**
    * Get the Model by id
    * @returns The Model
    */
   Model *getModel(unsigned int id)
   {
-    return &models[id];
+    return models.at(id);
   }
 
   /**
    * Gets all models
-   * @returns A pointer to a vector of Model
+   * @returns A vector of Model pointers
    */
-  std::vector<Model> *getModels()
+  std::vector<Model *> &getModels()
   {
-    return &models;
+    return models;
+  }
+
+  /**
+   * @returns A pointer to a Model
+   */
+  Texture2D *createTexture2D(const char *path)
+  {
+    unsigned int id = textures.size();
+    textures.push_back(new Texture2D(id, path));
+    return textures.at(id);
   }
 
   /**
    * Get the Texture2D by id
    * @returns The Texture2D
    */
-  Texture2D *getTexture(unsigned int id)
+  Texture2D *getTexture2D(unsigned int id)
   {
-    return &textures[id];
+    return textures.at(id);
   }
 
   /**
    * Gets all texture2ds
-   * @returns A pointer to a vector of Texture2D
+   * @returns A vector of Texture2D pointers
    */
-  std::vector<Texture2D> *getTextures()
+  std::vector<Texture2D *> &getTexture2Ds()
   {
-    return &textures;
+    return textures;
   }
+
+  /**
+   * @returns A pointer to a Material
+   */
+  Material *createMaterial(const char *path)
+  {
+    unsigned int id = materials.size();
+    materials.push_back(new Material(id));
+    return materials.at(id);
+  }
+
+  /**
+   * Get the Material by id
+   * @returns The Material
+   */
+  Material *getMaterial(unsigned int id)
+  {
+    return materials.at(id);
+  }
+
+  /**
+   * Gets all Materials
+   * @returns A vector of Material pointers
+   */
+  std::vector<Material *> &getMaterials()
+  {
+    return materials;
+  }
+
+  void update() { renderer.update(camera); };
+
+  void draw(const Primitive &primitive = Primitive::TRIANGLES) { renderer.draw(primitive); };
 };

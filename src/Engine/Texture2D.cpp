@@ -33,9 +33,6 @@ Texture2D::~Texture2D()
 {
   unbind();
   glDeleteTextures(1, &texture);
-  LOG_BREAK_BEFORE;
-  LOG("Texture deleted:", texture);
-  LOG_BREAK_AFTER;
   texture = 0;
 }
 

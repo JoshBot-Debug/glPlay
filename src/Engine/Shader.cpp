@@ -67,10 +67,6 @@ inline unsigned int compileShader(const char *filepath, const ShaderType &type)
     return 0;
   }
 
-  LOG_BREAK_BEFORE;
-  LOG("Shader created:", filepath, " : ", shader);
-  LOG_BREAK_AFTER;
-
   return shader;
 }
 
@@ -159,7 +155,7 @@ unsigned int Shader::createProgram(const std::vector<unsigned int> &link)
 
 void Shader::bind(const unsigned int program)
 {
-  if (this->program->id == programs[program].id)
+  if (this->program && this->program->id == programs[program].id)
     return;
   glUseProgram(programs[program].id);
   this->program = &programs[program];

@@ -38,11 +38,11 @@ private:
 
   BufferOffset offset;
 
-  std::vector<Instance> instances;
+  std::vector<Instance *> instances;
 
 public:
   Model(unsigned int id, const char *filepath);
-  ~Model() = default;
+  ~Model();
 
   void setMaterial(Material *material);
 
@@ -50,11 +50,9 @@ public:
 
   void bindTextures() const;
 
-  template <typename... Args>
-  unsigned int createInstance(Args &&...args);
-
+  unsigned int createInstance();
   Instance *getInstance(unsigned int id);
-  std::vector<Instance *> getInstances();
+  std::vector<Instance *> &getInstances();
 
   const void setIndiceOffset(unsigned int offset);
   const void setVertexOffset(unsigned int offset);

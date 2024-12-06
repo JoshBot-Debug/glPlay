@@ -7,8 +7,10 @@
 class Material
 {
 private:
+  unsigned int id;
+
 public:
-  Material() = default;
+  Material(unsigned int id);
   ~Material() = default;
 
   void setDiffuseTexture(const Texture2D *texture);

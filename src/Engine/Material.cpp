@@ -1,5 +1,9 @@
 #include "Material.h"
 
+Material::Material(unsigned int id): id(id)
+{
+}
+
 void Material::setDiffuseTexture(const Texture2D *texture)
 {
 }
