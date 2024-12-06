@@ -38,21 +38,28 @@ private:
   BufferTarget target;
   VertexDraw draw;
 
-  /**
-   * This multiplier is applied to the incoming data size when resizing a partition (e.g., during an upsert operation)
-   * to accommodate more data.
-   *
-   * For example, if the data size is 12 bytes (3 floats) and the buffer needs resizing, the buffer will be resized
-   * to accommodate 12 * multiplier bytes.
-   */
   unsigned int resizeFactor = 0;
 
   unsigned int buffer = 0;
   std::vector<BufferPartition> partitions;
 
 public:
+  /**
+   * @param target Specify weather this is a vertex array buffer or an element array buffer
+   *
+   * @param draw VertexDraw, Static for non changing, dynamic for frequently changing, or stream
+   */
   ArrayBuffer(BufferTarget target, VertexDraw draw = VertexDraw::STATIC);
 
+  /**
+   * @param target Specify weather this is a vertex array buffer or an element array buffer
+   *
+   * @param resizeFactor This multiplier is applied to the incoming data size when resizing a partition (e.g., during an upsert operation)
+   * to accommodate more data. For example, if the data size is 12 bytes (3 floats) and the buffer needs resizing, the buffer will be resized
+   * to accommodate 12 * multiplier bytes.
+   *
+   * @param draw VertexDraw, Static for non changing, dynamic for frequently changing, or stream
+   */
   ArrayBuffer(BufferTarget target, unsigned int resizeFactor, VertexDraw draw = VertexDraw::STATIC);
 
   /**

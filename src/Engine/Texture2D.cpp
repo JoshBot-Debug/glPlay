@@ -1,9 +1,9 @@
-#include "Texture.h"
+#include "Texture2D.h"
 
 #include "Debug.h"
 #include <stb/stb_image.h>
 
-Texture::Texture(const std::string &name, const std::string &path) : name(name), path(path)
+Texture2D::Texture2D(unsigned int id, const char *filepath): id(id)
 {
   glGenTextures(1, &texture);
   bind();
@@ -12,7 +12,7 @@ Texture::Texture(const std::string &name, const std::string &path) : name(name),
   setMipmapLevel(0, 5);
 
   int width, height, nrChannels;
-  unsigned char *data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
+  unsigned char *data = stbi_load(filepath, &width, &height, &nrChannels, 0);
   if (data)
   {
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
@@ -21,7 +21,7 @@ Texture::Texture(const std::string &name, const std::string &path) : name(name),
   else
   {
     LOG_BREAK_BEFORE;
-    LOG("Texture: Failed to read texture", name);
+    LOG("Texture: Failed to read texture", filepath);
     LOG_BREAK_AFTER;
   }
 
@@ -29,7 +29,7 @@ Texture::Texture(const std::string &name, const std::string &path) : name(name),
   unbind();
 }
 
-Texture::~Texture()
+Texture2D::~Texture2D()
 {
   unbind();
   glDeleteTextures(1, &texture);
@@ -39,31 +39,31 @@ Texture::~Texture()
   texture = 0;
 }
 
-void Texture::setWrap(TextureWrap s, TextureWrap t, TextureWrap r) const
+void Texture2D::setWrap(TextureWrap s, TextureWrap t, TextureWrap r) const
 {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, (unsigned int)s);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, (unsigned int)t);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, (unsigned int)r);
 }
 
-void Texture::setFilter(TextureFilter min, TextureFilter mag) const
+void Texture2D::setFilter(TextureFilter min, TextureFilter mag) const
 {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, (unsigned int)min);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, (unsigned int)mag);
 }
 
-void Texture::setMipmapLevel(int base, int max) const
+void Texture2D::setMipmapLevel(int base, int max) const
 {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, base);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, max);
 }
 
-void Texture::setBorderColor(float color[4]) const
+void Texture2D::setBorderColor(float color[4]) const
 {
   glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, color);
 }
 
-void Texture::bind(int activate) const
+void Texture2D::bind(int activate) const
 {
   if (texture == 0)
     return;
@@ -72,7 +72,7 @@ void Texture::bind(int activate) const
   glBindTexture(GL_TEXTURE_2D, texture);
 }
 
-void Texture::unbind() const
+void Texture2D::unbind() const
 {
   glBindTexture(GL_TEXTURE_2D, 0);
 }

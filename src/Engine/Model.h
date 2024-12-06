@@ -1,14 +1,22 @@
 #pragma once
 
-#include <string>
 #include <vector>
-#include <unordered_map>
+#include <glm/glm.hpp>
 
-#include "Texture.h"
-#include "Material.h"
 #include "Mesh.h"
-#include "Instance.h"
+#include "Texture2D.h"
+#include "Material.h"
 
+struct Instance
+{
+  glm::vec3 translate = glm::vec3(0.0f);
+
+  glm::vec3 rotation = glm::vec3(0.0f);
+
+  glm::vec3 scale = glm::vec3(1.0f);
+
+  glm::vec4 color = glm::vec4(1.0f);
+};
 
 struct BufferOffset
 {
@@ -20,32 +28,33 @@ struct BufferOffset
 class Model
 {
 private:
-  const std::string path;
+  unsigned int id;
 
   std::vector<Mesh> meshes;
-  std::vector<Texture *> textures;
+
+  std::vector<Texture2D *> textures;
 
   Material *material;
 
-  BufferOffset offset; // The offsets of the data in all buffers
+  BufferOffset offset;
 
-  std::unordered_map<std::string, InstanceManager> InstanceManagers;
-
-private:
-  void loadFBX(const std::string &filename, std::vector<Mesh> &meshes);
+  std::vector<Instance> instances;
 
 public:
-  Model(const std::string &path);
+  Model(unsigned int id, const char *filepath);
+  ~Model() = default;
 
   void setMaterial(Material *material);
 
-  void addTexture(Texture *texture);
+  void addTexture(Texture2D *texture);
 
   void bindTextures() const;
 
-  std::vector<InstanceManager *> getInstanceManagers();
+  template <typename... Args>
+  unsigned int createInstance(Args &&...args);
 
-  InstanceManager *getInstanceManager(const std::string &name);
+  Instance *getInstance(unsigned int id);
+  std::vector<Instance *> getInstances();
 
   const void setIndiceOffset(unsigned int offset);
   const void setVertexOffset(unsigned int offset);
@@ -54,10 +63,8 @@ public:
   const unsigned int getIndiceOffset() const;
   const unsigned int getVertexOffset() const;
   const unsigned int getInstanceOffset() const;
-
-  const size_t getInstanceCount() const;
+  const unsigned int getInstanceCount() const;
 
   const std::vector<Vertex> getVertices() const;
-
   const std::vector<unsigned int> getIndices() const;
 };

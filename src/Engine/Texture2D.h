@@ -21,16 +21,15 @@ enum class TextureFilter
   LINEAR_MIPMAP_LINEAR = GL_LINEAR_MIPMAP_LINEAR,
 };
 
-class Texture
+class Texture2D
 {
 private:
+  unsigned int id;
   unsigned int texture = 0;
-  const std::string name;
-  const std::string path;
 
 public:
-  Texture(const std::string &name, const std::string &path);
-  ~Texture();
+  Texture2D(unsigned int id, const char *filepath);
+  ~Texture2D();
 
   void setWrap(TextureWrap s = TextureWrap::REPEAT, TextureWrap t = TextureWrap::REPEAT, TextureWrap r = TextureWrap::REPEAT) const;
   void setFilter(TextureFilter min = TextureFilter::LINEAR_MIPMAP_LINEAR, TextureFilter mag = TextureFilter::LINEAR) const;

@@ -1,24 +1,17 @@
 #pragma once
 
 #include <string>
-
 #include <glm/glm.hpp>
 
-enum class CameraType
-{
-  Orthographic,
-  Perspective
-};
+#include "Camera.h"
 
-class Camera
+class OrthographicCamera : public Camera
 {
 private:
   glm::mat4 view = glm::mat4(1.0f);
   glm::mat4 projection = glm::mat4(0.0f);
 
 public:
-  CameraType type;
-
   float width = 1.0f;
   float height = 1.0f;
 
@@ -34,9 +27,7 @@ public:
 
   void update();
 
-  void setType(CameraType type);
-
-  void setSize(float width, float height);
+  void setViewportSize(float width, float height) override;
 
   void setOffset(float offsetX, float offsetY);
 
@@ -50,5 +41,5 @@ public:
 
   void rotate(float deltaPitch, float deltaYaw, float deltaRoll);
 
-  const glm::mat4 &getViewProjectionMatrix();
+  const glm::mat4 getViewProjectionMatrix() const override;
 };

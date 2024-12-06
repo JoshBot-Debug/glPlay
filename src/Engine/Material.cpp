@@ -1,6 +1,6 @@
 #include "Material.h"
 
-void Material::setDiffuseTexture(const Texture *texture)
+void Material::setDiffuseTexture(const Texture2D *texture)
 {
 }
 

@@ -3,16 +3,18 @@
 #include <string>
 #include <vector>
 
-#include "Shader/Shader.h"
-#include "Camera/Camera.h"
-#include "Batch/Batch.h"
+#include "Model.h"
+#include "Shader.h"
+#include "Camera.h"
+#include "Texture2D.h"
 
 class Engine
 {
 private:
   Shader shader;
   Camera *camera;
-  std::vector<Batch> batches;
+  std::vector<Model> models;
+  std::vector<Texture2D> textures;
 
 public:
   Engine() = default;
@@ -28,18 +30,27 @@ public:
   {
     static_assert(std::is_base_of<Camera, T>::value, "T must implement the Camera interface.");
     camera = new T();
-    return camera;
+    return dynamic_cast<T *>(camera);
   }
 
   /**
-   * Creates an instance of Batch, used to batch models to together
-   *
-   * @returns A pointer to a Batch
+   * @returns A pointer to a Model
    */
-  Batch *createBatch()
+  Model *createModel(const char *path)
   {
-    batches.emplace_back(batches.size());
-    return &batches[batches.size() - 1];
+    unsigned int id = models.size() + 1;
+    models.emplace_back(id, path);
+    return &models[id];
+  }
+
+  /**
+   * @returns A pointer to a Model
+   */
+  Texture2D *createTexture2D(const char *path)
+  {
+    unsigned int id = textures.size() + 1;
+    textures.emplace_back(id, path);
+    return &textures[id];
   }
 
   /**
@@ -49,5 +60,51 @@ public:
   Shader *getShader()
   {
     return &shader;
+  }
+
+  /**
+   * Get the camera
+   * @returns The camera
+   */
+  template <typename T>
+  T *getCamera()
+  {
+    return camera;
+  }
+
+  /**
+   * Get the Model by id
+   * @returns The Model
+   */
+  Model *getModel(unsigned int id)
+  {
+    return &models[id];
+  }
+
+  /**
+   * Gets all models
+   * @returns A pointer to a vector of Model
+   */
+  std::vector<Model> *getModels()
+  {
+    return &models;
+  }
+
+  /**
+   * Get the Texture2D by id
+   * @returns The Texture2D
+   */
+  Texture2D *getTexture(unsigned int id)
+  {
+    return &textures[id];
+  }
+
+  /**
+   * Gets all texture2ds
+   * @returns A pointer to a vector of Texture2D
+   */
+  std::vector<Texture2D> *getTextures()
+  {
+    return &textures;
   }
 };

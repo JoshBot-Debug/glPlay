@@ -5,7 +5,7 @@
 
 #include "Camera.h"
 
-class OrthographicCamera : Camera
+class PerspectiveCamera : public Camera
 {
 private:
   glm::mat4 view = glm::mat4(1.0f);

@@ -3,7 +3,7 @@
 #include <Window/Window.h>
 
 // #include "ECS/Registry.h"
-// #include "Engine/Engine.h"
+#include "Engine/Engine.h"
 
 // #include "Scene/AnimatorViewport.h"
 
@@ -12,7 +12,7 @@
 class App : Window
 {
 private:
-  // Engine engine;
+  Engine engine;
   // Registry registry;
   // AnimatorViewport animatorViewport;
 
