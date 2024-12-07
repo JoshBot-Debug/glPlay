@@ -28,7 +28,7 @@ struct Program
 class Shader
 {
 private:
-  Program *program = nullptr;
+  int program = -1;
 
   std::vector<ShaderFile> shaders;
   std::unordered_map<std::string, unsigned int> uniforms;

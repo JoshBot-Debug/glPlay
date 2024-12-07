@@ -108,7 +108,7 @@ inline unsigned int createShaderProgram(const std::vector<unsigned int> &link)
 Shader::~Shader()
 {
   glUseProgram(0);
-  program = nullptr;
+  program = -1;
   for (const auto &program : programs)
     glDeleteProgram(program.id);
 }
@@ -127,14 +127,15 @@ void Shader::recompile()
 {
   std::vector<unsigned int> ids;
 
-  for (auto &file : program->shaders)
+  for (auto &file : programs[program].shaders)
   {
     file->id = compileShader(file->path, file->type);
     if (file->id)
       ids.push_back(file->id);
   }
 
-  program->id = createShaderProgram(ids);
+  programs[program].id = createShaderProgram(ids);
+  glUseProgram(programs[program].id);
 }
 
 const unsigned int Shader::createProgram(const std::vector<unsigned int> &link)
@@ -155,23 +156,23 @@ const unsigned int Shader::createProgram(const std::vector<unsigned int> &link)
 
 void Shader::bind(const unsigned int program)
 {
-  if (this->program && this->program->id == programs[program].id)
+  if (this->program == program)
     return;
   glUseProgram(programs[program].id);
-  this->program = &programs[program];
+  this->program = program;
 }
 
 void Shader::unbind()
 {
   glUseProgram(0);
-  program = nullptr;
+  program = -1;
 }
 
 void Shader::setUniform1i(const std::string &name, int location)
 {
   try
   {
-    if (!program)
+    if (program < 0)
     {
       LOG_BREAK_BEFORE;
       LOG("Error! No shader program bound");
@@ -181,7 +182,7 @@ void Shader::setUniform1i(const std::string &name, int location)
     }
 
     if (!uniforms[name])
-      uniforms[name] = glGetUniformLocation(program->id, name.c_str());
+      uniforms[name] = glGetUniformLocation(programs[program].id, name.c_str());
 
     glUniform1i(uniforms[name], location);
   }
@@ -198,7 +199,7 @@ void Shader::setUniform1f(const std::string &name, float value)
 {
   try
   {
-    if (!program)
+    if (program < 0)
     {
       LOG_BREAK_BEFORE;
       LOG("Error! No shader program bound");
@@ -208,7 +209,7 @@ void Shader::setUniform1f(const std::string &name, float value)
     }
 
     if (!uniforms[name])
-      uniforms[name] = glGetUniformLocation(program->id, name.c_str());
+      uniforms[name] = glGetUniformLocation(programs[program].id, name.c_str());
 
     glUniform1f(uniforms[name], value);
   }
@@ -225,7 +226,7 @@ void Shader::setUniform2i(const std::string &name, int value1, int value2)
 {
   try
   {
-    if (!program)
+    if (program < 0)
     {
       LOG_BREAK_BEFORE;
       LOG("Error! No shader program bound");
@@ -235,7 +236,7 @@ void Shader::setUniform2i(const std::string &name, int value1, int value2)
     }
 
     if (!uniforms[name])
-      uniforms[name] = glGetUniformLocation(program->id, name.c_str());
+      uniforms[name] = glGetUniformLocation(programs[program].id, name.c_str());
 
     glUniform2i(uniforms[name], value1, value2);
   }
@@ -252,7 +253,7 @@ void Shader::setUniform2f(const std::string &name, float value1, float value2)
 {
   try
   {
-    if (!program)
+    if (program < 0)
     {
       LOG_BREAK_BEFORE;
       LOG("Error! No shader program bound");
@@ -262,7 +263,7 @@ void Shader::setUniform2f(const std::string &name, float value1, float value2)
     }
 
     if (!uniforms[name])
-      uniforms[name] = glGetUniformLocation(program->id, name.c_str());
+      uniforms[name] = glGetUniformLocation(programs[program].id, name.c_str());
 
     glUniform2f(uniforms[name], value1, value2);
   }
@@ -279,7 +280,7 @@ void Shader::setUniform3i(const std::string &name, int value1, int value2, int v
 {
   try
   {
-    if (!program)
+    if (program < 0)
     {
       LOG_BREAK_BEFORE;
       LOG("Error! No shader program bound");
@@ -289,7 +290,7 @@ void Shader::setUniform3i(const std::string &name, int value1, int value2, int v
     }
 
     if (!uniforms[name])
-      uniforms[name] = glGetUniformLocation(program->id, name.c_str());
+      uniforms[name] = glGetUniformLocation(programs[program].id, name.c_str());
 
     glUniform3i(uniforms[name], value1, value2, value3);
   }
@@ -306,7 +307,7 @@ void Shader::setUniform3f(const std::string &name, float value1, float value2, f
 {
   try
   {
-    if (!program)
+    if (program < 0)
     {
       LOG_BREAK_BEFORE;
       LOG("Error! No shader program bound");
@@ -316,7 +317,7 @@ void Shader::setUniform3f(const std::string &name, float value1, float value2, f
     }
 
     if (!uniforms[name])
-      uniforms[name] = glGetUniformLocation(program->id, name.c_str());
+      uniforms[name] = glGetUniformLocation(programs[program].id, name.c_str());
 
     glUniform3f(uniforms[name], value1, value2, value3);
   }
@@ -333,7 +334,7 @@ void Shader::setUniform4i(const std::string &name, int value1, int value2, int v
 {
   try
   {
-    if (!program)
+    if (program < 0)
     {
       LOG_BREAK_BEFORE;
       LOG("Error! No shader program bound");
@@ -343,7 +344,7 @@ void Shader::setUniform4i(const std::string &name, int value1, int value2, int v
     }
 
     if (!uniforms[name])
-      uniforms[name] = glGetUniformLocation(program->id, name.c_str());
+      uniforms[name] = glGetUniformLocation(programs[program].id, name.c_str());
 
     glUniform4i(uniforms[name], value1, value2, value3, value4);
   }
@@ -360,7 +361,7 @@ void Shader::setUniform4f(const std::string &name, float value1, float value2, f
 {
   try
   {
-    if (!program)
+    if (program < 0)
     {
       LOG_BREAK_BEFORE;
       LOG("Error! No shader program bound");
@@ -370,7 +371,7 @@ void Shader::setUniform4f(const std::string &name, float value1, float value2, f
     }
 
     if (!uniforms[name])
-      uniforms[name] = glGetUniformLocation(program->id, name.c_str());
+      uniforms[name] = glGetUniformLocation(programs[program].id, name.c_str());
 
     glUniform4f(uniforms[name], value1, value2, value3, value4);
   }
@@ -387,7 +388,7 @@ void Shader::setUniformMatrix4fv(const std::string &name, const glm::mat4 &matri
 {
   try
   {
-    if (!program)
+    if (program < 0)
     {
       LOG_BREAK_BEFORE;
       LOG("Error! No shader program bound");
@@ -397,7 +398,7 @@ void Shader::setUniformMatrix4fv(const std::string &name, const glm::mat4 &matri
     }
 
     if (!uniforms[name])
-      uniforms[name] = glGetUniformLocation(program->id, name.c_str());
+      uniforms[name] = glGetUniformLocation(programs[program].id, name.c_str());
 
     glUniformMatrix4fv(uniforms[name], 1, GL_FALSE, glm::value_ptr(matrix));
   }
@@ -414,7 +415,7 @@ void Shader::setUniformMatrix3fv(const std::string &name, const glm::mat3 &matri
 {
   try
   {
-    if (!program)
+    if (program < 0)
     {
       LOG_BREAK_BEFORE;
       LOG("Error! No shader program bound");
@@ -424,7 +425,7 @@ void Shader::setUniformMatrix3fv(const std::string &name, const glm::mat3 &matri
     }
 
     if (!uniforms[name])
-      uniforms[name] = glGetUniformLocation(program->id, name.c_str());
+      uniforms[name] = glGetUniformLocation(programs[program].id, name.c_str());
 
     glUniformMatrix3fv(uniforms[name], 1, GL_FALSE, glm::value_ptr(matrix));
   }
@@ -441,7 +442,7 @@ void Shader::setUniform3fv(const std::string &name, const glm::vec3 &vector)
 {
   try
   {
-    if (!program)
+    if (program < 0)
     {
       LOG_BREAK_BEFORE;
       LOG("Error! No shader program bound");
@@ -451,7 +452,7 @@ void Shader::setUniform3fv(const std::string &name, const glm::vec3 &vector)
     }
 
     if (!uniforms[name])
-      uniforms[name] = glGetUniformLocation(program->id, name.c_str());
+      uniforms[name] = glGetUniformLocation(programs[program].id, name.c_str());
 
     glUniform3fv(uniforms[name], 1, glm::value_ptr(vector));
   }
@@ -468,7 +469,7 @@ void Shader::setUniform4fv(const std::string &name, const glm::vec4 &vector)
 {
   try
   {
-    if (!program)
+    if (program < 0)
     {
       LOG_BREAK_BEFORE;
       LOG("Error! No shader program bound");
@@ -478,7 +479,7 @@ void Shader::setUniform4fv(const std::string &name, const glm::vec4 &vector)
     }
 
     if (!uniforms[name])
-      uniforms[name] = glGetUniformLocation(program->id, name.c_str());
+      uniforms[name] = glGetUniformLocation(programs[program].id, name.c_str());
 
     glUniform4fv(uniforms[name], 1, glm::value_ptr(vector));
   }

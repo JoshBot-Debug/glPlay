@@ -17,4 +17,5 @@ void main(){
   // FragColor=ambient*f_Color;
   
   FragColor=texture(u_Texture, f_TexCoord)*f_Color;
+  // FragColor=f_Color;
 }

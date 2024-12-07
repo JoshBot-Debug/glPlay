@@ -79,9 +79,6 @@ App::App() : Window(opts)
   cube->getInstance(cube2ID).translate.x = 5.0f;
   cube->getInstance(cube2ID).translate.y = 5.0f;
 
-  // Instance &i1 = renderer.add<Instance>("sphere", "i1");
-  // Instance &i2 = renderer.add<Instance>("cube", "i2");
-  // i2.translate.x = 6.0f;
   // Begins the onDraw loop
   open();
 }
