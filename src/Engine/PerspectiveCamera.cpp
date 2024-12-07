@@ -1,6 +1,7 @@
 #include "PerspectiveCamera.h"
 
 #include <glm/gtc/matrix_transform.hpp>
+#include <iostream>
 
 void PerspectiveCamera::update()
 {
@@ -17,7 +18,7 @@ void PerspectiveCamera::update()
   right = glm::normalize(glm::vec3(rollMatrix * glm::vec4(right, 0.0f)));
   up = glm::normalize(glm::vec3(rollMatrix * glm::vec4(up, 0.0f)));
 
-  glm::vec3 cameraPosition = position + glm::vec3(offsetX, offsetY, 0.0f);
+  glm::vec3 cameraPosition = (position + glm::vec3(offsetX, offsetY, 0.0f));
 
   view = glm::lookAt(cameraPosition, cameraPosition + front, up);
 

@@ -55,9 +55,6 @@ void Renderer::update(const unsigned int partition, std::vector<Instance> instan
 
 void Renderer::draw(std::vector<Model *> &models, const Primitive &primitive)
 {
-  vao.bind();
-  ebo.bind();
-
   for (const auto &model : models)
   {
     model->bindTextures();
