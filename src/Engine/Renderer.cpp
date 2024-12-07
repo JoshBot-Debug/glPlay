@@ -64,6 +64,8 @@ void Renderer::draw(std::vector<Model *> &models, const Primitive &primitive)
 
     /**
      * TODO need to move all these functions inside model. Don't want to use Instance or Vertex here
+     * All this crap should be moved to a Struct that gets updated whenever changes are made, it should not be
+     * calculated on the fly.
      */
     const unsigned int indices = model->getIndicesCount();
     const unsigned int instances = model->getInstancesCount();
