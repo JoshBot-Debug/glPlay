@@ -25,8 +25,8 @@ App::App() : Window(opts)
    */
   PerspectiveCamera *camera = engine.createCamera<PerspectiveCamera>();
   camera->setOffset(0.5f, 0.5f);
-  camera->setPosition(2.0f, 2.0f, 10.0f);
-  camera->setRotation(10.0f, 0.0f, 0.0f);
+  camera->setPosition(0.0f, 0.0f, 10.0f);
+  camera->setRotation(0.0f, 0.0f, 0.0f);
 
   /**
    * Setup a light source
@@ -38,7 +38,7 @@ App::App() : Window(opts)
   /**
    * Load the model foo
    */
-  // Model *sphere = engine.createModel("assets/model/sphere.fbx");
+  Model *sphere = engine.createModel("assets/model/sphere.fbx");
   Model *cube = engine.createModel("assets/model/cube-textured.fbx");
 
   /**
@@ -64,11 +64,21 @@ App::App() : Window(opts)
   // material->setRoughness(0.8f);
   // material->setShininess(32.0f);
 
-  // sphere->addTexture(brick);
+  sphere->addTexture(brick);
   cube->addTexture(wall);
 
-  // sphere->createInstance();
-  cube->createInstance();
+  const unsigned int sphere1ID = sphere->createInstance();
+  const unsigned int sphere2ID = sphere->createInstance();
+  const unsigned int cube1ID = cube->createInstance();
+  const unsigned int cube2ID = cube->createInstance();
+
+  sphere->getInstance(sphere1ID).translate.x = -5.0f;
+  sphere->getInstance(sphere2ID).translate.x = -5.0f;
+  sphere->getInstance(sphere2ID).translate.y = 5.0f;
+  cube->getInstance(cube1ID).translate.x = 5.0f;
+  cube->getInstance(cube2ID).translate.x = 5.0f;
+  cube->getInstance(cube2ID).translate.y = 5.0f;
+
   // Instance &i1 = renderer.add<Instance>("sphere", "i1");
   // Instance &i2 = renderer.add<Instance>("cube", "i2");
   // i2.translate.x = 6.0f;

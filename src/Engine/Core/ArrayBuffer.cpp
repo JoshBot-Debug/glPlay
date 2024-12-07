@@ -33,7 +33,7 @@ void ArrayBuffer::set(unsigned int chunk, unsigned int count, const void *data, 
 void ArrayBuffer::update(unsigned int chunk, unsigned int offset, unsigned int size, const void *data, unsigned int partition)
 {
   glBindBuffer((unsigned int)target, buffer);
-  glBufferSubData((unsigned int)target, (offset * chunk) + getBufferPartitionOffsetSize(partitions, partition), size, data);
+  glBufferSubData((unsigned int)target, (offset * chunk) + getBufferPartitionOffsetSize(partition), size, data);
 }
 
 unsigned int ArrayBuffer::get() const { return buffer; }
@@ -83,7 +83,7 @@ void ArrayBuffer::resize(unsigned int partition, unsigned int size, unsigned int
 
   glBindBuffer(GL_COPY_WRITE_BUFFER, next);
 
-  int partitionOffset = getBufferPartitionOffsetSize(partitions, partition);
+  int partitionOffset = getBufferPartitionOffsetSize(partition);
 
   const size_t remaining = currentSize - (partitionOffset + offset);
 
@@ -102,7 +102,7 @@ void ArrayBuffer::resize(unsigned int partition, unsigned int size, unsigned int
   partitions[partition] += size;
 }
 
-unsigned int ArrayBuffer::addPartition(unsigned int size)
+const unsigned int ArrayBuffer::addPartition(unsigned int size)
 {
   this->partitions.emplace_back(size);
   const unsigned int id = this->partitions.size() - 1;

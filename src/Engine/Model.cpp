@@ -72,6 +72,8 @@ Model::Model(Renderer *renderer, unsigned int id, const char *filepath) : render
 {
   loadModel(filepath, meshes);
 
+  indicesCount = getIndices().size();
+
   renderer->upsertModel(this);
 }
 
@@ -123,37 +125,12 @@ std::vector<Instance> &Model::getInstances()
   return instances;
 }
 
-const void Model::setIndiceOffset(unsigned int offset)
+const unsigned int Model::getIndicesCount() const
 {
-  this->offset.indice = offset;
+  return indicesCount;
 }
 
-const void Model::setVertexOffset(unsigned int offset)
-{
-  this->offset.vertex = offset;
-}
-
-const void Model::setInstanceOffset(unsigned int offset)
-{
-  this->offset.instance = offset;
-}
-
-const unsigned int Model::getIndiceOffset() const
-{
-  return this->offset.indice;
-}
-
-const unsigned int Model::getVertexOffset() const
-{
-  return this->offset.vertex;
-}
-
-const unsigned int Model::getInstanceOffset() const
-{
-  return this->offset.instance;
-}
-
-const unsigned int Model::getInstanceCount() const
+const unsigned int Model::getInstancesCount() const
 {
   return instances.size();
 }

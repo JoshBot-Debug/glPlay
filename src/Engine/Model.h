@@ -20,13 +20,6 @@ struct Instance
   glm::vec4 color = glm::vec4(1.0f);
 };
 
-struct BufferOffset
-{
-  unsigned int vertex = 0;   // The offset in the vertex array buffer where the data begins
-  unsigned int indice = 0;   // The offset in the element array buffer where the data begins
-  unsigned int instance = 0; // The offset in the instance vertex array buffer where the data begins
-};
-
 class Model
 {
 private:
@@ -40,9 +33,9 @@ private:
 
   Material *material;
 
-  BufferOffset offset;
-
   std::vector<Instance> instances;
+
+  unsigned int indicesCount;
 
 public:
   Model(Renderer *renderer, unsigned int id, const char *filepath);
@@ -60,14 +53,8 @@ public:
   Instance &getInstance(unsigned int id);
   std::vector<Instance> &getInstances();
 
-  const void setIndiceOffset(unsigned int offset);
-  const void setVertexOffset(unsigned int offset);
-  const void setInstanceOffset(unsigned int offset);
-
-  const unsigned int getIndiceOffset() const;
-  const unsigned int getVertexOffset() const;
-  const unsigned int getInstanceOffset() const;
-  const unsigned int getInstanceCount() const;
+  const unsigned int getIndicesCount() const;
+  const unsigned int getInstancesCount() const;
 
   const std::vector<Vertex> getVertices() const;
   const std::vector<unsigned int> getIndices() const;

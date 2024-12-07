@@ -37,26 +37,18 @@ void Renderer::upsertModel(Model *model)
   vao.set(2, 2, VertexType::FLOAT, false, sizeof(Vertex), (void *)offsetof(Vertex, texCoord));
 }
 
-void Renderer::upsertInstance(Model *model, Instance &instance, unsigned int id)
+void Renderer::upsertInstance(Model *model, Instance &instance, const unsigned int id)
 {
-  assert(ibo.addPartition(0) == model->getID());
+  ibo.addPartition(0);
   ibo.upsert(sizeof(Instance), id, sizeof(instance), (const void *)&instance, model->getID());
 
   vao.set(3, 3, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, translate), 1);
   vao.set(4, 3, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, rotation), 1);
   vao.set(5, 3, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, scale), 1);
   vao.set(6, 4, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, color), 1);
-
-  // debug(model->getID());
-  // Instance* inst = new Instance();
-  // inst->color.a = 99.0f;
-
-  // std::cout << sizeof(Instance) << std::endl;
-  // ibo.update(0, std::vector{inst}, model->getID());
-  // debug(model->getID());
 }
 
-void Renderer::update(unsigned int partition, std::vector<Instance> instances)
+void Renderer::update(const unsigned int partition, std::vector<Instance> instances)
 {
   ibo.update(0, instances, partition);
 }
@@ -66,31 +58,19 @@ void Renderer::draw(std::vector<Model *> &models, const Primitive &primitive)
   vao.bind();
   ebo.bind();
 
-  glDrawElementsInstancedBaseVertexBaseInstance((unsigned int)primitive, 36, GL_UNSIGNED_INT, (const void *)(0 * sizeof(unsigned int)), 1, 0, 0);
-
-
-  // glDrawElementsInstancedBaseVertexBaseInstance((unsigned int)primitive, 2880, GL_UNSIGNED_INT, (const void *)(0 * sizeof(unsigned int)), 1, 0, 0);
-  // glDrawElementsInstancedBaseVertexBaseInstance((unsigned int)primitive, 36, GL_UNSIGNED_INT, (const void *)(2880 * sizeof(unsigned int)), 1, 1984, 1);
-
   for (const auto &model : models)
   {
     model->bindTextures();
 
-    // glDrawElementsInstancedBaseVertex((unsigned int)primitive, model->getIndices().size(), GL_UNSIGNED_INT, (const void *)(model->getIndiceOffset() * sizeof(unsigned int)), model->getInstanceCount(), model->getVertexOffset());
+    /**
+     * TODO need to move all these functions inside model. Don't want to use Instance or Vertex here
+     */
+    const unsigned int indices = model->getIndicesCount();
+    const unsigned int instances = model->getInstancesCount();
+    const size_t indiceSizeOffset = ebo.getBufferPartitionOffsetSize(model->getID());
+    const size_t vertexOffset = vbo.getBufferPartitionOffsetSize(model->getID()) / sizeof(Vertex);
+    const size_t instanceOffset = ibo.getBufferPartitionOffsetSize(model->getID()) / sizeof(Instance);
 
-    // LOG("Model ebo size:", model->getIndices().size());
-    // LOG("Model ebo offset(bytes):", model->getIndiceOffset());
-    // LOG("Model vbo offset(bytes):", model->getVertexOffset());
-    // LOG("Model instances:", model->getInstanceCount());
-  }
-}
-
-void Renderer::debug(unsigned int partition)
-{
-  std::vector<float> instances = ibo.getBufferData<float>(partition);
-
-  for (const auto &instanceData : instances)
-  {
-    std::cout << instanceData << std::endl;
+    glDrawElementsInstancedBaseVertexBaseInstance((unsigned int)primitive, indices, GL_UNSIGNED_INT, (const void *)indiceSizeOffset, instances, vertexOffset, instanceOffset);
   }
 }

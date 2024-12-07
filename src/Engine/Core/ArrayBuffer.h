@@ -23,21 +23,6 @@ struct BufferPartition
   BufferPartition(unsigned int size, unsigned int used, unsigned int chunk) : size(size), used(used), chunk(chunk) {}
 };
 
-inline unsigned int getBufferPartitionOffsetSize(const std::vector<unsigned int> &partitions, unsigned int partitionIndex)
-{
-  // Did you forget to call .addPartition(0) before trying to upsert to a partition that
-  // does not exist? You need to add a partition first.
-  // And if only partition 0 exists, you cannot try upserting or updating to partition[2,3,4,...]
-  assert(partitions.size() > partitionIndex);
-
-  unsigned int size = 0;
-
-  for (unsigned int i = 0; i < partitionIndex; i++)
-    size += partitions[i];
-
-  return size;
-}
-
 class ArrayBuffer
 {
 private:
@@ -147,7 +132,7 @@ public:
   void update(unsigned int offset, const std::vector<T> &data, unsigned int partition = 0)
   {
     glBindBuffer((unsigned int)target, buffer);
-    glBufferSubData((unsigned int)target, offset * sizeof(T) + getBufferPartitionOffsetSize(partitions, partition), data.size() * sizeof(T), data.data());
+    glBufferSubData((unsigned int)target, offset * sizeof(T) + getBufferPartitionOffsetSize(partition), data.size() * sizeof(T), data.data());
   }
 
   /**
@@ -185,7 +170,7 @@ public:
     if (expansionSize > 0)
       resize(partition, expansionSize + (dataSize * resizeFactor), offsetSize);
 
-    glBufferSubData((unsigned int)target, offsetSize + getBufferPartitionOffsetSize(partitions, partition), dataSize, data.data());
+    glBufferSubData((unsigned int)target, offsetSize + getBufferPartitionOffsetSize(partition), dataSize, data.data());
   }
 
   /**
@@ -212,7 +197,7 @@ public:
       resize(partition, expansionSize + (size * resizeFactor), offsetSize);
 
     glBindBuffer((unsigned int)target, buffer);
-    glBufferSubData((unsigned int)target, offsetSize + getBufferPartitionOffsetSize(partitions, partition), size, data);
+    glBufferSubData((unsigned int)target, offsetSize + getBufferPartitionOffsetSize(partition), size, data);
   }
 
   /**
@@ -258,9 +243,9 @@ public:
    * @returns the specific partition data in the buffer.
    */
   template <typename T>
-  std::vector<T> getBufferData(unsigned int partition) const
+  std::vector<T> getBufferData(unsigned int partition)
   {
-    const int offset = getBufferPartitionOffsetSize(partitions, partition);
+    const unsigned int offset = getBufferPartitionOffsetSize(partition);
     const int size = partitions[partition];
     const int items = size / sizeof(T);
 
@@ -292,5 +277,20 @@ public:
    *
    * @param size The size in bytes.
    */
-  unsigned int addPartition(unsigned int size);
+  const unsigned int addPartition(unsigned int size);
+
+  size_t getBufferPartitionOffsetSize(unsigned int partitionIndex)
+  {
+    // Did you forget to call .addPartition(0) before trying to upsert to a partition that
+    // does not exist? You need to add a partition first.
+    // And if only partition 0 exists, you cannot try upserting or updating to partition[2,3,4,...]
+    assert(partitions.size() > partitionIndex);
+
+    size_t size = 0;
+
+    for (unsigned int i = 0; i < partitionIndex; i++)
+      size += partitions[i];
+
+    return size;
+  }
 };
