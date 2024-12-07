@@ -6,6 +6,10 @@ private:
   static double time;
   static double deltaTime;
 
+  static int currentFrame;
+  static int averageFPS[60];
+  static int fps;
+
 public:
   /**
    * DO NOT CALL THIS METHOD
@@ -16,10 +20,15 @@ public:
   /**
    * Get the current time since the window initialized
    */
-  static double GetTime();
+  static const double GetTime();
 
   /**
    * Get the delta time for this loop
    */
-  static double GetDeltaTime();
+  static const double GetDeltaTime();
+
+  /**
+   * Get the average FPS over the last 60 frames
+   */
+  static const int GetAverageFPS();
 };

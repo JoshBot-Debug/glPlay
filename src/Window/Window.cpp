@@ -122,8 +122,7 @@ Window::Window(const WindowOptions &options) : options(options)
 
   glDebug();
 
-  if (options.enableVSync)
-    glfwSwapInterval(1);
+  glfwSwapInterval(options.enableVSync ? 1 : 0);
 
   if (options.enableDepth)
     glEnable(GL_DEPTH_TEST);

@@ -216,5 +216,10 @@ public:
     shader->setUniformMatrix4fv("u_ViewProjection", camera->getViewProjectionMatrix());
   };
 
+  void getFPS()
+  {
+    
+  }
+
   void draw(const Primitive &primitive = Primitive::TRIANGLES) { renderer.draw(models, primitive); };
 };

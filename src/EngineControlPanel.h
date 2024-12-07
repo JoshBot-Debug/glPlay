@@ -142,9 +142,18 @@ public:
     mouse = Input::MousePosition();
   }
 
+  void stats()
+  {
+    ImGui::Begin("Stats");
+    ImGui::Text("FPS: %i", Time::GetAverageFPS());
+    ImGui::End();
+  }
+
   void draw()
   {
     ImGui::Begin("Debug Menu");
+
+    this->stats();
 
     this->shaderMenu();
 

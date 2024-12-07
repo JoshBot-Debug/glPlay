@@ -11,7 +11,7 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
-const WindowOptions opts = {.title = "glPlay", .width = 800, .height = 600, .enableDepth = true, .enableVSync = true, .MSAA = 16, .imguiEnableDocking = true, .maximized = true};
+const WindowOptions opts = {.title = "glPlay", .width = 800, .height = 600, .enableDepth = true, .enableVSync = false, .MSAA = 16, .imguiEnableDocking = true, .maximized = true};
 
 /**
  * TODO need to add a ViewportManager class that holds all this information\
@@ -73,9 +73,6 @@ App::App() : Window(opts)
   cube->getInstance(cube1ID).translate.x = 5.0f;
   cube->getInstance(cube2ID).translate.x = 5.0f;
   cube->getInstance(cube2ID).translate.y = 5.0f;
-
-  for(const auto&l : engine.getLights<PointLight>())
-    std::cout << "GOT ONE" << std::endl;
 
   // Begins the onDraw loop
   open();
