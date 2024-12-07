@@ -6,7 +6,8 @@
 #include "Renderer.h"
 #include "Model.h"
 #include "Shader.h"
-#include "Camera.h"
+#include "Camera/Camera.h"
+#include "Light/Light.h"
 #include "Texture2D.h"
 #include "Material.h"
 
@@ -16,6 +17,7 @@ private:
   Renderer renderer;
   Shader *shader;
   Camera *camera;
+  std::vector<Light *> lights;
   std::vector<Model *> models;
   std::vector<Material *> materials;
   std::vector<Texture2D *> textures;
@@ -155,10 +157,54 @@ public:
     return materials;
   }
 
+  /**
+   * Creates an instance of Light and returns a pointer
+   * @param T An instance of Light
+   * @returns Light pointer
+   */
+  template <typename T>
+  T *createLight()
+  {
+    static_assert(std::is_base_of<Light, T>::value, "T must implement the Light interface.");
+    unsigned int id = lights.size();
+    T *light = new T(id);
+    lights.push_back(light);
+    return dynamic_cast<T *>(lights[id]);
+  }
+
+  /**
+   * Get the Light
+   * @returns The Light
+   */
+  template <typename T>
+  T *getLight(unsigned int id)
+  {
+    return dynamic_cast<T *>(lights[id]);
+  }
+
+  /**
+   * Get all Lights of type T
+   * @returns A vector of Lights of type T
+   */
+  template <typename T>
+  std::vector<T *> getLights()
+  {
+    std::vector<T *> result;
+
+    for (const auto &light : lights)
+    {
+      T *castedLight = dynamic_cast<T *>(light);
+      if (castedLight)
+        result.push_back(castedLight);
+    }
+
+    return result;
+  }
+
   void update()
   {
     camera->update();
-    
+
     // TODO Need to do a dirty check here
     // And do all the updates in one call
     for (const auto &model : models)

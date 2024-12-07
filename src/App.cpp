@@ -2,7 +2,9 @@
 #include "Window/Input.h"
 #include "Window/Time.h"
 
-#include "Engine/PerspectiveCamera.h"
+#include "Engine/Camera/PerspectiveCamera.h"
+#include "Engine/Light/PointLight.h"
+#include "Engine/Light/DirectionalLight.h"
 #include "Engine/Shader.h"
 
 #include "Engine/Core/ArrayBuffer.h"
@@ -32,6 +34,7 @@ App::App() : Window(opts)
    * Setup a light source
    * Specify the type and other properties.
    */
+  PointLight *point = engine.createLight<PointLight>();
   // Light *light = new Light();
   // light->setType(LightType::Ambient);
 
@@ -45,26 +48,18 @@ App::App() : Window(opts)
    * Setup the shader
    */
   Shader *shader = engine.getShader();
-  unsigned int vertex = shader->compile("src/Shader/vertex.glsl", ShaderType::VERTEX_SHADER);
-  unsigned int fragment = shader->compile("src/Shader/fragment.glsl", ShaderType::FRAGMENT_SHADER);
-  shader->createProgram({vertex, fragment});
+  unsigned int v_transform = shader->compile("src/Shader/v_transform.glsl", ShaderType::VERTEX_SHADER);
+  unsigned int f_material = shader->compile("src/Shader/f_material.glsl", ShaderType::FRAGMENT_SHADER);
+  shader->createProgram({v_transform, f_material});
+
+  unsigned int f_light = shader->compile("src/Shader/f_point_light.glsl", ShaderType::FRAGMENT_SHADER);
+  shader->createProgram({v_transform, f_light});
 
   /**
    * Load all textures
    */
   Texture2D *wall = engine.createTexture2D("assets/textures/wall.jpg");
-  Texture2D *brick = engine.createTexture2D("assets/textures/brick.jpg");
 
-  /**
-   * Create all materials
-   */
-  // Material *material = new Material();
-  // material->setDiffuseTexture(diffuseTexture);
-  // material->setDiffuseColor(glm::vec3(1.0f, 0.5f, 0.3f));
-  // material->setRoughness(0.8f);
-  // material->setShininess(32.0f);
-
-  sphere->addTexture(brick);
   cube->addTexture(wall);
 
   const unsigned int sphere1ID = sphere->createInstance();
@@ -78,6 +73,9 @@ App::App() : Window(opts)
   cube->getInstance(cube1ID).translate.x = 5.0f;
   cube->getInstance(cube2ID).translate.x = 5.0f;
   cube->getInstance(cube2ID).translate.y = 5.0f;
+
+  for(const auto&l : engine.getLights<PointLight>())
+    std::cout << "GOT ONE" << std::endl;
 
   // Begins the onDraw loop
   open();
