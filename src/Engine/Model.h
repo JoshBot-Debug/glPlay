@@ -35,7 +35,11 @@ private:
 
   std::vector<Instance> instances;
 
+  size_t vertexOffset;
+  size_t instanceOffset;
+  size_t indiceSizeOffset;
   unsigned int indicesCount;
+  unsigned int instancesCount;
 
 public:
   Model(Renderer *renderer, unsigned int id, const char *filepath);
@@ -52,6 +56,15 @@ public:
   const unsigned int createInstance();
   Instance &getInstance(unsigned int id);
   std::vector<Instance> &getInstances();
+
+  const size_t getVertexOffset() const;
+  const void setVertexOffset(size_t offset);
+
+  const size_t getInstanceOffset() const;
+  const void setInstanceOffset(size_t offset);
+
+  const size_t getIndiceSizeOffset() const;
+  const void setIndiceSizeOffset(size_t offset);
 
   const unsigned int getIndicesCount() const;
   const unsigned int getInstancesCount() const;

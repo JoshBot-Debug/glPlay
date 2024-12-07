@@ -28,9 +28,11 @@ void Renderer::upsertModel(Model *model)
 {
   assert(ebo.addPartition(0) == model->getID());
   ebo.upsert(0, model->getIndices(), model->getID());
+  model->setIndiceSizeOffset(ebo.getBufferPartitionOffsetSize(model->getID()));
 
   assert(vbo.addPartition(0) == model->getID());
   vbo.upsert(0, model->getVertices(), model->getID());
+  model->setVertexOffset(vbo.getBufferPartitionOffsetSize(model->getID()) / sizeof(Vertex));
 
   vao.set(0, 3, VertexType::FLOAT, false, sizeof(Vertex), (void *)offsetof(Vertex, position));
   vao.set(1, 3, VertexType::FLOAT, false, sizeof(Vertex), (void *)offsetof(Vertex, normal));
@@ -41,6 +43,7 @@ void Renderer::upsertInstance(Model *model, Instance &instance, const unsigned i
 {
   ibo.addPartition(0);
   ibo.upsert(sizeof(Instance), id, sizeof(instance), (const void *)&instance, model->getID());
+  model->setInstanceOffset(ibo.getBufferPartitionOffsetSize(model->getID()) / sizeof(Instance));
 
   vao.set(3, 3, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, translate), 1);
   vao.set(4, 3, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, rotation), 1);
@@ -58,18 +61,19 @@ void Renderer::draw(std::vector<Model *> &models, const Primitive &primitive)
   for (const auto &model : models)
   {
     model->bindTextures();
+    // glMultiDrawElementsIndirect MAGIC!!!
+    // Welcome to batching elements into one draw call!!
+    // typedef struct
+    // {
+    //   uint count;
+    //   uint instanceCount;
+    //   uint firstIndex;
+    //   int baseVertex;
+    //   uint baseInstance;
+    // } DrawElementsIndirectCommand;
+    // glMultiDrawElementsIndirect accepts an array of structs like this!!!
+    // It's exactly like glDrawElementsInstancedBaseVertexBaseInstance except it's multi!!
 
-    /**
-     * TODO need to move all these functions inside model. Don't want to use Instance or Vertex here
-     * All this crap should be moved to a Struct that gets updated whenever changes are made, it should not be
-     * calculated on the fly.
-     */
-    const unsigned int indices = model->getIndicesCount();
-    const unsigned int instances = model->getInstancesCount();
-    const size_t indiceSizeOffset = ebo.getBufferPartitionOffsetSize(model->getID());
-    const size_t vertexOffset = vbo.getBufferPartitionOffsetSize(model->getID()) / sizeof(Vertex);
-    const size_t instanceOffset = ibo.getBufferPartitionOffsetSize(model->getID()) / sizeof(Instance);
-
-    glDrawElementsInstancedBaseVertexBaseInstance((unsigned int)primitive, indices, GL_UNSIGNED_INT, (const void *)indiceSizeOffset, instances, vertexOffset, instanceOffset);
+    glDrawElementsInstancedBaseVertexBaseInstance((unsigned int)primitive, model->getIndicesCount(), GL_UNSIGNED_INT, (const void *)model->getIndiceSizeOffset(), model->getInstancesCount(), model->getVertexOffset(), model->getInstanceOffset());
   }
 }

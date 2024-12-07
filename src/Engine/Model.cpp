@@ -108,7 +108,9 @@ const unsigned int Model::createInstance()
 {
   instances.emplace_back();
 
-  const unsigned int id = instances.size() - 1;
+  instancesCount = instances.size();
+
+  const unsigned int id = instancesCount - 1;
 
   renderer->upsertInstance(this, instances[id], id);
 
@@ -132,7 +134,37 @@ const unsigned int Model::getIndicesCount() const
 
 const unsigned int Model::getInstancesCount() const
 {
-  return instances.size();
+  return instancesCount;
+}
+
+const size_t Model::getIndiceSizeOffset() const
+{
+  return indiceSizeOffset;
+}
+
+const void Model::setIndiceSizeOffset(size_t offset)
+{
+  indiceSizeOffset = offset;
+}
+
+const size_t Model::getVertexOffset() const
+{
+  return vertexOffset;
+}
+
+const void Model::setVertexOffset(size_t offset)
+{
+  vertexOffset = offset;
+}
+
+const size_t Model::getInstanceOffset() const
+{
+  return instanceOffset;
+}
+
+const void Model::setInstanceOffset(size_t offset)
+{
+  instanceOffset = offset;
 }
 
 const std::vector<Vertex> Model::getVertices() const
