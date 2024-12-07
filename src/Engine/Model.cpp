@@ -102,23 +102,23 @@ void Model::bindTextures() const
     textures[i]->bind(i);
 }
 
-unsigned int Model::createInstance()
+const unsigned int Model::createInstance()
 {
-  Instance *instance = new Instance();
+  instances.emplace_back();
 
-  instances.push_back(instance);
+  const unsigned int id = instances.size() - 1;
 
-  renderer->upsertInstance(this, instance);
+  renderer->upsertInstance(this, instances[id], id);
 
-  return instances.size() - 1;
+  return id;
 }
 
-Instance *Model::getInstance(unsigned int id)
+Instance &Model::getInstance(unsigned int id)
 {
   return instances.at(id);
 }
 
-std::vector<Instance *> &Model::getInstances()
+std::vector<Instance> &Model::getInstances()
 {
   return instances;
 }

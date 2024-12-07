@@ -42,7 +42,7 @@ private:
 
   BufferOffset offset;
 
-  std::vector<Instance *> instances;
+  std::vector<Instance> instances;
 
 public:
   Model(Renderer *renderer, unsigned int id, const char *filepath);
@@ -56,9 +56,9 @@ public:
 
   void bindTextures() const;
 
-  unsigned int createInstance();
-  Instance *getInstance(unsigned int id);
-  std::vector<Instance *> &getInstances();
+  const unsigned int createInstance();
+  Instance &getInstance(unsigned int id);
+  std::vector<Instance> &getInstances();
 
   const void setIndiceOffset(unsigned int offset);
   const void setVertexOffset(unsigned int offset);

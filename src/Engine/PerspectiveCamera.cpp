@@ -26,8 +26,8 @@ void PerspectiveCamera::update()
 
 void PerspectiveCamera::setViewportSize(const glm::vec2 &size)
 {
-  this->width = width;
-  this->height = height;
+  this->width = size.x;
+  this->height = size.y;
 }
 
 void PerspectiveCamera::setViewportSize(float width, float height)

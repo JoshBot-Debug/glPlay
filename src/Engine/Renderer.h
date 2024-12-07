@@ -18,7 +18,11 @@ public:
 
   void upsertModel(Model *model);
 
-  void upsertInstance(Model *model, Instance *instance);
+  void upsertInstance(Model *model, Instance &instance, unsigned int id);
 
-  void draw(const Primitive &primitive = Primitive::TRIANGLES);
+  void update(unsigned int partition, std::vector<Instance> instances);
+
+  void draw(std::vector<Model *> &models, const Primitive &primitive = Primitive::TRIANGLES);
+
+  void debug(unsigned int partition);
 };

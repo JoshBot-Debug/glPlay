@@ -17,6 +17,8 @@ const WindowOptions opts = {.title = "glPlay", .width = 800, .height = 600, .ena
  */
 App::App() : Window(opts)
 {
+  controlPanel.setEngine(&engine);
+
   /**
    * Setup a camera
    * Specify the type, and other properties.
@@ -36,7 +38,7 @@ App::App() : Window(opts)
   /**
    * Load the model foo
    */
-  Model *sphere = engine.createModel("assets/model/sphere.fbx");
+  // Model *sphere = engine.createModel("assets/model/sphere.fbx");
   Model *cube = engine.createModel("assets/model/cube-textured.fbx");
 
   /**
@@ -62,23 +64,14 @@ App::App() : Window(opts)
   // material->setRoughness(0.8f);
   // material->setShininess(32.0f);
 
-  /**
-   * Setup the renderer
-   */
-  // renderer.setCamera(&camera);
-  // renderer.addLight(light);
-  // renderer.addModel(sphere);
-  // renderer.addModel(cube);
+  // sphere->addTexture(brick);
+  cube->addTexture(wall);
 
+  // sphere->createInstance();
+  cube->createInstance();
   // Instance &i1 = renderer.add<Instance>("sphere", "i1");
   // Instance &i2 = renderer.add<Instance>("cube", "i2");
   // i2.translate.x = 6.0f;
-
-  // debugMenu.setCamera(camera);
-  // debugMenu.addInstance("i1", &i1);
-  // debugMenu.addInstance("i2", &i2);
-  // debugMenu.addShader(shader);
-
   // Begins the onDraw loop
   open();
 }
@@ -89,7 +82,7 @@ void App::onUpdate()
 
   engine.update();
 
-  // debugMenu.update();
+  controlPanel.update();
 }
 
 void App::onDraw()
@@ -103,5 +96,5 @@ void App::onDraw()
 
   engine.draw();
 
-  // debugMenu.draw();
+  controlPanel.draw();
 }

@@ -2,21 +2,14 @@
 
 #include <Window/Window.h>
 
-// #include "ECS/Registry.h"
 #include "Engine/Engine.h"
-
-// #include "Scene/AnimatorViewport.h"
-
-// #include "DebugMenu.h"
+#include "EngineControlPanel.h"
 
 class App : Window
 {
 private:
   Engine engine;
-  // Registry registry;
-  // AnimatorViewport animatorViewport;
-
-  // DebugMenu debugMenu;
+  EngineControlPanel controlPanel;
 
 public:
   App();

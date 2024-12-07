@@ -155,12 +155,14 @@ public:
     return materials;
   }
 
-  void update() {
+  void update()
+  {
+    camera->update();
+    
     // TODO Need to do a dirty check here
     // And do all the updates in one call
-    // for (const auto &model : models)
-    //   for (const auto &im : model->getInstanceManagers())
-    //     ibo.update(im->offset * sizeof(Instance), sizeof(im->instance), &im->instance);
+    for (const auto &model : models)
+      renderer.update(model->getID(), model->getInstances());
   };
 
   void begin()
@@ -168,5 +170,5 @@ public:
     shader->setUniformMatrix4fv("u_ViewProjection", camera->getViewProjectionMatrix());
   };
 
-  void draw(const Primitive &primitive = Primitive::TRIANGLES) { renderer.draw(primitive); };
+  void draw(const Primitive &primitive = Primitive::TRIANGLES) { renderer.draw(models, primitive); };
 };
