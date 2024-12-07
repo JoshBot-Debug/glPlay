@@ -6,6 +6,7 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+#include "Renderer.h"
 #include "Debug.h"
 
 void loadModel(const char *path, std::vector<Mesh> &meshes)
@@ -67,15 +68,22 @@ void loadModel(const char *path, std::vector<Mesh> &meshes)
   }
 }
 
-Model::Model(unsigned int id, const char *filepath) : id(id)
+Model::Model(Renderer *renderer, unsigned int id, const char *filepath) : renderer(renderer), id(id)
 {
   loadModel(filepath, meshes);
+
+  renderer->upsertModel(this);
 }
 
 Model::~Model()
 {
   textures.clear();
   material = nullptr;
+}
+
+const unsigned int Model::getID()
+{
+  return id;
 }
 
 void Model::setMaterial(Material *material)
@@ -96,7 +104,12 @@ void Model::bindTextures() const
 
 unsigned int Model::createInstance()
 {
-  instances.push_back(new Instance());
+  Instance *instance = new Instance();
+
+  instances.push_back(instance);
+
+  renderer->upsertInstance(this, instance);
+
   return instances.size() - 1;
 }
 

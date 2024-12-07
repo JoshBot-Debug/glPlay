@@ -73,8 +73,12 @@ public:
   Model *createModel(const char *path)
   {
     unsigned int id = models.size();
-    models.push_back(new Model(id, path));
-    return models[id];
+
+    Model *model = new Model(&renderer, id, path);
+
+    models.push_back(model);
+
+    return model;
   }
 
   /**

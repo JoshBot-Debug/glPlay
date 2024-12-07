@@ -17,14 +17,14 @@ void ArrayBuffer::generate()
     glGenBuffers(1, &buffer);
 }
 
-void ArrayBuffer::set(unsigned int chunk, unsigned int count, const void *data, const std::vector<BufferPartition> partitions)
+void ArrayBuffer::set(unsigned int chunk, unsigned int count, const void *data, const std::vector<unsigned int> partitions)
 {
   unsigned int size = count * chunk;
 
   if (partitions.size())
     this->partitions = partitions;
   else
-    this->partitions.emplace_back(size, size, chunk);
+    this->partitions.emplace_back(size);
 
   glBindBuffer((unsigned int)target, buffer);
   glBufferData((unsigned int)target, size, data, (unsigned int)draw);
@@ -87,23 +87,28 @@ void ArrayBuffer::resize(unsigned int partition, unsigned int size, unsigned int
 
   const size_t remaining = currentSize - (partitionOffset + offset);
 
-  glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, partitionOffset + offset);
+  if (partitionOffset + offset > 0)
+    glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, partitionOffset + offset);
 
   if (remaining > 0)
     glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, partitionOffset + offset, partitionOffset + offset + size, remaining);
 
+  glBindBuffer(GL_COPY_READ_BUFFER, 0);
+  glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
   glDeleteBuffers(1, &buffer);
 
   buffer = next;
 
-  partitions[partition].size += size;
+  partitions[partition] += size;
 }
 
-unsigned int ArrayBuffer::addPartition(unsigned int chunk, unsigned int count)
+unsigned int ArrayBuffer::addPartition(unsigned int size)
 {
-  this->partitions.emplace_back(chunk * count, 0, chunk);
+  this->partitions.emplace_back(size);
+  const unsigned int id = this->partitions.size() - 1;
 
-  resize(getBufferSize() + (chunk * count));
+  if (size > 0)
+    resize(id, size, 0);
 
-  return this->partitions.size() - 1;
+  return id;
 }

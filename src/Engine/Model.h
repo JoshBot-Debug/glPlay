@@ -7,6 +7,8 @@
 #include "Texture2D.h"
 #include "Material.h"
 
+class Renderer;
+
 struct Instance
 {
   glm::vec3 translate = glm::vec3(0.0f);
@@ -28,6 +30,8 @@ struct BufferOffset
 class Model
 {
 private:
+  Renderer *renderer;
+
   unsigned int id;
 
   std::vector<Mesh> meshes;
@@ -41,8 +45,10 @@ private:
   std::vector<Instance *> instances;
 
 public:
-  Model(unsigned int id, const char *filepath);
+  Model(Renderer *renderer, unsigned int id, const char *filepath);
   ~Model();
+
+  const unsigned int getID();
 
   void setMaterial(Material *material);
 

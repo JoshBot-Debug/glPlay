@@ -4,6 +4,7 @@
 #include <vector>
 #include <cstring>
 #include <iostream>
+#include <cassert>
 
 #include "Common.h"
 
@@ -22,12 +23,17 @@ struct BufferPartition
   BufferPartition(unsigned int size, unsigned int used, unsigned int chunk) : size(size), used(used), chunk(chunk) {}
 };
 
-inline unsigned int getBufferPartitionOffsetSize(const std::vector<BufferPartition> &partitions, unsigned int partitionIndex)
+inline unsigned int getBufferPartitionOffsetSize(const std::vector<unsigned int> &partitions, unsigned int partitionIndex)
 {
+  // Did you forget to call .addPartition(0) before trying to upsert to a partition that
+  // does not exist? You need to add a partition first.
+  // And if only partition 0 exists, you cannot try upserting or updating to partition[2,3,4,...]
+  assert(partitions.size() > partitionIndex);
+
   unsigned int size = 0;
 
   for (unsigned int i = 0; i < partitionIndex; i++)
-    size += partitions[i].size;
+    size += partitions[i];
 
   return size;
 }
@@ -43,7 +49,7 @@ private:
 
   unsigned int resizeFactor = 0;
 
-  std::vector<BufferPartition> partitions;
+  std::vector<unsigned int> partitions;
 
 public:
   /**
@@ -106,14 +112,14 @@ public:
    * @tparam T The type of the elements in the vector (e.g., float, glm::vec3).
    */
   template <typename T>
-  void set(const std::vector<T> &data, const std::vector<BufferPartition> partitions = {})
+  void set(const std::vector<T> &data, const std::vector<unsigned int> partitions = {})
   {
     unsigned int size = data.size() * sizeof(T);
 
     if (partitions.size())
       this->partitions = partitions;
     else
-      this->partitions.emplace_back(size, size, sizeof(T));
+      this->partitions.emplace_back(size);
 
     glBindBuffer((unsigned int)target, buffer);
     glBufferData((unsigned int)target, size, data.data(), (unsigned int)draw);
@@ -127,7 +133,7 @@ public:
    * @param data A pointer to the raw data to be uploaded to the buffer.
    * @param draw Specifies how the buffer will be used (static, dynamic, etc.). Default is STATIC.
    */
-  void set(unsigned int chunk, unsigned int count, const void *data, const std::vector<BufferPartition> partitions = {});
+  void set(unsigned int chunk, unsigned int count, const void *data, const std::vector<unsigned int> partitions = {});
 
   /**
    * Updates part of the buffer with a vector of generic data type.
@@ -152,7 +158,7 @@ public:
    * @param size The size of the data to update in bytes.
    * @param data A pointer to the raw data to upload to the buffer.
    */
-  void update(unsigned int chunk, unsigned int offset, unsigned int size, const void *data, unsigned int partitionID = 0);
+  void update(unsigned int chunk, unsigned int offset, unsigned int size, const void *data, unsigned int partition = 0);
 
   /**
    * Insert or updates part of the buffer with a vector of generic data type.
@@ -167,15 +173,46 @@ public:
   template <typename T>
   void upsert(unsigned int offset, const std::vector<T> &data, unsigned int partition = 0)
   {
+    // Did you forget to call .addPartition(0) before trying to upsert to a partition that
+    // does not exist? You need to add a partition first.
+    // And if only partition 0 exists, you cannot try upserting to partition[2,3,4,...]
+    assert(partitions.size() > partition);
+
     int dataSize = data.size() * sizeof(T);
     int offsetSize = offset * sizeof(T);
-    int expansionSize = (offsetSize + dataSize) - partitions[partition].size;
+    int expansionSize = (offsetSize + dataSize) - partitions[partition];
 
     if (expansionSize > 0)
       resize(partition, expansionSize + (dataSize * resizeFactor), offsetSize);
 
-    glBindBuffer((unsigned int)target, buffer);
     glBufferSubData((unsigned int)target, offsetSize + getBufferPartitionOffsetSize(partitions, partition), dataSize, data.data());
+  }
+
+  /**
+   * Insert or updates part of the buffer with a vector of generic data type.
+   * If there is not enough place in the partition, the buffer will resize.
+   *
+   * @param offset The offset in the buffer to start updating (in terms of number of elements).
+   * @param data The new data to upload to the buffer. This is a vector of any type T.
+   * @param partition The partition you want to upsert the data into.
+   *
+   * @tparam T The type of the elements in the vector (e.g., float, glm::vec3).
+   */
+  void upsert(unsigned int chunk, unsigned int offset, unsigned int size, const void *data, unsigned int partition = 0)
+  {
+    // Did you forget to call .addPartition(0) before trying to upsert to a partition that
+    // does not exist? You need to add a partition first.
+    // And if only partition 0 exists, you cannot try upserting to partition[2,3,4,...]
+    assert(partitions.size() > partition);
+
+    int offsetSize = offset * chunk;
+    int expansionSize = (offsetSize + size) - partitions[partition];
+
+    if (expansionSize > 0)
+      resize(partition, expansionSize + (size * resizeFactor), offsetSize);
+
+    glBindBuffer((unsigned int)target, buffer);
+    glBufferSubData((unsigned int)target, offsetSize + getBufferPartitionOffsetSize(partitions, partition), size, data);
   }
 
   /**
@@ -224,7 +261,7 @@ public:
   std::vector<T> getBufferData(unsigned int partition) const
   {
     const int offset = getBufferPartitionOffsetSize(partitions, partition);
-    const int size = partitions[partition].size;
+    const int size = partitions[partition];
     const int items = size / sizeof(T);
 
     std::vector<T> data(items);
@@ -253,8 +290,7 @@ public:
   /**
    * Creates a new partition. This function will resize the buffer
    *
-   * @param chunk The size of one chunk in bytes.
-   * @param count The number of chunks you are reserving space for
+   * @param size The size in bytes.
    */
-  unsigned int addPartition(unsigned int chunk, unsigned int count);
+  unsigned int addPartition(unsigned int size);
 };
