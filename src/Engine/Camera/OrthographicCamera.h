@@ -27,7 +27,7 @@ public:
 
   void setViewportSize(float width, float height) override;
 
-  void setOffset(float offsetX, float offsetY) override;
+  void setOffset(float offsetX, float offsetY);
 
   void setPosition(float x, float y, float z) override;
 

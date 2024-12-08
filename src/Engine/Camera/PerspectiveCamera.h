@@ -11,12 +11,14 @@ private:
   glm::mat4 view = glm::mat4(1.0f);
   glm::mat4 projection = glm::mat4(0.0f);
 
+  glm::vec3 front = glm::vec3(0.0f);
+  glm::vec3 right = glm::vec3(0.0f);
+  glm::vec3 up = glm::vec3(0.0f);
+  glm::mat4 roll = glm::mat4(0.0f);
+
 public:
   float width = 1.0f;
   float height = 1.0f;
-
-  float offsetX = 1.0f;
-  float offsetY = 1.0f;
 
   glm::vec3 rotation = glm::vec3(0.0f);
   glm::vec3 position = glm::vec3(0.0f);
@@ -30,8 +32,6 @@ public:
   void setViewportSize(const glm::vec2 &size) override;
 
   void setViewportSize(float width, float height) override;
-
-  void setOffset(float offsetX, float offsetY) override;
 
   void setPosition(float x, float y, float z) override;
 

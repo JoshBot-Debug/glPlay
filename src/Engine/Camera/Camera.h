@@ -11,8 +11,6 @@ public:
 
   virtual void setViewportSize(float width, float height) = 0;
 
-  virtual void setOffset(float offsetX, float offsetY) = 0;
-
   virtual void setPosition(float x, float y, float z) = 0;
 
   virtual void setRotation(float pitch, float yaw, float roll) = 0;

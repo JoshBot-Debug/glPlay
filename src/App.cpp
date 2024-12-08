@@ -26,7 +26,6 @@ App::App() : Window(opts)
    * Specify the type, and other properties.
    */
   PerspectiveCamera *camera = engine.createCamera<PerspectiveCamera>();
-  camera->setOffset(0.5f, 0.5f);
   camera->setPosition(0.0f, 0.0f, 10.0f);
   camera->setRotation(0.0f, 0.0f, 0.0f);
 

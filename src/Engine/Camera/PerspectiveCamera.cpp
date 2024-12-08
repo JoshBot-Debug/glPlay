@@ -1,26 +1,31 @@
 #include "PerspectiveCamera.h"
 
 #include <glm/gtc/matrix_transform.hpp>
+#include <algorithm>
 #include <iostream>
+
+float toDegree(float degree)
+{
+  return std::fmod(std::abs(degree), 360.0f) * (degree < 0 ? -1 : 1);
+}
 
 void PerspectiveCamera::update()
 {
-  glm::vec3 front;
   front.x = sin(glm::radians(rotation.y)) * cos(glm::radians(rotation.x));
   front.y = sin(glm::radians(rotation.x));
-  front.z = cos(glm::radians(rotation.y)) * cos(glm::radians(rotation.x)) * -1.0f;
+  front.z = -cos(glm::radians(rotation.y)) * cos(glm::radians(rotation.x));
 
-  glm::vec3 right = glm::normalize(glm::cross(front, glm::vec3(0.0f, 1.0f, 0.0f)));
-  glm::vec3 up = glm::normalize(glm::cross(right, front));
+  front = glm::normalize(front);
 
-  glm::mat4 rollMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(rotation.z), front);
+  right = glm::normalize(glm::cross(front, glm::vec3(0.0f, 1.0f, 0.0f)));
+  up = glm::normalize(glm::cross(right, front));
 
-  right = glm::normalize(glm::vec3(rollMatrix * glm::vec4(right, 0.0f)));
-  up = glm::normalize(glm::vec3(rollMatrix * glm::vec4(up, 0.0f)));
+  roll = glm::rotate(glm::mat4(1.0f), glm::radians(rotation.z), front);
 
-  glm::vec3 cameraPosition = (position + glm::vec3(offsetX, offsetY, 0.0f));
+  right = glm::normalize(glm::vec3(roll * glm::vec4(right, 0.0f)));
+  up = glm::normalize(glm::vec3(roll * glm::vec4(up, 0.0f)));
 
-  view = glm::lookAt(cameraPosition, cameraPosition + front, up);
+  view = glm::lookAt(position, position + front, up);
 
   projection = glm::perspective(glm::radians(fov), width / height, nearPlane, farPlane);
 }
@@ -37,12 +42,6 @@ void PerspectiveCamera::setViewportSize(float width, float height)
   this->height = height;
 }
 
-void PerspectiveCamera::setOffset(float offsetX, float offsetY)
-{
-  this->offsetX = offsetX;
-  this->offsetY = offsetY;
-}
-
 void PerspectiveCamera::setPosition(float x, float y, float z)
 {
   position.x = x;
@@ -52,23 +51,23 @@ void PerspectiveCamera::setPosition(float x, float y, float z)
 
 void PerspectiveCamera::setRotation(float pitch, float yaw, float roll)
 {
-  rotation.x = pitch;
-  rotation.y = yaw;
-  rotation.z = roll;
+  rotation.x = toDegree(pitch);
+  rotation.y = toDegree(yaw);
+  rotation.z = toDegree(roll);
 }
 
 void PerspectiveCamera::translate(float deltaX, float deltaY, float deltaZ)
 {
-  position.x += deltaX;
-  position.y += deltaY;
-  position.z += deltaZ;
+  position += deltaX * right;
+  position += deltaY * up;
+  position += deltaZ * front;
 }
 
 void PerspectiveCamera::rotate(float deltaPitch, float deltaYaw, float deltaRoll)
 {
-  rotation.x += deltaPitch;
-  rotation.y += deltaYaw;
-  rotation.z += deltaRoll;
+  rotation.x = toDegree(rotation.x + deltaPitch);
+  rotation.y = toDegree(rotation.y + deltaYaw);
+  rotation.z = toDegree(rotation.z + deltaRoll);
 }
 
 void PerspectiveCamera::setProjection(float fov, float nearPlane, float farPlane)

@@ -92,11 +92,6 @@ public:
     ImGui::DragFloat("Rotation Y", &camera->rotation.y, 0.1f);
     ImGui::DragFloat("Rotation Z", &camera->rotation.z, 0.1f);
 
-    ImGui::SeparatorText("Offset");
-
-    ImGui::DragFloat("Offset X", &camera->offsetX, 0.1f);
-    ImGui::DragFloat("Offset Y", &camera->offsetY, 0.1f);
-
     ImGui::SeparatorText("Perspective");
 
     ImGui::DragFloat("FOV", &camera->fov, 0.1f);
@@ -114,22 +109,28 @@ public:
     if (io.WantCaptureKeyboard || io.WantCaptureMouse)
       return;
 
-    float speed = 10.0f;
+    float speed = 15.0f;
     double delta = Time::GetDeltaTime();
 
     glm::vec3 translate(0.0f);
 
     if (Input::KeyPress(KeyboardKey::W))
-      translate.z -= speed * delta;
+      translate.z += speed * delta;
 
     if (Input::KeyPress(KeyboardKey::S))
-      translate.z += speed * delta;
+      translate.z -= speed * delta;
 
     if (Input::KeyPress(KeyboardKey::A))
       translate.x -= speed * delta;
 
     if (Input::KeyPress(KeyboardKey::D))
       translate.x += speed * delta;
+
+    if (Input::KeyPress(KeyboardKey::Q))
+      translate.y += speed * delta;
+
+    if (Input::KeyPress(KeyboardKey::E))
+      translate.y -= speed * delta;
 
     if (Input::KeyPress(MouseButton::LEFT))
     {
