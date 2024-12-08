@@ -35,7 +35,7 @@ private:
 
   const WindowOptions &options;
 
-  static glm::ivec2 dimensions;
+  static glm::vec2 dimensions;
 
   static void setFrameBufferSize(GLFWwindow *window, int w, int h);
 
@@ -45,5 +45,5 @@ public:
 
   void open();
 
-  static const glm::ivec2 &GetDimensions();
+  static const glm::vec2 &GetDimensions();
 };

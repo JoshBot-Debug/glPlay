@@ -38,8 +38,6 @@ private:
 
   std::vector<Mesh> meshes;
 
-  std::vector<Texture2D *> textures;
-
   Material *material;
 
   std::vector<Instance> instances;
@@ -57,10 +55,6 @@ public:
   const unsigned int getID();
 
   void setMaterial(Material *material);
-
-  void addTexture(Texture2D *texture);
-
-  void bindTextures() const;
 
   const unsigned int createInstance();
   Instance &getInstance(unsigned int id);

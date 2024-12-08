@@ -10,7 +10,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
 
-glm::ivec2 Window::dimensions = glm::ivec2(-1, -1);
+glm::vec2 Window::dimensions = glm::vec2(0.0f, 0.0f);
 
 void errorCallback(int error, const char *description)
 {
@@ -70,7 +70,7 @@ void Window::open()
   this->onCleanUp();
 }
 
-const glm::ivec2 &Window::GetDimensions()
+const glm::vec2 &Window::GetDimensions()
 {
   return Window::dimensions;
 }
@@ -111,7 +111,8 @@ Window::Window(const WindowOptions &options) : options(options)
 
   glfwMakeContextCurrent(window);
   glfwSetFramebufferSizeCallback(window, setFrameBufferSize);
-  glfwGetFramebufferSize(window, &dimensions.x, &dimensions.y);
+  glfwGetFramebufferSize(window, (int *)&dimensions.x, (int *)&dimensions.y);
+  glViewport(0, 0, dimensions.x, dimensions.y);
 
   const int init = glewInit();
 

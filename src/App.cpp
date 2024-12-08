@@ -26,14 +26,13 @@ App::App() : Window(opts)
    * Specify the type, and other properties.
    */
   PerspectiveCamera *camera = engine.createCamera<PerspectiveCamera>();
-  camera->setPosition(0.0f, 0.0f, 10.0f);
-  camera->setRotation(0.0f, 0.0f, 0.0f);
+  camera->setPosition(0.0f, 0.0f, 20.0f);
 
   /**
    * Setup a light source
    * Specify the type and other properties.
    */
-  PointLight *point = engine.createLight<PointLight>();
+  // PointLight *point = engine.createLight<PointLight>();
   // Light *light = new Light();
   // light->setType(LightType::Ambient);
 
@@ -51,15 +50,12 @@ App::App() : Window(opts)
   unsigned int f_material = shader->compile("src/Shader/f_material.glsl", ShaderType::FRAGMENT_SHADER);
   shader->createProgram({v_transform, f_material});
 
-  unsigned int f_light = shader->compile("src/Shader/f_point_light.glsl", ShaderType::FRAGMENT_SHADER);
-  shader->createProgram({v_transform, f_light});
-
   /**
    * Load all textures
    */
   Texture2D *wall = engine.createTexture2D("assets/textures/wall.jpg");
 
-  cube->addTexture(wall);
+  // cube->addTexture(wall);
 
   const unsigned int sphere1ID = sphere->createInstance();
   const unsigned int sphere2ID = sphere->createInstance();
@@ -73,13 +69,18 @@ App::App() : Window(opts)
   cube->getInstance(cube2ID).translate.x = 5.0f;
   cube->getInstance(cube2ID).translate.y = 5.0f;
 
+  // engine->createRenderer<BatchInstances>();
+  // engine->createRenderer<MultiBatchInstances>();
+
   // Begins the onDraw loop
   open();
 }
 
 void App::onUpdate()
 {
-  engine.getCamera<Camera>()->setViewportSize(Window::GetDimensions());
+  const glm::vec2 &size = Window::GetDimensions();
+
+  engine.getCamera<Camera>()->setViewportSize(size);
 
   engine.update();
 

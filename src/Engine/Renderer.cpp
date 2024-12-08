@@ -60,7 +60,6 @@ void Renderer::draw(std::vector<Model *> &models, const Primitive &primitive)
 {
   for (const auto &model : models)
   {
-    model->bindTextures();
     // glMultiDrawElementsIndirect MAGIC!!!
     // Welcome to batching elements into one draw call!!
     // typedef struct

@@ -79,7 +79,6 @@ Model::Model(Renderer *renderer, unsigned int id, const char *filepath) : render
 
 Model::~Model()
 {
-  textures.clear();
   material = nullptr;
 }
 
@@ -91,17 +90,6 @@ const unsigned int Model::getID()
 void Model::setMaterial(Material *material)
 {
   this->material = material;
-}
-
-void Model::addTexture(Texture2D *texture)
-{
-  textures.push_back(texture);
-}
-
-void Model::bindTextures() const
-{
-  for (size_t i = 0; i < textures.size(); i++)
-    textures[i]->bind(i);
 }
 
 const unsigned int Model::createInstance()
