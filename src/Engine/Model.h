@@ -20,6 +20,15 @@ struct Instance
   glm::vec4 color = glm::vec4(1.0f);
 };
 
+struct DrawElementsIndirectCommand
+{
+  unsigned int count;
+  unsigned int instanceCount;
+  unsigned int firstIndex;
+  unsigned int baseVertex;
+  unsigned int baseInstance;
+};
+
 class Model
 {
 private:

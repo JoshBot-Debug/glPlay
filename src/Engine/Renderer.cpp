@@ -73,6 +73,7 @@ void Renderer::draw(std::vector<Model *> &models, const Primitive &primitive)
     // } DrawElementsIndirectCommand;
     // glMultiDrawElementsIndirect accepts an array of structs like this!!!
     // It's exactly like glDrawElementsInstancedBaseVertexBaseInstance except it's multi!!
+    // https://github.com/litasa/Advanced-OpenGL-Examples/blob/master/src/MultidrawIndirect/MultidrawIndirect.cpp
 
     glDrawElementsInstancedBaseVertexBaseInstance((unsigned int)primitive, model->getIndicesCount(), GL_UNSIGNED_INT, (const void *)model->getIndiceSizeOffset(), model->getInstancesCount(), model->getVertexOffset(), model->getInstanceOffset());
   }
