@@ -24,7 +24,7 @@ struct DrawElementsIndirectCommand
 {
   unsigned int count;
   unsigned int instanceCount;
-  unsigned int firstIndex;
+  int firstIndex;
   unsigned int baseVertex;
   unsigned int baseInstance;
 };

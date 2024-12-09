@@ -5,7 +5,7 @@
 
 struct Instance;
 
-class InstanceBufferManager
+class MultiInstanceBuffer
 {
 private:
   VertexArray vao;
@@ -14,7 +14,7 @@ private:
   ArrayBuffer ibo;
 
 public:
-  InstanceBufferManager();
+  MultiInstanceBuffer();
 
   /**
    * @param vertices The virtex data

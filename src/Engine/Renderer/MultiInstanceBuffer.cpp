@@ -1,7 +1,7 @@
-#include "InstanceBufferManager.h"
+#include "MultiInstanceBuffer.h"
 #include "Model.h"
 
-InstanceBufferManager::InstanceBufferManager() : vbo(BufferTarget::ARRAY_BUFFER), ebo(BufferTarget::ELEMENT_ARRAY_BUFFER), ibo(BufferTarget::ARRAY_BUFFER, VertexDraw::DYNAMIC)
+MultiInstanceBuffer::MultiInstanceBuffer() : vbo(BufferTarget::ARRAY_BUFFER), ebo(BufferTarget::ELEMENT_ARRAY_BUFFER), ibo(BufferTarget::ARRAY_BUFFER, VertexDraw::DYNAMIC)
 {
   vao.generate();
   vbo.generate();
@@ -22,7 +22,7 @@ InstanceBufferManager::InstanceBufferManager() : vbo(BufferTarget::ARRAY_BUFFER)
   vao.set(6, 4, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, color), 1);
 }
 
-const unsigned int InstanceBufferManager::addBufferData(const std::vector<Vertex> &vertices, const std::vector<unsigned int> &indices, unsigned int &firstIndex, int &baseVertex)
+const unsigned int MultiInstanceBuffer::addBufferData(const std::vector<Vertex> &vertices, const std::vector<unsigned int> &indices, unsigned int &firstIndex, int &baseVertex)
 {
   const unsigned int epID = ebo.addPartition(0);
   const unsigned int vpID = vbo.addPartition(0);
@@ -42,7 +42,7 @@ const unsigned int InstanceBufferManager::addBufferData(const std::vector<Vertex
   return epID;
 }
 
-unsigned int InstanceBufferManager::add(const unsigned int partition, Instance &instance, unsigned int &baseInstance)
+unsigned int MultiInstanceBuffer::add(const unsigned int partition, Instance &instance, unsigned int &baseInstance)
 {
   if (!ibo.partitionExists(partition))
     ibo.addPartition(0);
@@ -60,7 +60,7 @@ unsigned int InstanceBufferManager::add(const unsigned int partition, Instance &
   return offset;
 }
 
-std::vector<unsigned int> InstanceBufferManager::add(const unsigned int partition, std::vector<Instance> &instances, unsigned int &baseInstance)
+std::vector<unsigned int> MultiInstanceBuffer::add(const unsigned int partition, std::vector<Instance> &instances, unsigned int &baseInstance)
 {
   if (!ibo.partitionExists(partition))
     ibo.addPartition(0);
@@ -84,7 +84,7 @@ std::vector<unsigned int> InstanceBufferManager::add(const unsigned int partitio
   return offsets;
 }
 
-void InstanceBufferManager::update(const unsigned int partition, const unsigned int offset, Instance &instance)
+void MultiInstanceBuffer::update(const unsigned int partition, const unsigned int offset, Instance &instance)
 {
   assert(ibo.partitionExists(partition));
   assert(offset < ibo.getBufferPartitionSize(partition));
@@ -92,7 +92,7 @@ void InstanceBufferManager::update(const unsigned int partition, const unsigned 
   ibo.upsert(sizeof(Instance), offset, sizeof(instance), (const void *)&instance, partition);
 }
 
-void InstanceBufferManager::update(const unsigned int partition, const unsigned int offset, std::vector<Instance> &instances)
+void MultiInstanceBuffer::update(const unsigned int partition, const unsigned int offset, std::vector<Instance> &instances)
 {
   assert(ibo.partitionExists(partition));
   assert(offset < ibo.getBufferPartitionSize(partition));
