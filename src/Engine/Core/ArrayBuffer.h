@@ -279,6 +279,11 @@ public:
    */
   const unsigned int addPartition(unsigned int size);
 
+  /**
+   * Checks if the partiton exists
+   */
+  const bool partitionExists(const unsigned int partition);
+
   size_t getBufferPartitionOffsetSize(unsigned int partitionIndex)
   {
     // Did you forget to call .addPartition(0) before trying to upsert to a partition that
@@ -292,5 +297,15 @@ public:
       size += partitions[i];
 
     return size;
+  }
+
+    size_t getBufferPartitionSize(unsigned int partitionIndex)
+  {
+    // Did you forget to call .addPartition(0) before trying to upsert to a partition that
+    // does not exist? You need to add a partition first.
+    // And if only partition 0 exists, you cannot try upserting or updating to partition[2,3,4,...]
+    assert(partitions.size() > partitionIndex);
+
+    return partitions[partitionIndex];
   }
 };

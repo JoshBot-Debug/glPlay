@@ -28,19 +28,14 @@ App::App() : Window(opts)
   PerspectiveCamera *camera = engine.createCamera<PerspectiveCamera>();
   camera->setPosition(0.0f, 0.0f, 20.0f);
 
-  /**
-   * Setup a light source
-   * Specify the type and other properties.
-   */
-  // PointLight *point = engine.createLight<PointLight>();
-  // Light *light = new Light();
-  // light->setType(LightType::Ambient);
+
+  ResourceManager *resource = engine.getResourceManager();
 
   /**
    * Load the model foo
    */
-  Model *sphere = engine.createModel("assets/model/sphere.fbx");
-  Model *cube = engine.createModel("assets/model/cube-textured.fbx");
+  Model *sphere = resource->loadModel("assets/model/sphere.fbx");
+  Model *cube = resource->loadModel("assets/model/cube-textured.fbx");
 
   /**
    * Setup the shader
@@ -48,23 +43,18 @@ App::App() : Window(opts)
   Shader *shader = engine.getShader();
   unsigned int v_transform = shader->compile("src/Shader/v_transform.glsl", ShaderType::VERTEX_SHADER);
   unsigned int f_material = shader->compile("src/Shader/f_material.glsl", ShaderType::FRAGMENT_SHADER);
-  shader->createProgram({v_transform, f_material});
-
-  /**
-   * Load all textures
-   */
-  Texture2D *wall = engine.createTexture2D("assets/textures/wall.jpg");
-
-  // cube->addTexture(wall);
+  const unsigned int modelShader = shader->createProgram({v_transform, f_material});
 
   const unsigned int sphere1ID = sphere->createInstance();
   const unsigned int sphere2ID = sphere->createInstance();
+
   const unsigned int cube1ID = cube->createInstance();
   const unsigned int cube2ID = cube->createInstance();
 
   sphere->getInstance(sphere1ID).translate.x = -5.0f;
   sphere->getInstance(sphere2ID).translate.x = -5.0f;
   sphere->getInstance(sphere2ID).translate.y = 5.0f;
+
   cube->getInstance(cube1ID).translate.x = 5.0f;
   cube->getInstance(cube2ID).translate.x = 5.0f;
   cube->getInstance(cube2ID).translate.y = 5.0f;

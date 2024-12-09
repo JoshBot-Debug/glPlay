@@ -68,13 +68,11 @@ void loadModel(const char *path, std::vector<Mesh> &meshes)
   }
 }
 
-Model::Model(Renderer *renderer, unsigned int id, const char *filepath) : renderer(renderer), id(id)
+Model::Model(unsigned int id, const char *filepath) : id(id)
 {
   loadModel(filepath, meshes);
 
   indicesCount = getIndices().size();
-
-  renderer->upsertModel(this);
 }
 
 Model::~Model()
@@ -99,8 +97,6 @@ const unsigned int Model::createInstance()
   instancesCount = instances.size();
 
   const unsigned int id = instancesCount - 1;
-
-  renderer->upsertInstance(this, instances[id], id);
 
   return id;
 }

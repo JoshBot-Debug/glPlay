@@ -32,8 +32,6 @@ struct DrawElementsIndirectCommand
 class Model
 {
 private:
-  Renderer *renderer;
-
   unsigned int id;
 
   std::vector<Mesh> meshes;
@@ -49,7 +47,7 @@ private:
   unsigned int instancesCount;
 
 public:
-  Model(Renderer *renderer, unsigned int id, const char *filepath);
+  Model(unsigned int id, const char *filepath);
   ~Model();
 
   const unsigned int getID();
