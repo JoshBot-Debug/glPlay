@@ -3,22 +3,38 @@
 #include <string>
 #include <unordered_map>
 
+#include "imgui.h"
+
 #include "Window/Time.h"
 #include "Window/Input.h"
+
+#include "Engine/Shader.h"
+#include "Engine/ResourceManager.h"
 #include "Engine/Camera/PerspectiveCamera.h"
-#include "Engine/Engine.h"
-#include "imgui.h"
 
 class EngineControlPanel
 {
 private:
-  Engine *engine;
+  Shader *shader;
+  PerspectiveCamera *camera;
+  ResourceManager *resource;
+
   glm::vec2 mouse;
 
 public:
-  void setEngine(Engine *engine)
+  void setCamera(PerspectiveCamera *camera)
   {
-    this->engine = engine;
+    this->camera = camera;
+  }
+
+  void setShader(Shader *shader)
+  {
+    this->shader = shader;
+  }
+
+  void setResourceManager(ResourceManager *resource)
+  {
+    this->resource = resource;
   }
 
   void shaderMenu()
@@ -26,15 +42,15 @@ public:
     ImGui::Begin("Shaders");
 
     if (ImGui::Button("Recompile shaders"))
-      engine->getShader()->recompile();
+      shader->recompile();
 
     ImGui::End();
   }
 
   void instanceMenu()
   {
-
-    for (const auto &model : engine->getModels())
+    
+    for (const auto &model : resource->getModels())
     {
       std::vector<Instance> &instances = model->getInstances();
 
@@ -76,8 +92,6 @@ public:
 
   void cameraMenu()
   {
-    PerspectiveCamera *camera = engine->getCamera<PerspectiveCamera>();
-
     ImGui::Begin("Camera");
 
     ImGui::SeparatorText("Position");
@@ -104,7 +118,6 @@ public:
   void update()
   {
     ImGuiIO &io = ImGui::GetIO();
-    PerspectiveCamera *camera = engine->getCamera<PerspectiveCamera>();
 
     if (io.WantCaptureKeyboard || io.WantCaptureMouse)
       return;

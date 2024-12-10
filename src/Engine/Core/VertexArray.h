@@ -2,7 +2,7 @@
 
 #include <GL/glew.h>
 
-#include "Common.h"
+#include "Engine/Types.h"
 
 class VertexArray
 {
@@ -31,6 +31,11 @@ public:
    * Disable assignment operator
    */
   VertexArray &operator=(const VertexArray &) = delete;
+
+  /**
+   * Create a move constructor
+   */
+  VertexArray(VertexArray &&) = default;
 
   /**
    * Generates the Vertex Array Object (VAO) if it hasn't already been created.

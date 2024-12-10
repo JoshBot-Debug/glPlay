@@ -1,6 +1,9 @@
 #pragma once
 
+#include <vector>
+
 #include <GL/glew.h>
+#include <glm/glm.hpp>
 
 enum class VertexDraw
 {
@@ -30,4 +33,38 @@ enum class Primitive
   TRIANGLES = GL_TRIANGLES,
   TRIANGLE_STRIP = GL_TRIANGLE_STRIP,
   TRIANGLE_FAN = GL_TRIANGLE_FAN
+};
+
+struct Vertex
+{
+  glm::vec3 position;
+  glm::vec3 normal;
+  glm::vec2 texCoord;
+};
+
+struct Instance
+{
+  glm::vec3 translate = glm::vec3(0.0f);
+
+  glm::vec3 rotation = glm::vec3(0.0f);
+
+  glm::vec3 scale = glm::vec3(1.0f);
+
+  glm::vec4 color = glm::vec4(1.0f);
+};
+
+struct Mesh
+{
+  std::vector<Vertex> vertices;
+  std::vector<unsigned int> indices;
+};
+
+
+struct DrawElementsIndirectCommand
+{
+  unsigned int count;
+  unsigned int primCount;
+  unsigned int firstIndex;
+  unsigned int baseVertex;
+  unsigned int baseInstance;
 };

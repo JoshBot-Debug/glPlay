@@ -6,7 +6,7 @@
 #include <iostream>
 #include <cassert>
 
-#include "Common.h"
+#include "Engine/Types.h"
 
 enum class BufferTarget
 {
@@ -74,11 +74,11 @@ public:
    * Disable assignment operator
    */
   ArrayBuffer &operator=(const ArrayBuffer &) = delete;
-
+  
   /**
-   * Define a move constructor
+   * Create a move constructor
    */
-  ArrayBuffer(ArrayBuffer &&other) noexcept {};
+  ArrayBuffer(ArrayBuffer &&) = default;
 
   /**
    * Generates a buffer if it doesn't already exist.
@@ -280,7 +280,12 @@ public:
   const unsigned int addPartition(unsigned int size);
 
   /**
-   * Checks if the partiton exists
+   * Checks if the partiton sepcified is the next partition
+   */
+  const bool isNextPartition(const unsigned int partition);
+
+  /**
+   * Checks if the partition exists
    */
   const bool partitionExists(const unsigned int partition);
 
@@ -289,7 +294,7 @@ public:
     // Did you forget to call .addPartition(0) before trying to upsert to a partition that
     // does not exist? You need to add a partition first.
     // And if only partition 0 exists, you cannot try upserting or updating to partition[2,3,4,...]
-    assert(partitions.size() > partitionIndex);
+    assert(partitionExists(partitionIndex));
 
     size_t size = 0;
 
@@ -299,12 +304,12 @@ public:
     return size;
   }
 
-    size_t getBufferPartitionSize(unsigned int partitionIndex)
+  size_t getBufferPartitionSize(unsigned int partitionIndex)
   {
     // Did you forget to call .addPartition(0) before trying to upsert to a partition that
     // does not exist? You need to add a partition first.
     // And if only partition 0 exists, you cannot try upserting or updating to partition[2,3,4,...]
-    assert(partitions.size() > partitionIndex);
+    assert(partitionExists(partitionIndex));
 
     return partitions[partitionIndex];
   }

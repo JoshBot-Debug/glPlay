@@ -1,12 +1,11 @@
 #include "PerspectiveCamera.h"
 
 #include <glm/gtc/matrix_transform.hpp>
-#include <algorithm>
 #include <iostream>
 
 float toDegree(float degree)
 {
-  return std::fmod(std::abs(degree), 360.0f) * (degree < 0 ? -1 : 1);
+  return glm::mod(glm::abs(degree), 360.0f) * (degree < 0 ? -1 : 1);
 }
 
 void PerspectiveCamera::update()

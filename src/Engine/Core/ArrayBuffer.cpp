@@ -113,7 +113,12 @@ const unsigned int ArrayBuffer::addPartition(unsigned int size)
   return id;
 }
 
+const bool ArrayBuffer::isNextPartition(const unsigned int partition)
+{
+  return this->partitions.size() == partition;
+}
+
 const bool ArrayBuffer::partitionExists(const unsigned int partition)
 {
-  return this->partitions.size() == partition + 1;
+  return partitions.size() > partition;
 }

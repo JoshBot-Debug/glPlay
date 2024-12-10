@@ -15,7 +15,7 @@ public:
 
   ResourceManager(const ResourceManager &) = delete;
 
-  ~ResourceManager();
+  ~ResourceManager() = default;
 
   /**
    * @returns A pointer to a Model
@@ -25,7 +25,6 @@ public:
     unsigned int id = models.size();
 
     Model *model = new Model(id, path);
-
     models.push_back(model);
 
     return model;
@@ -44,7 +43,7 @@ public:
    * Gets all models
    * @returns A vector of Model pointers
    */
-  std::vector<Model *> &getModels()
+  const std::vector<Model *> &getModels() const
   {
     return models;
   }

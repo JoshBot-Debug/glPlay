@@ -1,7 +1,6 @@
-#include "MultiInstanceBuffer.h"
-#include "Model.h"
+#include "MultiModelInstanceBuffer.h"
 
-MultiInstanceBuffer::MultiInstanceBuffer() : vbo(BufferTarget::ARRAY_BUFFER), ebo(BufferTarget::ELEMENT_ARRAY_BUFFER), ibo(BufferTarget::ARRAY_BUFFER, VertexDraw::DYNAMIC)
+MultiModelInstanceBuffer::MultiModelInstanceBuffer() : vbo(BufferTarget::ARRAY_BUFFER), ebo(BufferTarget::ELEMENT_ARRAY_BUFFER), ibo(BufferTarget::ARRAY_BUFFER, VertexDraw::DYNAMIC)
 {
   vao.generate();
   vbo.generate();
@@ -22,7 +21,7 @@ MultiInstanceBuffer::MultiInstanceBuffer() : vbo(BufferTarget::ARRAY_BUFFER), eb
   vao.set(6, 4, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, color), 1);
 }
 
-const unsigned int MultiInstanceBuffer::addBufferData(const std::vector<Vertex> &vertices, const std::vector<unsigned int> &indices, unsigned int &firstIndex, int &baseVertex)
+const unsigned int MultiModelInstanceBuffer::addBufferData(const std::vector<Vertex> &vertices, const std::vector<unsigned int> &indices, unsigned int &firstIndex, unsigned int &baseVertex)
 {
   const unsigned int epID = ebo.addPartition(0);
   const unsigned int vpID = vbo.addPartition(0);
@@ -42,9 +41,9 @@ const unsigned int MultiInstanceBuffer::addBufferData(const std::vector<Vertex> 
   return epID;
 }
 
-unsigned int MultiInstanceBuffer::add(const unsigned int partition, Instance &instance, unsigned int &baseInstance)
+unsigned int MultiModelInstanceBuffer::add(const unsigned int partition, const Instance &instance, unsigned int &baseInstance)
 {
-  if (!ibo.partitionExists(partition))
+  if (ibo.isNextPartition(partition))
     ibo.addPartition(0);
 
   const unsigned int offset = ibo.getBufferPartitionSize(partition) / sizeof(Instance);
@@ -60,9 +59,9 @@ unsigned int MultiInstanceBuffer::add(const unsigned int partition, Instance &in
   return offset;
 }
 
-std::vector<unsigned int> MultiInstanceBuffer::add(const unsigned int partition, std::vector<Instance> &instances, unsigned int &baseInstance)
+std::vector<unsigned int> MultiModelInstanceBuffer::add(const unsigned int partition, const std::vector<Instance> &instances, unsigned int &baseInstance)
 {
-  if (!ibo.partitionExists(partition))
+  if (ibo.isNextPartition(partition))
     ibo.addPartition(0);
 
   const unsigned int offset = ibo.getBufferPartitionSize(partition) / sizeof(Instance);
@@ -84,7 +83,7 @@ std::vector<unsigned int> MultiInstanceBuffer::add(const unsigned int partition,
   return offsets;
 }
 
-void MultiInstanceBuffer::update(const unsigned int partition, const unsigned int offset, Instance &instance)
+void MultiModelInstanceBuffer::update(const unsigned int partition, const unsigned int offset, const Instance &instance)
 {
   assert(ibo.partitionExists(partition));
   assert(offset < ibo.getBufferPartitionSize(partition));
@@ -92,10 +91,23 @@ void MultiInstanceBuffer::update(const unsigned int partition, const unsigned in
   ibo.upsert(sizeof(Instance), offset, sizeof(instance), (const void *)&instance, partition);
 }
 
-void MultiInstanceBuffer::update(const unsigned int partition, const unsigned int offset, std::vector<Instance> &instances)
+void MultiModelInstanceBuffer::update(const unsigned int partition, const unsigned int offset, const std::vector<Instance> &instances)
 {
   assert(ibo.partitionExists(partition));
   assert(offset < ibo.getBufferPartitionSize(partition));
 
   ibo.upsert(offset, instances, partition);
+}
+
+void MultiModelInstanceBuffer::bind() const
+{
+  vao.bind();
+}
+
+void MultiModelInstanceBuffer::unbind() const
+{
+  vbo.unbind();
+  ebo.unbind();
+  ibo.unbind();
+  vao.unbind();
 }

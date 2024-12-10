@@ -6,7 +6,6 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-#include "Renderer.h"
 #include "Debug.h"
 
 void loadModel(const char *path, std::vector<Mesh> &meshes)
@@ -30,11 +29,11 @@ void loadModel(const char *path, std::vector<Mesh> &meshes)
     aiMesh *mesh = scene->mMeshes[i];
     Mesh &m = meshes[i];
 
-    m.resize(mesh->mNumVertices);
+    m.vertices.resize(mesh->mNumVertices);
 
     for (unsigned int j = 0; j < mesh->mNumVertices; ++j)
     {
-      Vertex &v = m.getVertex(j);
+      Vertex &v = m.vertices[j];
 
       const aiVector3D &vertex = mesh->mVertices[j];
       v.position.x = vertex.x;
@@ -63,7 +62,7 @@ void loadModel(const char *path, std::vector<Mesh> &meshes)
     {
       const aiFace &face = mesh->mFaces[j];
       for (unsigned int k = 0; k < face.mNumIndices; ++k)
-        m.addIndex(face.mIndices[k]);
+        m.indices.push_back(face.mIndices[k]);
     }
   }
 }
@@ -71,32 +70,20 @@ void loadModel(const char *path, std::vector<Mesh> &meshes)
 Model::Model(unsigned int id, const char *filepath) : id(id)
 {
   loadModel(filepath, meshes);
-
-  indicesCount = getIndices().size();
 }
 
-Model::~Model()
-{
-  material = nullptr;
-}
+Model::~Model() {}
 
 const unsigned int Model::getID()
 {
   return id;
 }
 
-void Model::setMaterial(Material *material)
-{
-  this->material = material;
-}
-
 const unsigned int Model::createInstance()
 {
   instances.emplace_back();
 
-  instancesCount = instances.size();
-
-  const unsigned int id = instancesCount - 1;
+  const unsigned int id = instances.size() - 1;
 
   return id;
 }
@@ -111,61 +98,18 @@ std::vector<Instance> &Model::getInstances()
   return instances;
 }
 
-const unsigned int Model::getIndicesCount() const
-{
-  return indicesCount;
-}
-
-const unsigned int Model::getInstancesCount() const
-{
-  return instancesCount;
-}
-
-const size_t Model::getIndiceSizeOffset() const
-{
-  return indiceSizeOffset;
-}
-
-const void Model::setIndiceSizeOffset(size_t offset)
-{
-  indiceSizeOffset = offset;
-}
-
-const size_t Model::getVertexOffset() const
-{
-  return vertexOffset;
-}
-
-const void Model::setVertexOffset(size_t offset)
-{
-  vertexOffset = offset;
-}
-
-const size_t Model::getInstanceOffset() const
-{
-  return instanceOffset;
-}
-
-const void Model::setInstanceOffset(size_t offset)
-{
-  instanceOffset = offset;
-}
-
 const std::vector<Vertex> Model::getVertices() const
 {
   std::vector<Vertex> vertices;
 
   size_t count = 0;
   for (const auto &mesh : meshes)
-    count += mesh.getVertices().size();
+    count += mesh.vertices.size();
 
   vertices.reserve(count);
 
   for (const auto &mesh : meshes)
-  {
-    const auto &v = mesh.getVertices();
-    vertices.insert(vertices.begin(), v.begin(), v.end());
-  }
+    vertices.insert(vertices.begin(), mesh.vertices.begin(), mesh.vertices.end());
 
   return vertices;
 }
@@ -177,15 +121,12 @@ const std::vector<unsigned int> Model::getIndices() const
   size_t count = 0;
 
   for (const auto &mesh : meshes)
-    count += mesh.getIndices().size();
+    count += mesh.indices.size();
 
   indices.reserve(count);
 
   for (const auto &mesh : meshes)
-  {
-    const auto &v = mesh.getIndices();
-    indices.insert(indices.begin(), v.begin(), v.end());
-  }
+    indices.insert(indices.begin(), mesh.indices.begin(), mesh.indices.end());
 
   return indices;
 }

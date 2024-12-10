@@ -19,31 +19,28 @@ const WindowOptions opts = {.title = "glPlay", .width = 800, .height = 600, .ena
  */
 App::App() : Window(opts)
 {
-  controlPanel.setEngine(&engine);
+  controlPanel.setCamera(&camera);
+  controlPanel.setShader(&shader);
+  controlPanel.setResourceManager(&resource);
 
   /**
    * Setup a camera
    * Specify the type, and other properties.
    */
-  PerspectiveCamera *camera = engine.createCamera<PerspectiveCamera>();
-  camera->setPosition(0.0f, 0.0f, 20.0f);
-
-
-  ResourceManager *resource = engine.getResourceManager();
+  camera.setPosition(0.0f, 0.0f, 20.0f);
 
   /**
    * Load the model foo
    */
-  Model *sphere = resource->loadModel("assets/model/sphere.fbx");
-  Model *cube = resource->loadModel("assets/model/cube-textured.fbx");
+  Model *sphere = resource.loadModel("assets/model/sphere.fbx");
+  Model *cube = resource.loadModel("assets/model/cube-textured.fbx");
 
   /**
    * Setup the shader
    */
-  Shader *shader = engine.getShader();
-  unsigned int v_transform = shader->compile("src/Shader/v_transform.glsl", ShaderType::VERTEX_SHADER);
-  unsigned int f_material = shader->compile("src/Shader/f_material.glsl", ShaderType::FRAGMENT_SHADER);
-  const unsigned int modelShader = shader->createProgram({v_transform, f_material});
+  unsigned int v_transform = shader.compile("src/Shader/v_transform.glsl", ShaderType::VERTEX_SHADER);
+  unsigned int f_material = shader.compile("src/Shader/f_material.glsl", ShaderType::FRAGMENT_SHADER);
+  const unsigned int modelShader = shader.createProgram({v_transform, f_material});
 
   const unsigned int sphere1ID = sphere->createInstance();
   const unsigned int sphere2ID = sphere->createInstance();
@@ -51,16 +48,43 @@ App::App() : Window(opts)
   const unsigned int cube1ID = cube->createInstance();
   const unsigned int cube2ID = cube->createInstance();
 
-  sphere->getInstance(sphere1ID).translate.x = -5.0f;
-  sphere->getInstance(sphere2ID).translate.x = -5.0f;
-  sphere->getInstance(sphere2ID).translate.y = 5.0f;
+  Instance &iSphere1 = sphere->getInstance(sphere1ID);
+  Instance &iSphere2 = sphere->getInstance(sphere2ID);
 
-  cube->getInstance(cube1ID).translate.x = 5.0f;
-  cube->getInstance(cube2ID).translate.x = 5.0f;
-  cube->getInstance(cube2ID).translate.y = 5.0f;
+  Instance &iCube1 = cube->getInstance(cube1ID);
+  Instance &iCube2 = cube->getInstance(cube2ID);
 
-  // engine->createRenderer<BatchInstances>();
-  // engine->createRenderer<MultiBatchInstances>();
+  iSphere1.translate.x = -5.0f;
+  iSphere2.translate.x = -5.0f;
+  iSphere2.translate.y = 5.0f;
+
+  iCube1.translate.x = 5.0f;
+  iCube2.translate.x = 5.0f;
+  iCube2.translate.y = 5.0f;
+
+  MultiModelInstanceBuffer &buffer = buffers.emplace_back();
+
+  instancedCommands.emplace_back();
+  DrawElementsIndirectCommand &sphereCommand = instancedCommands.at(sphere->getID());
+  const unsigned int spherePartitionID = buffer.addBufferData(sphere->getVertices(), sphere->getIndices(), sphereCommand.firstIndex, sphereCommand.baseVertex);
+  buffer.add(spherePartitionID, iSphere1, sphereCommand.baseInstance);
+  buffer.add(spherePartitionID, iSphere2, sphereCommand.baseInstance);
+  sphereCommand.count = sphere->getIndices().size();
+  sphereCommand.primCount = sphere->getInstances().size();
+
+
+  instancedCommands.emplace_back();
+  DrawElementsIndirectCommand &cubeCommand = instancedCommands.at(cube->getID());
+  const unsigned int cubePartitionID = buffer.addBufferData(cube->getVertices(), cube->getIndices(), cubeCommand.firstIndex, cubeCommand.baseVertex);
+  buffer.add(cubePartitionID, iCube1, cubeCommand.baseInstance);
+  buffer.add(cubePartitionID, iCube2, cubeCommand.baseInstance);
+  cubeCommand.count = cube->getIndices().size();
+  cubeCommand.primCount = cube->getInstances().size();
+
+  unsigned int indirectBuffer;
+  glGenBuffers(1, &indirectBuffer);
+  glBindBuffer(GL_DRAW_INDIRECT_BUFFER, indirectBuffer);
+  glBufferData(GL_DRAW_INDIRECT_BUFFER, instancedCommands.size() * sizeof(DrawElementsIndirectCommand), instancedCommands.data(), GL_STATIC_DRAW);
 
   // Begins the onDraw loop
   open();
@@ -70,11 +94,20 @@ void App::onUpdate()
 {
   const glm::vec2 &size = Window::GetDimensions();
 
-  engine.getCamera<Camera>()->setViewportSize(size);
-
-  engine.update();
+  camera.setViewportSize(size);
+  camera.update();
 
   controlPanel.update();
+
+  MultiModelInstanceBuffer &buffer = buffers.at(0);
+  const std::vector<Model *> &models = resource.getModels();
+
+  for (unsigned int i = 0; i < models.size(); i++)
+  {
+    const std::vector<Instance> &instances = models.at(i)->getInstances();
+    for (unsigned int j = 0; j < instances.size(); j++)
+      buffer.update(i, j, instances.at(j));
+  }
 }
 
 void App::onDraw()
@@ -82,11 +115,10 @@ void App::onDraw()
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  engine.getShader()->bind(0);
+  shader.bind(0);
+  shader.setUniformMatrix4fv("u_ViewProjection", camera.getViewProjectionMatrix());
 
-  engine.begin();
-
-  engine.draw();
+  Renderer::Draw(instancedCommands);
 
   controlPanel.draw();
 }
