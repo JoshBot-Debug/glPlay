@@ -14,6 +14,6 @@ public:
 
   static void Draw(const std::vector<DrawElementsIndirectCommand> &commands, const Primitive &primitive = Primitive::TRIANGLES)
   {
-    glMultiDrawElementsIndirect((unsigned int)primitive, GL_UNSIGNED_INT, 0, commands.size(), 0);
+    glMultiDrawElementsIndirect((unsigned int)primitive, GL_UNSIGNED_INT, (const void *)(0 * sizeof(DrawElementsIndirectCommand)), commands.size() / 2, 0);
   }
 };

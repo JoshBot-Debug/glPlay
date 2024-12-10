@@ -67,7 +67,7 @@ std::vector<unsigned int> MultiModelInstanceBuffer::add(const unsigned int parti
   const unsigned int offset = ibo.getBufferPartitionSize(partition) / sizeof(Instance);
 
   ibo.upsert(offset, instances, partition);
-  baseInstance = ibo.getBufferPartitionOffsetSize(partition) / sizeof(Instance); // Send to the outside setInstanceOffset
+  baseInstance = ibo.getBufferPartitionOffsetSize(partition) / sizeof(Instance);
 
   vao.bind();
   vao.set(3, 3, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, translate), 1);
