@@ -4,10 +4,12 @@
 #include <unordered_map>
 
 #include "Model.h"
+#include "Shader.h"
 
 class ResourceManager
 {
 private:
+  Shader shader;
   std::vector<Model *> models;
 
 public:
@@ -47,4 +49,9 @@ public:
   {
     return models;
   }
+
+  Shader &getShader()
+  {
+    return shader;
+  };
 };

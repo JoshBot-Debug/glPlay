@@ -4,7 +4,6 @@
 
 #include "Engine/ResourceManager.h"
 #include "Engine/Camera/PerspectiveCamera.h"
-#include "Engine/Shader.h"
 
 #include "Engine/Renderer/Renderer.h"
 #include "Engine/Renderer/MultiModelInstanceBuffer.h"
@@ -14,7 +13,6 @@
 class App : Window
 {
 private:
-  Shader shader;
   ResourceManager resource;
   PerspectiveCamera camera;
 

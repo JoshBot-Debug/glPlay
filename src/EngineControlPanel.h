@@ -8,14 +8,12 @@
 #include "Window/Time.h"
 #include "Window/Input.h"
 
-#include "Engine/Shader.h"
 #include "Engine/ResourceManager.h"
 #include "Engine/Camera/PerspectiveCamera.h"
 
 class EngineControlPanel
 {
 private:
-  Shader *shader;
   PerspectiveCamera *camera;
   ResourceManager *resource;
 
@@ -25,11 +23,6 @@ public:
   void setCamera(PerspectiveCamera *camera)
   {
     this->camera = camera;
-  }
-
-  void setShader(Shader *shader)
-  {
-    this->shader = shader;
   }
 
   void setResourceManager(ResourceManager *resource)
@@ -42,7 +35,7 @@ public:
     ImGui::Begin("Shaders");
 
     if (ImGui::Button("Recompile shaders"))
-      shader->recompile();
+      resource->getShader().recompile();
 
     ImGui::End();
   }
@@ -129,10 +122,16 @@ public:
 
     const glm::vec2 scroll = Input::GetScroll();
 
-    if(scroll.y)
-      translate.z += (speed * delta) * scroll.y * 50.0f;
+    if (scroll.y)
+    {
+      float direction = (speed * delta * (Input::KeyPress(KeyboardKey::LEFT_CONTROL) ? 10.0f : 50.0f)) * scroll.y;
+      if (Input::KeyPress(KeyboardKey::LEFT_SHIFT))
+        translate.x += direction;
+      else
+        translate.z += direction;
+    }
 
-    if(scroll.x)
+    if (scroll.x)
       translate.x += (speed * delta) * scroll.x * 50.0f;
 
     if (Input::KeyPress(KeyboardKey::W))

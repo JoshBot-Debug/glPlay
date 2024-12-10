@@ -20,7 +20,6 @@ const WindowOptions opts = {.title = "glPlay", .width = 800, .height = 600, .ena
 App::App() : Window(opts)
 {
   controlPanel.setCamera(&camera);
-  controlPanel.setShader(&shader);
   controlPanel.setResourceManager(&resource);
 
   /**
@@ -38,6 +37,7 @@ App::App() : Window(opts)
   /**
    * Setup the shader
    */
+  Shader &shader = resource.getShader();
   unsigned int v_transform = shader.compile("src/Shader/v_transform.glsl", ShaderType::VERTEX_SHADER);
   unsigned int f_material = shader.compile("src/Shader/f_material.glsl", ShaderType::FRAGMENT_SHADER);
   const unsigned int modelShader = shader.createProgram({v_transform, f_material});
@@ -114,7 +114,8 @@ void App::onDraw()
 {
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+  
+  Shader &shader = resource.getShader();
   shader.bind(0);
   shader.setUniformMatrix4fv("u_ViewProjection", camera.getViewProjectionMatrix());
 
