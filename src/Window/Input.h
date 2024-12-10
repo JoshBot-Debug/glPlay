@@ -9,17 +9,35 @@ class Input
 {
 private:
   static GLFWwindow *window;
-  
+  static glm::vec2 scroll;
+
 public:
   static void SetWindowContext(GLFWwindow *window);
 
   static const glm::vec2 MousePosition();
 
+  static void ResetScroll()
+  {
+    scroll.x = 0.0f;
+    scroll.y = 0.0f;
+  }
+
+  static void ScrollCallback(GLFWwindow *window, double x, double y)
+  {
+    scroll.x = x;
+    scroll.y = y;
+  }
+
+  static const glm::vec2 GetScroll()
+  {
+    return scroll;
+  }
+
   /**
    * @param key Expects a KeyboardKey or MouseButton
    */
   template <typename T>
-  static bool KeyPress(const T &key)
+  static const bool KeyPress(const T &key)
   {
     if (!window)
       return false;
@@ -39,7 +57,7 @@ public:
    * @param key Expects a KeyboardKey or MouseButton
    */
   template <typename T>
-  static bool KeyRelease(const T &key)
+  static const bool KeyRelease(const T &key)
   {
     if (!window)
       return false;
@@ -55,3 +73,5 @@ public:
     return state == static_cast<int>(KeyAction::RELEASE);
   }
 };
+
+inline glm::vec2 Input::scroll(0.0f);

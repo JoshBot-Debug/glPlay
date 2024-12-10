@@ -65,6 +65,7 @@ void Window::open()
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
     glfwSwapBuffers(window);
+    Input::ResetScroll();
   }
 
   this->onCleanUp();
@@ -155,6 +156,7 @@ Window::Window(const WindowOptions &options) : options(options)
   ImGui_ImplOpenGL3_Init(glsl_version);
 
   Input::SetWindowContext(window);
+  glfwSetScrollCallback(window, Input::ScrollCallback);
 }
 
 Window::~Window()

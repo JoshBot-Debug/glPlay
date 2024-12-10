@@ -49,7 +49,7 @@ public:
 
   void instanceMenu()
   {
-    
+
     for (const auto &model : resource->getModels())
     {
       std::vector<Instance> &instances = model->getInstances();
@@ -127,6 +127,14 @@ public:
 
     glm::vec3 translate(0.0f);
 
+    const glm::vec2 scroll = Input::GetScroll();
+
+    if(scroll.y)
+      translate.z += (speed * delta) * scroll.y * 50.0f;
+
+    if(scroll.x)
+      translate.x += (speed * delta) * scroll.x * 50.0f;
+
     if (Input::KeyPress(KeyboardKey::W))
       translate.z += speed * delta;
 
@@ -139,10 +147,10 @@ public:
     if (Input::KeyPress(KeyboardKey::D))
       translate.x += speed * delta;
 
-    if (Input::KeyPress(KeyboardKey::Q))
+    if (Input::KeyPress(KeyboardKey::E))
       translate.y += speed * delta;
 
-    if (Input::KeyPress(KeyboardKey::E))
+    if (Input::KeyPress(KeyboardKey::Q))
       translate.y -= speed * delta;
 
     if (Input::KeyPress(MouseButton::LEFT))
