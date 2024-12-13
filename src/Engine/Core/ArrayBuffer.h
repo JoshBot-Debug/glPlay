@@ -161,6 +161,7 @@ public:
     // Did you forget to call .addPartition(0) before trying to upsert to a partition that
     // does not exist? You need to add a partition first.
     // And if only partition 0 exists, you cannot try upserting to partition[2,3,4,...]
+
     assert(partitions.size() > partition);
 
     int dataSize = data.size() * sizeof(T);

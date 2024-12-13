@@ -12,9 +12,16 @@ void loadModel(const char *path, std::vector<Mesh> &meshes)
 {
   Assimp::Importer importer;
 
-  const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipWindingOrder | aiProcess_GenSmoothNormals);
+  const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipWindingOrder | aiProcess_GenSmoothNormals | aiProcess_OptimizeMeshes);
 
-  if (!scene)
+  // const aiScene *scene = importer.ReadFile(path,
+  //                                          aiProcess_Triangulate |
+  //                                              aiProcess_FlipUVs |
+  //                                              aiProcess_GenSmoothNormals |
+  //                                              aiProcess_OptimizeMeshes |
+  //                                              aiProcess_JoinIdenticalVertices);
+
+  if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
   {
     LOG_BREAK_BEFORE;
     LOG("Failed to load model:", importer.GetErrorString());
@@ -40,6 +47,9 @@ void loadModel(const char *path, std::vector<Mesh> &meshes)
       v.position.y = vertex.y;
       v.position.z = vertex.z;
 
+    std::cout <<  v.position.x << " " << v.position.y << " " << v.position.z << std::endl;
+
+
       const aiVector3D &normal = mesh->mNormals[j];
       v.normal.x = normal.x;
       v.normal.y = normal.y;
@@ -57,12 +67,34 @@ void loadModel(const char *path, std::vector<Mesh> &meshes)
         v.texCoord.y = 0.0f;
       }
     }
-
+    
     for (unsigned int j = 0; j < mesh->mNumFaces; ++j)
     {
       const aiFace &face = mesh->mFaces[j];
-      for (unsigned int k = 0; k < face.mNumIndices; ++k)
+      for (unsigned int k = 0; k < face.mNumIndices; ++k) 
         m.indices.push_back(face.mIndices[k]);
+    }
+  }
+
+
+  for (unsigned int i = 0; i < scene->mNumMaterials; ++i)
+  {
+    aiMaterial *material = scene->mMaterials[i];
+    aiString texturePath;
+
+    if (material->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath) == AI_SUCCESS)
+    {
+      if (texturePath.C_Str()[0] == '*')
+      {
+        int textureIndex = std::atoi(texturePath.C_Str() + 1);
+        if (textureIndex < scene->mNumTextures)
+        {
+          const aiTexture *embeddedTexture = scene->mTextures[textureIndex];
+          LOG_BREAK_BEFORE;
+          LOG("Embedded texture found, size:", embeddedTexture->mWidth);
+          LOG_BREAK_AFTER;
+        }
+      }
     }
   }
 }
@@ -109,7 +141,13 @@ const std::vector<Vertex> Model::getVertices() const
   vertices.reserve(count);
 
   for (const auto &mesh : meshes)
-    vertices.insert(vertices.begin(), mesh.vertices.begin(), mesh.vertices.end());
+    vertices.insert(vertices.end(), mesh.vertices.begin(), mesh.vertices.end());
+
+  // for (size_t i = 0; i < meshes[0].vertices.size(); i++)
+  // {
+  //   std::cout << meshes[0].vertices[i].position.x << " " << meshes[0].vertices[i].position.y << " " << meshes[0].vertices[i].position.z << std::endl;
+  // }
+  
 
   return vertices;
 }
@@ -126,7 +164,7 @@ const std::vector<unsigned int> Model::getIndices() const
   indices.reserve(count);
 
   for (const auto &mesh : meshes)
-    indices.insert(indices.begin(), mesh.indices.begin(), mesh.indices.end());
+    indices.insert(indices.end(), mesh.indices.begin(), mesh.indices.end());
 
   return indices;
 }

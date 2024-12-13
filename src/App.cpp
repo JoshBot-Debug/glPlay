@@ -11,6 +11,10 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "Engine/Types.h"
+#include "Engine/Core/VertexArray.h"
+#include "Engine/Core/ArrayBuffer.h"
+
 const WindowOptions opts = {.title = "glPlay", .width = 800, .height = 600, .enableDepth = true, .enableVSync = false, .MSAA = 16, .imguiEnableDocking = true, .maximized = true};
 
 /**
@@ -31,8 +35,24 @@ App::App() : Window(opts)
   /**
    * Load the model foo
    */
-  Model *sphere = resource.loadModel("assets/model/sphere.fbx");
-  Model *cube = resource.loadModel("assets/model/cube-textured.fbx");
+  // Model *sphere = resource.loadModel("assets/model/Keqing - Piercing Thunderbolt/Keqing - Piercing Thunderbolt.glb");
+  // Model *sphere = resource.loadModel("assets/model/Keqing - Piercing Thunderbolt/Keqing.fbx");
+  // Model *sphere = resource.loadModel("assets/model/Raiden Shogun/Raiden Shogun.fbx");
+
+  // Model *sphere = resource.loadModel("assets/model/cube.fbx");
+  // Model *sphere = resource.loadModel("assets/model/2B/2B.fbx");
+  // Model *sphere = resource.loadModel("assets/model/2B/2B.glb");
+  // Model *sphere = resource.loadModel("assets/model/sphere.fbx");
+
+  // Model *sphere = resource.loadModel("assets/model/2-cube-joined.fbx");
+  Model *sphere = resource.loadModel("assets/model/2-cube-seperate.fbx");
+
+  // Model *sphere = resource.loadModel("assets/model/cube-sphere-joined.fbx");
+  // Model *sphere = resource.loadModel("assets/model/cube-sphere-seperate.fbx");
+
+  // Model *sphere = resource.loadModel("assets/model/sphere.fbx");
+  // Vertices: 1984
+  // Indices: 2880
 
   /**
    * Setup the shader
@@ -42,44 +62,20 @@ App::App() : Window(opts)
   unsigned int f_material = shader.compile("src/Shader/f_material.glsl", ShaderType::FRAGMENT_SHADER);
   const unsigned int modelShader = shader.createProgram({v_transform, f_material});
 
-  const unsigned int sphere1ID = sphere->createInstance();
-  const unsigned int sphere2ID = sphere->createInstance();
-
-  const unsigned int cube1ID = cube->createInstance();
-  const unsigned int cube2ID = cube->createInstance();
-
-  Instance &iSphere1 = sphere->getInstance(sphere1ID);
-  Instance &iSphere2 = sphere->getInstance(sphere2ID);
-
-  Instance &iCube1 = cube->getInstance(cube1ID);
-  Instance &iCube2 = cube->getInstance(cube2ID);
-
-  iSphere1.translate.x = -5.0f;
-  iSphere2.translate.x = -5.0f;
-  iSphere2.translate.y = 5.0f;
-
-  iCube1.translate.x = 5.0f;
-  iCube2.translate.x = 5.0f;
-  iCube2.translate.y = 5.0f;
+  unsigned int iSphereID = sphere->createInstance();
+  Instance &iSphere = sphere->getInstance(iSphereID);
 
   MultiModelInstanceBuffer &buffer = buffers.emplace_back();
 
   instancedCommands.emplace_back();
-  DrawElementsIndirectCommand &sphereCommand = instancedCommands.at(sphere->getID());
-  const unsigned int spherePartitionID = buffer.addBufferData(sphere->getVertices(), sphere->getIndices(), sphereCommand.firstIndex, sphereCommand.baseVertex);
-  buffer.add(spherePartitionID, iSphere1, sphereCommand.baseInstance);
-  buffer.add(spherePartitionID, iSphere2, sphereCommand.baseInstance);
-  sphereCommand.count = sphere->getIndices().size();
-  sphereCommand.primCount = sphere->getInstances().size();
+  DrawElementsIndirectCommand &command = instancedCommands.at(sphere->getID());
+  const unsigned int spherePartitionID = buffer.addBufferData(sphere->getVertices(), sphere->getIndices(), command.firstIndex, command.baseVertex);
+  buffer.add(spherePartitionID, iSphere, command.baseInstance);
+  command.count = sphere->getIndices().size();
+  command.primCount = sphere->getInstances().size();
 
-
-  instancedCommands.emplace_back();
-  DrawElementsIndirectCommand &cubeCommand = instancedCommands.at(cube->getID());
-  const unsigned int cubePartitionID = buffer.addBufferData(cube->getVertices(), cube->getIndices(), cubeCommand.firstIndex, cubeCommand.baseVertex);
-  buffer.add(cubePartitionID, iCube1, cubeCommand.baseInstance);
-  buffer.add(cubePartitionID, iCube2, cubeCommand.baseInstance);
-  cubeCommand.count = cube->getIndices().size();
-  cubeCommand.primCount = cube->getInstances().size();
+  std::cout << "Vertices: " << sphere->getVertices().size() << std::endl;
+  std::cout << "Indices: " << sphere->getIndices().size() << std::endl;
 
   unsigned int indirectBuffer;
   glGenBuffers(1, &indirectBuffer);

@@ -38,6 +38,27 @@ const unsigned int MultiModelInstanceBuffer::addBufferData(const std::vector<Ver
   vao.set(1, 3, VertexType::FLOAT, false, sizeof(Vertex), (void *)offsetof(Vertex, normal));
   vao.set(2, 2, VertexType::FLOAT, false, sizeof(Vertex), (void *)offsetof(Vertex, texCoord));
 
+  // for (size_t i = 0; i < 36; i++)
+  // {
+  //   std::cout << vertices[i].position.x << " " << vertices[i].position.y << " " << vertices[i].position.z << std::endl;
+  // }
+
+  // const auto &data = ebo.getBufferData<unsigned int>(0);
+
+  // for (size_t i = 0; i < data.size(); i++)
+  // {
+  //   std::cout << data[i] << std::endl;
+  // }
+
+  // std::cout << data.size() - 36 << " " << data.size() << std::endl;
+
+  // const auto &data = vbo.getBufferData<Vertex>(0);
+
+  // for (size_t i = 0; i < data.size(); i++)
+  // {
+  //   std::cout << data[i].position.x << " " << data[i].position.y << " " << data[i].position.z << std::endl;
+  // }
+
   return epID;
 }
 
