@@ -8,17 +8,6 @@ MultiModelInstanceBuffer::MultiModelInstanceBuffer() : vbo(BufferTarget::ARRAY_B
   ibo.generate();
 
   vao.bind();
-
-  vbo.bind();
-  vao.set(0, 3, VertexType::FLOAT, false, sizeof(Vertex), (void *)offsetof(Vertex, position));
-  vao.set(1, 3, VertexType::FLOAT, false, sizeof(Vertex), (void *)offsetof(Vertex, normal));
-  vao.set(2, 2, VertexType::FLOAT, false, sizeof(Vertex), (void *)offsetof(Vertex, texCoord));
-
-  ibo.bind();
-  vao.set(3, 3, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, translate), 1);
-  vao.set(4, 3, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, rotation), 1);
-  vao.set(5, 3, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, scale), 1);
-  vao.set(6, 4, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, color), 1);
 }
 
 const unsigned int MultiModelInstanceBuffer::addBufferData(const std::vector<Vertex> &vertices, const std::vector<unsigned int> &indices, unsigned int &firstIndex, unsigned int &baseVertex)
@@ -37,27 +26,9 @@ const unsigned int MultiModelInstanceBuffer::addBufferData(const std::vector<Ver
   vao.set(0, 3, VertexType::FLOAT, false, sizeof(Vertex), (void *)offsetof(Vertex, position));
   vao.set(1, 3, VertexType::FLOAT, false, sizeof(Vertex), (void *)offsetof(Vertex, normal));
   vao.set(2, 2, VertexType::FLOAT, false, sizeof(Vertex), (void *)offsetof(Vertex, texCoord));
-
-  // for (size_t i = 0; i < 36; i++)
-  // {
-  //   std::cout << vertices[i].position.x << " " << vertices[i].position.y << " " << vertices[i].position.z << std::endl;
-  // }
-
-  // const auto &data = ebo.getBufferData<unsigned int>(0);
-
-  // for (size_t i = 0; i < data.size(); i++)
-  // {
-  //   std::cout << data[i] << std::endl;
-  // }
-
-  // std::cout << data.size() - 36 << " " << data.size() << std::endl;
-
-  // const auto &data = vbo.getBufferData<Vertex>(0);
-
-  // for (size_t i = 0; i < data.size(); i++)
-  // {
-  //   std::cout << data[i].position.x << " " << data[i].position.y << " " << data[i].position.z << std::endl;
-  // }
+  vao.set(3, 3, VertexType::FLOAT, false, sizeof(Vertex), (void *)offsetof(Vertex, tangent));
+  vao.set(4, 3, VertexType::FLOAT, false, sizeof(Vertex), (void *)offsetof(Vertex, bitangent));
+  vao.set(5, 3, VertexType::FLOAT, false, sizeof(Vertex), (void *)offsetof(Vertex, color));
 
   return epID;
 }
@@ -72,10 +43,10 @@ unsigned int MultiModelInstanceBuffer::add(const unsigned int partition, const I
   ibo.upsert(sizeof(Instance), offset, sizeof(instance), (const void *)&instance, partition);
   baseInstance = ibo.getBufferPartitionOffsetSize(partition) / sizeof(Instance);
 
-  vao.set(3, 3, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, translate), 1);
-  vao.set(4, 3, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, rotation), 1);
-  vao.set(5, 3, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, scale), 1);
-  vao.set(6, 4, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, color), 1);
+  vao.set(6, 3, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, translate), 1);
+  vao.set(7, 3, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, rotation), 1);
+  vao.set(8, 3, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, scale), 1);
+  vao.set(9, 4, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, color), 1);
 
   return offset;
 }
@@ -91,10 +62,10 @@ std::vector<unsigned int> MultiModelInstanceBuffer::add(const unsigned int parti
   baseInstance = ibo.getBufferPartitionOffsetSize(partition) / sizeof(Instance);
 
   vao.bind();
-  vao.set(3, 3, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, translate), 1);
-  vao.set(4, 3, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, rotation), 1);
-  vao.set(5, 3, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, scale), 1);
-  vao.set(6, 4, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, color), 1);
+  vao.set(6, 3, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, translate), 1);
+  vao.set(7, 3, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, rotation), 1);
+  vao.set(8, 3, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, scale), 1);
+  vao.set(9, 4, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, color), 1);
 
   std::vector<unsigned int> offsets(instances.size());
 

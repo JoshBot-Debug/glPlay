@@ -3,11 +3,14 @@
 layout(location=0)in vec3 in_Position;
 layout(location=1)in vec3 in_Normal;
 layout(location=2)in vec2 in_TexCoord;
+layout(location=3)in vec3 in_Tangent;
+layout(location=4)in vec3 in_BiTangent;
+layout(location=5)in vec3 in_Color;
 
-layout(location=3)in vec3 in_Translate;
-layout(location=4)in vec3 in_Rotation;
-layout(location=5)in vec3 in_Scale;
-layout(location=6)in vec4 in_Color;
+layout(location=6)in vec3 in_iTranslate;
+layout(location=7)in vec3 in_iRotation;
+layout(location=8)in vec3 in_iScale;
+layout(location=9)in vec4 in_iColor;
 
 out vec4 f_Color;
 out vec3 f_Normal;
@@ -66,13 +69,13 @@ mat4 translate(mat4 m,vec3 t){
 void main(){
   mat4 model=mat4(1.);
   
-  model=scale(model,in_Scale);
-  model=rotateX(model,radians(in_Rotation.x));
-  model=rotateY(model,radians(in_Rotation.y));
-  model=rotateZ(model,radians(in_Rotation.z));
-  model=translate(model,in_Translate);
+  model=scale(model,in_iScale);
+  model=rotateX(model,radians(in_iRotation.x));
+  model=rotateY(model,radians(in_iRotation.y));
+  model=rotateZ(model,radians(in_iRotation.z));
+  model=translate(model,in_iTranslate);
   
-  f_Color=in_Color;
+  f_Color=vec4(in_Color,1.)+in_iColor;
   f_Normal=in_Normal;
   f_Position=vec3(model*vec4(in_Position,1.));
   f_TexCoord=in_TexCoord;

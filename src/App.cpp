@@ -45,7 +45,32 @@ App::App() : Window(opts)
   // Model *sphere = resource.loadModel("assets/model/sphere.fbx");
 
   // Model *sphere = resource.loadModel("assets/model/2-cube-joined.fbx");
-  Model *sphere = resource.loadModel("assets/model/2-cube-seperate.fbx");
+  // Model *sphere = resource.loadModel("assets/model/2-cube-seperate.fbx");
+
+  // Vertices: 4
+  // -1 -1  0
+  //  1 -1  0
+  //  1  1  0
+  // -1  1  0
+  // Indices: 6 - 3 2 1 3 1 0
+  // Model *sphere = resource.loadModel("assets/model/plane.fbx");
+
+  // Vertices: 8
+  // -1 -1  0
+  //  1 -1  0
+  //  1  1  0
+  // -1  1  0
+  // *********
+  // -1 -4  0
+  //  1 -4  0
+  //  1 -2  0
+  // -1 -2  0
+  // Indices: 12 - 3 2 1 3 1 0 | 7 6 5 7 5 4
+  // Model *sphere = resource.loadModel("assets/model/plane-joined.fbx");
+
+  // Vertices: 8
+  // Indices: 12
+  Model *sphere = resource.loadModel("assets/model/plane-seperate.fbx");
 
   // Model *sphere = resource.loadModel("assets/model/cube-sphere-joined.fbx");
   // Model *sphere = resource.loadModel("assets/model/cube-sphere-seperate.fbx");

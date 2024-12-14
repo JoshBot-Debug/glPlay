@@ -31,3 +31,4 @@ instance.position.y = 0.0f;
 #TODO
 Read raylib
 
+https://github.com/AyushKoul00/opengl-model-loading/blob/main/Test%20Project/include/utils/Model.h

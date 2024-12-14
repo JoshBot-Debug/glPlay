@@ -8,18 +8,83 @@
 
 #include "Debug.h"
 
+void processMesh(Mesh &m, aiMesh *mesh, const aiScene *scene)
+{
+  m.vertices.resize(mesh->mNumVertices);
+
+  for (unsigned int i = 0; i < mesh->mNumVertices; i++)
+  {
+    Vertex &v = m.vertices[i];
+
+    std::cout << mesh->mVertices[i].y << std::endl;
+
+    if (mesh->HasPositions())
+    {
+      v.position.x = mesh->mVertices[i].x;
+      v.position.y = mesh->mVertices[i].y;
+      v.position.z = mesh->mVertices[i].z;
+    }
+
+    if (mesh->HasNormals())
+    {
+      v.normal.x = mesh->mNormals[i].x;
+      v.normal.y = mesh->mNormals[i].y;
+      v.normal.z = mesh->mNormals[i].z;
+    }
+
+    if (mesh->HasTextureCoords(0))
+    {
+      v.texCoord.x = mesh->mTextureCoords[0][i].x;
+      v.texCoord.y = mesh->mTextureCoords[0][i].y;
+    }
+
+    if (mesh->HasTangentsAndBitangents())
+    {
+      v.tangent.x = mesh->mTangents[i].x;
+      v.tangent.y = mesh->mTangents[i].y;
+      v.tangent.z = mesh->mTangents[i].z;
+
+      v.bitangent.x = mesh->mBitangents[i].x;
+      v.bitangent.y = mesh->mBitangents[i].y;
+      v.bitangent.z = mesh->mBitangents[i].z;
+    }
+
+    if (mesh->HasVertexColors(0))
+    {
+      v.color.x = mesh->mColors[0][i].r;
+      v.color.y = mesh->mColors[0][i].g;
+      v.color.z = mesh->mColors[0][i].b;
+    }
+  }
+
+  for (unsigned int i = 0; i < mesh->mNumFaces; i++)
+  {
+    aiFace &face = mesh->mFaces[i];
+    for (unsigned int j = 0; j < face.mNumIndices; j++)
+      m.indices.push_back(face.mIndices[j]);
+  }
+};
+
+void processNode(std::vector<Mesh> &meshes, aiNode *node, const aiScene *scene)
+{
+  unsigned int start = meshes.size();
+  meshes.resize(start + scene->mNumMeshes);
+
+  for (unsigned int i = 0; i < node->mNumMeshes; i++)
+  {
+    aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
+    processMesh(meshes[start + i], mesh, scene);
+  }
+
+  for (unsigned int i = 0; i < node->mNumChildren; i++)
+    processNode(meshes, node->mChildren[i], scene);
+}
+
 void loadModel(const char *path, std::vector<Mesh> &meshes)
 {
   Assimp::Importer importer;
 
-  const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipWindingOrder | aiProcess_GenSmoothNormals | aiProcess_OptimizeMeshes);
-
-  // const aiScene *scene = importer.ReadFile(path,
-  //                                          aiProcess_Triangulate |
-  //                                              aiProcess_FlipUVs |
-  //                                              aiProcess_GenSmoothNormals |
-  //                                              aiProcess_OptimizeMeshes |
-  //                                              aiProcess_JoinIdenticalVertices);
+  const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_FlipWindingOrder | aiProcess_GenSmoothNormals | aiProcess_OptimizeMeshes);
 
   if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
   {
@@ -29,74 +94,7 @@ void loadModel(const char *path, std::vector<Mesh> &meshes)
     return;
   }
 
-  meshes.resize(scene->mNumMeshes);
-
-  for (unsigned int i = 0; i < scene->mNumMeshes; ++i)
-  {
-    aiMesh *mesh = scene->mMeshes[i];
-    Mesh &m = meshes[i];
-
-    m.vertices.resize(mesh->mNumVertices);
-
-    for (unsigned int j = 0; j < mesh->mNumVertices; ++j)
-    {
-      Vertex &v = m.vertices[j];
-
-      const aiVector3D &vertex = mesh->mVertices[j];
-      v.position.x = vertex.x;
-      v.position.y = vertex.y;
-      v.position.z = vertex.z;
-
-    std::cout <<  v.position.x << " " << v.position.y << " " << v.position.z << std::endl;
-
-
-      const aiVector3D &normal = mesh->mNormals[j];
-      v.normal.x = normal.x;
-      v.normal.y = normal.y;
-      v.normal.z = normal.z;
-
-      if (mesh->mTextureCoords[0])
-      {
-        const aiVector3D &texCoord = mesh->mTextureCoords[0][j];
-        v.texCoord.x = texCoord.x;
-        v.texCoord.y = texCoord.y;
-      }
-      else
-      {
-        v.texCoord.x = 0.0f;
-        v.texCoord.y = 0.0f;
-      }
-    }
-    
-    for (unsigned int j = 0; j < mesh->mNumFaces; ++j)
-    {
-      const aiFace &face = mesh->mFaces[j];
-      for (unsigned int k = 0; k < face.mNumIndices; ++k) 
-        m.indices.push_back(face.mIndices[k]);
-    }
-  }
-
-
-  for (unsigned int i = 0; i < scene->mNumMaterials; ++i)
-  {
-    aiMaterial *material = scene->mMaterials[i];
-    aiString texturePath;
-
-    if (material->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath) == AI_SUCCESS)
-    {
-      if (texturePath.C_Str()[0] == '*')
-      {
-        int textureIndex = std::atoi(texturePath.C_Str() + 1);
-        if (textureIndex < scene->mNumTextures)
-        {
-          const aiTexture *embeddedTexture = scene->mTextures[textureIndex];
-          LOG_BREAK_BEFORE;
-          LOG("Embedded texture found, size:", embeddedTexture->mWidth);
-          LOG_BREAK_AFTER;
-        }
-      }
-    }
-  }
+  processNode(meshes, scene->mRootNode, scene);
 }
 
 Model::Model(unsigned int id, const char *filepath) : id(id)
@@ -147,7 +145,6 @@ const std::vector<Vertex> Model::getVertices() const
   // {
   //   std::cout << meshes[0].vertices[i].position.x << " " << meshes[0].vertices[i].position.y << " " << meshes[0].vertices[i].position.z << std::endl;
   // }
-  
 
   return vertices;
 }
