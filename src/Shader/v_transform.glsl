@@ -75,7 +75,7 @@ void main(){
   model=rotateZ(model,radians(in_iRotation.z));
   model=translate(model,in_iTranslate);
   
-  f_Color=vec4(in_Color,1.)+in_iColor;
+  f_Color=vec4(in_Color,1.)*in_iColor;
   f_Normal=in_Normal;
   f_Position=vec3(model*vec4(in_Position,1.));
   f_TexCoord=in_TexCoord;

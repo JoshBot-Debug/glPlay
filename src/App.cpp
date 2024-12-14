@@ -85,7 +85,7 @@ App::App() : Window(opts)
   // 3 2 1 3 1 0
   // *********
   // 3 2 1 3 1 0
-  Model *sphere = resource.loadModel("assets/model/plane-seperate.fbx");
+  Model *sphere = resource.loadModel("assets/model/plane.obj");
 
   // Model *sphere = resource.loadModel("assets/model/cube-sphere-joined.fbx");
   // Model *sphere = resource.loadModel("assets/model/cube-sphere-seperate.fbx");

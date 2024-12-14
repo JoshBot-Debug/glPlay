@@ -8,28 +8,75 @@
 
 #include "Debug.h"
 
-void processMesh(Mesh &m, aiMesh *mesh, const aiScene *scene)
+void printMatrix(const glm::mat4 &matrix)
+{
+  for (int i = 0; i < 4; ++i)
+  {
+    for (int j = 0; j < 4; ++j)
+    {
+      std::cout << matrix[i][j] << " ";
+    }
+    std::cout << std::endl;
+  }
+}
+
+glm::mat4 toGLMMat4(const aiMatrix4x4 &aiMat)
+{
+  glm::mat4 glmMat;
+  glmMat[0][0] = aiMat.a1;
+  glmMat[0][1] = aiMat.a2;
+  glmMat[0][2] = aiMat.a3;
+  glmMat[0][3] = aiMat.a4;
+  glmMat[1][0] = aiMat.b1;
+  glmMat[1][1] = aiMat.b2;
+  glmMat[1][2] = aiMat.b3;
+  glmMat[1][3] = aiMat.b4;
+  glmMat[2][0] = aiMat.c1;
+  glmMat[2][1] = aiMat.c2;
+  glmMat[2][2] = aiMat.c3;
+  glmMat[2][3] = aiMat.c4;
+  glmMat[3][0] = aiMat.d1;
+  glmMat[3][1] = aiMat.d2;
+  glmMat[3][2] = aiMat.d3;
+  glmMat[3][3] = aiMat.d4;
+  return glmMat;
+}
+
+glm::mat4 getGlobalTransform(aiNode *node, const aiScene *scene)
+{
+  glm::mat4 transform = glm::mat4(1.0f);
+
+  while (node)
+  {
+    printMatrix(toGLMMat4(node->mTransformation));
+    transform = toGLMMat4(node->mTransformation) * transform;
+    node = node->mParent;
+  }
+
+  return transform;
+}
+
+void processMesh(Mesh &m, aiMesh *mesh, const glm::mat4 &globalTransform, const aiScene *scene)
 {
   m.vertices.resize(mesh->mNumVertices);
+
+  glm::mat4 normalMatrix = glm::transpose(glm::inverse(globalTransform));
 
   for (unsigned int i = 0; i < mesh->mNumVertices; i++)
   {
     Vertex &v = m.vertices[i];
 
-    std::cout << mesh->mVertices[i].y << std::endl;
-
-    if (mesh->HasPositions())
-    {
-      v.position.x = mesh->mVertices[i].x;
-      v.position.y = mesh->mVertices[i].y;
-      v.position.z = mesh->mVertices[i].z;
-    }
+    glm::vec4 position = globalTransform * glm::vec4(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z, 1.0f);
+    v.position.x = position.x;
+    v.position.y = position.y;
+    v.position.z = position.z;
 
     if (mesh->HasNormals())
     {
-      v.normal.x = mesh->mNormals[i].x;
-      v.normal.y = mesh->mNormals[i].y;
-      v.normal.z = mesh->mNormals[i].z;
+      glm::vec4 normal = normalMatrix * glm::vec4(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z, 0.0f);
+      v.normal.x = normal.x;
+      v.normal.y = normal.y;
+      v.normal.z = normal.z;
     }
 
     if (mesh->HasTextureCoords(0))
@@ -40,13 +87,17 @@ void processMesh(Mesh &m, aiMesh *mesh, const aiScene *scene)
 
     if (mesh->HasTangentsAndBitangents())
     {
-      v.tangent.x = mesh->mTangents[i].x;
-      v.tangent.y = mesh->mTangents[i].y;
-      v.tangent.z = mesh->mTangents[i].z;
 
-      v.bitangent.x = mesh->mBitangents[i].x;
-      v.bitangent.y = mesh->mBitangents[i].y;
-      v.bitangent.z = mesh->mBitangents[i].z;
+      glm::vec4 tangent = normalMatrix * glm::vec4(mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z, 0.0f);
+      glm::vec4 bitangent = normalMatrix * glm::vec4(mesh->mBitangents[i].x, mesh->mBitangents[i].y, mesh->mBitangents[i].z, 0.0f);
+
+      v.tangent.x = tangent.x;
+      v.tangent.y = tangent.y;
+      v.tangent.z = tangent.z;
+
+      v.bitangent.x = bitangent.x;
+      v.bitangent.y = bitangent.y;
+      v.bitangent.z = bitangent.z;
     }
 
     if (mesh->HasVertexColors(0))
@@ -67,14 +118,16 @@ void processMesh(Mesh &m, aiMesh *mesh, const aiScene *scene)
 
 void processNode(std::vector<Mesh> &meshes, aiNode *node, const aiScene *scene)
 {
+  const glm::mat4 &globalTransform = getGlobalTransform(node, scene);
+
+  std::cout << "Global Transform for Node: " << node->mName.C_Str() << std::endl;
+  printMatrix(globalTransform);
+
   unsigned int start = meshes.size();
   meshes.resize(start + scene->mNumMeshes);
 
   for (unsigned int i = 0; i < node->mNumMeshes; i++)
-  {
-    aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
-    processMesh(meshes[start + i], mesh, scene);
-  }
+    processMesh(meshes[start + i], scene->mMeshes[node->mMeshes[i]], globalTransform, scene);
 
   for (unsigned int i = 0; i < node->mNumChildren; i++)
     processNode(meshes, node->mChildren[i], scene);
