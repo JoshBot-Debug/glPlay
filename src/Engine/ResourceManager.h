@@ -17,7 +17,11 @@ public:
 
   ResourceManager(const ResourceManager &) = delete;
 
-  ~ResourceManager() = default;
+  ~ResourceManager()
+  {
+    for (const auto &model : models)
+      delete model;
+  };
 
   /**
    * @returns A pointer to a Model

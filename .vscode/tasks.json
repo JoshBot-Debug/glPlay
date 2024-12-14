@@ -35,9 +35,37 @@
         "kind": "build",
         "isDefault": true
       },
+      "dependsOn": ["Build Debug"],
       "problemMatcher": ["$gcc"],
       "presentation": {
-        "reveal": "always"
+        "reveal": "always",
+        "clear": true,
+        "panel": "dedicated",
+        "showReuseMessage": false
+      }
+    },
+
+    {
+      "label": "renderdoc",
+      "type": "shell",
+      "command": "renderdoccmd",
+      "args": [
+        "capture",
+        "--working-dir",
+        "${workspaceFolder}",
+        "${workspaceFolder}/build/glPlay"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": ["$gcc"],
+      "dependsOn": ["Build Debug"],
+      "presentation": {
+        "reveal": "always",
+        "clear": true,
+        "panel": "dedicated",
+        "showReuseMessage": false
       }
     }
   ]
