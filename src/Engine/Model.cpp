@@ -1,12 +1,15 @@
 #include "Model.h"
 
 #include <iostream>
+#include <fstream>
+#include <sstream>
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
 #include "Debug.h"
+#include "OBJLoader.h"
 
 void printMatrix(const glm::mat4 &matrix)
 {
@@ -150,9 +153,43 @@ void loadModel(const char *path, std::vector<Mesh> &meshes)
   processNode(meshes, scene->mRootNode, scene);
 }
 
+void loadOBJ(const std::string &filepath, std::vector<Mesh> &meshes)
+{
+  OBJLoader loader(filepath);
+
+  meshes = loader.getMeshes();
+
+  // for (const auto &mesh : meshes)
+  // {
+  //   std::cout << mesh.name << std::endl;
+
+  //   std::cout << "position" << std::endl;
+
+  //   for (const auto &vertex : mesh.vertices)
+  //   {
+  //     std::cout << vertex.position.x << " " << vertex.position.y << " " << vertex.position.z << std::endl;
+  //   }
+
+  //   std::cout << "texCoord" << std::endl;
+
+  //   for (const auto &vertex : mesh.vertices)
+  //   {
+  //     std::cout << vertex.texCoord.x << " " << vertex.texCoord.y << std::endl;
+  //   }
+
+  //   std::cout << "normal" << std::endl;
+
+  //   for (const auto &vertex : mesh.vertices)
+  //   {
+  //     std::cout << vertex.normal.x << " " << vertex.normal.y << " " << vertex.normal.z << std::endl;
+  //   }
+  // }
+}
+
 Model::Model(unsigned int id, const char *filepath) : id(id)
 {
-  loadModel(filepath, meshes);
+  loadOBJ(filepath, meshes);
+  // loadModel(filepath, meshes);
 }
 
 Model::~Model() {}

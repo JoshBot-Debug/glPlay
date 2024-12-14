@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <string>
 
 #include <GL/glew.h>
 #include <glm/glm.hpp>
@@ -55,6 +56,7 @@ struct Instance
 
 struct Mesh
 {
+  std::string name;
   std::vector<Vertex> vertices;
   std::vector<unsigned int> indices;
 };
