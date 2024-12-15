@@ -1,5 +1,6 @@
 #pragma once
 
+#include <tuple>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -7,18 +8,11 @@
 #include "Types.h"
 #include "Debug.h"
 
-enum class Indexer : unsigned int
+struct MeshData
 {
-  COUNT_MESH,
-  COUNT_V,
-  COUNT_VN,
-  V,
-  VT,
-  VN,
-  F,
-  VERTEX_POSITION,
-  VERTEX_TEXCOORD,
-  VERTEX_NORMAL,
+  std::string name;
+  unsigned int facesIndex;
+  std::vector<unsigned int> indices;
 };
 
 class OBJLoader
@@ -26,15 +20,18 @@ class OBJLoader
 private:
   std::ifstream file;
   std::string filepath;
-  std::vector<Mesh> meshes;
 
+  // Name, faces start index, faces batch size (3/4)
+  std::vector<MeshData> meshes;
+  std::vector<glm::vec3> positions;
+  std::vector<glm::vec2> texCoords;
   std::vector<glm::vec3> normals;
-
-  std::vector<unsigned int> index = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+  std::vector<glm::ivec3> faces;
 
   void read()
   {
     std::string line;
+
     while (std::getline(file, line))
     {
       if (line.starts_with("#"))
@@ -44,153 +41,103 @@ private:
       std::string command, word;
       iss >> command;
 
-      if (command == "mtllib")
-        while (iss >> word)
-          mtllib(word);
+      // if (command == "mtllib")
+      //   while (iss >> word)
+      //     const std::string path = (filepath.substr(0, filepath.find_last_of('/')) + "/" + text);
 
       if (command == "o")
-        o(word);
+      {
+        iss >> word;
+        meshes.emplace_back(word, faces.size());
+      }
 
       if (command == "v")
       {
-        index[(int)Indexer::VERTEX_POSITION] = 0;
+        unsigned int index = 0;
+        glm::vec3 &position = positions.emplace_back();
         while (iss >> word)
-          v(word);
-        ++index[(int)Indexer::V];
+        {
+          position[index] = std::stof(word);
+          ++index;
+        }
       }
 
       if (command == "vt")
       {
-        index[(int)Indexer::VERTEX_TEXCOORD] = 0;
+        unsigned int index = 0;
+        glm::vec2 &texCoord = texCoords.emplace_back();
         while (iss >> word)
-          vt(word);
-        ++index[(int)Indexer::VT];
+        {
+          texCoord[index] = std::stof(word);
+          ++index;
+        }
       }
 
       if (command == "vn")
       {
-        index[(int)Indexer::VERTEX_NORMAL] = 0;
+        unsigned int index = 0;
+        glm::vec3 &normal = normals.emplace_back();
         while (iss >> word)
-          vn(word);
-        ++index[(int)Indexer::VN];
+        {
+          normal[index] = std::stof(word);
+          ++index;
+        }
       }
 
-      if (command == "g")
-        g(word);
+      // if (command == "g")
+      //   g(word);
 
-      if (command == "usemtl")
-        usemtl(word);
+      // if (command == "usemtl")
+      //   usemtl(word);
 
-      if (command == "s")
-        s(word);
+      // if (command == "s")
+      //   s(word);
 
       if (command == "f")
       {
-        std::vector<unsigned int> vertexIndices;
+        std::vector<unsigned int> vertices;
         while (iss >> word)
-          vertexIndices.push_back(f(word));
-        generateIndices(vertexIndices);
-        ++index[(int)Indexer::F];
+        {
+          glm::ivec3 &face = faces.emplace_back();
+          getFace(face, word);
+          vertices.push_back(face[0]);
+        }
+        processIndices(vertices);
       }
     }
   }
 
-  void mtllib(const std::string &text)
+  void processIndices(const std::vector<unsigned int> &vertices)
   {
-    const std::string path = (filepath.substr(0, filepath.find_last_of('/')) + "/" + text);
+    MeshData &mesh = meshes.back();
+
+    if (vertices.size() == 3)
+      mesh.indices = vertices;
+    else if (vertices.size() == 4)
+    {
+      mesh.indices.push_back(vertices[0]);
+      mesh.indices.push_back(vertices[1]);
+      mesh.indices.push_back(vertices[2]);
+
+      mesh.indices.push_back(vertices[0]);
+      mesh.indices.push_back(vertices[2]);
+      mesh.indices.push_back(vertices[3]);
+    }
   }
 
-  void o(const std::string &text)
+  void getFace(glm::ivec3 &face, const std::string &text)
   {
-    ++index[(int)Indexer::COUNT_MESH];
-    Mesh &mesh = meshes.emplace_back();
-    mesh.name = text;
-
-    normals.clear();
-    index[(int)Indexer::COUNT_V] += index[(int)Indexer::V];
-    index[(int)Indexer::COUNT_VN] += index[(int)Indexer::VN];
-    index[(int)Indexer::V] = 0;
-    index[(int)Indexer::VT] = 0;
-    index[(int)Indexer::VN] = 0;
-    index[(int)Indexer::F] = 0;
-  }
-
-  void v(const std::string &text)
-  {
-    Vertex &vertex = getCurrentVertex(Indexer::V);
-    vertex.position[index[(int)Indexer::VERTEX_POSITION]] = std::stof(text);
-    ++index[(int)Indexer::VERTEX_POSITION];
-  }
-
-  void vt(const std::string &text)
-  {
-    Vertex &vertex = getCurrentVertex(Indexer::VT);
-    vertex.texCoord[index[(int)Indexer::VERTEX_TEXCOORD]] = std::stof(text);
-    ++index[(int)Indexer::VERTEX_TEXCOORD];
-  }
-
-  void vn(const std::string &text)
-  {
-    glm::vec3 &normal = getCurrentLocalNormal();
-    normal[index[(int)Indexer::VERTEX_NORMAL]] = std::stof(text);
-    ++index[(int)Indexer::VERTEX_NORMAL];
-  }
-
-  void g(const std::string &text) {}
-  void usemtl(const std::string &text) {}
-  void s(const std::string &text) {}
-
-  unsigned int f(const std::string &text)
-  {
-    Mesh &mesh = meshes.back();
-
     std::stringstream ss(text);
     std::string token;
     std::vector<std::string> tokens;
 
+    unsigned int index = 0;
+
     while (std::getline(ss, token, '/'))
-      tokens.push_back(token);
-
-    unsigned int vertexIndex = std::stoi(tokens[0]) - 1 - index[(int)Indexer::COUNT_V];
-    unsigned int normalIndex = std::stoi(tokens[2]) - 1 - index[(int)Indexer::COUNT_VN];
-
-    Vertex &vertexNormal = mesh.vertices[vertexIndex];
-    vertexNormal.normal = normals[normalIndex];
-
-    return vertexIndex + index[(int)Indexer::COUNT_V];
-  }
-
-  void generateIndices(std::vector<unsigned int> vertexIndices)
-  {
-    Mesh &mesh = meshes.back();
-
-    if (vertexIndices.size() == 3)
-      mesh.indices = vertexIndices;
-    else if (vertexIndices.size() == 4)
     {
-      mesh.indices.push_back(vertexIndices[0]);
-      mesh.indices.push_back(vertexIndices[1]);
-      mesh.indices.push_back(vertexIndices[2]);
-
-      mesh.indices.push_back(vertexIndices[0]);
-      mesh.indices.push_back(vertexIndices[2]);
-      mesh.indices.push_back(vertexIndices[3]);
+      face[index] = std::stoi(token) - 1;
+      ++index;
     }
-  }
-
-  Vertex &getCurrentVertex(Indexer vType)
-  {
-    Mesh &mesh = meshes.back();
-    if (mesh.vertices.size() <= index[(int)vType])
-      return mesh.vertices.emplace_back();
-    return mesh.vertices[index[(int)vType]];
-  }
-
-  glm::vec3 &getCurrentLocalNormal()
-  {
-    if (normals.size() <= index[(int)Indexer::VN])
-      return normals.emplace_back();
-    return normals[index[(int)Indexer::VN]];
   }
 
 public:
@@ -211,8 +158,35 @@ public:
     file.close();
   }
 
-  std::vector<Mesh> &getMeshes()
+  unsigned int getMeshCount()
   {
-    return meshes;
+    return meshes.size();
   };
+
+  void getName(unsigned int meshIndex, std::string &name)
+  {
+    name = meshes[meshIndex].name;
+  }
+
+  void getVertices(unsigned int meshIndex, std::vector<Vertex> &vertices)
+  {
+    const MeshData &mesh = meshes[meshIndex];
+    const unsigned int faceSize = meshes.size() > meshIndex + 1 ? meshes[meshIndex + 1].facesIndex : faces.size();
+
+    std::cout << mesh.name << " " << mesh.facesIndex << " " << faceSize << std::endl;
+
+    for (size_t i = mesh.facesIndex; i < faceSize; i++)
+    {
+      Vertex &vertex = vertices.emplace_back();
+
+      vertex.position = positions[faces[i][0]];
+      vertex.texCoord = texCoords[faces[i][1]];
+      vertex.normal = normals[faces[i][2]];
+    }
+  }
+
+  void getIndices(unsigned int meshIndex, std::vector<unsigned int> &indices)
+  {
+    indices = meshes[meshIndex].indices;
+  }
 };

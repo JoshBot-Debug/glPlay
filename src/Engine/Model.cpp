@@ -157,7 +157,15 @@ void loadOBJ(const std::string &filepath, std::vector<Mesh> &meshes)
 {
   OBJLoader loader(filepath);
 
-  meshes = loader.getMeshes();
+  for (size_t i = 0; i < loader.getMeshCount(); i++)
+  {
+    Mesh &mesh = meshes.emplace_back();
+    loader.getName(i, mesh.name);
+    loader.getVertices(i, mesh.vertices);
+    loader.getIndices(i, mesh.indices);
+  }
+
+  // meshes = loader.getMeshCount();
 
   for (const auto &mesh : meshes)
   {
@@ -182,6 +190,13 @@ void loadOBJ(const std::string &filepath, std::vector<Mesh> &meshes)
     for (const auto &vertex : mesh.vertices)
     {
       std::cout << vertex.normal.x << " " << vertex.normal.y << " " << vertex.normal.z << std::endl;
+    }
+
+     std::cout << "indices" << std::endl;
+
+    for (const auto &i : mesh.indices)
+    {
+      std::cout << i << std::endl;
     }
   }
 }
