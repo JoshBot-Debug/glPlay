@@ -85,7 +85,11 @@ App::App() : Window(opts)
   // 3 2 1 3 1 0
   // *********
   // 3 2 1 3 1 0
-  Model *sphere = resource.loadModel("assets/model/plane.obj");
+  // Model *sphere = resource.loadModel("assets/model/plane.obj");
+  // Model *sphere = resource.loadModel("assets/model/cube.obj");
+  Model *sphere = resource.loadModel("assets/model/cube-2-seperate.obj");
+  // Model *sphere = resource.loadModel("assets/model/cube-2-joined.obj");
+  // Model *sphere = resource.loadModel("assets/model/Keqing - Piercing Thunderbolt/Keqing - Piercing Thunderbolt.obj");
 
   // Model *sphere = resource.loadModel("assets/model/cube-sphere-joined.fbx");
   // Model *sphere = resource.loadModel("assets/model/cube-sphere-seperate.fbx");

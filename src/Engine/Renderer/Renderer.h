@@ -17,6 +17,7 @@ public:
     // glMultiDrawElementsIndirect((unsigned int)primitive, GL_UNSIGNED_INT, (const void *)0, commands.size(), 0);
 
     // glDrawElementsBaseVertex((unsigned int)primitive, 12, GL_UNSIGNED_INT, (const void *)(0 * sizeof(unsigned int)), 0);
+    // glDrawElementsBaseVertex((unsigned int)primitive, 6, GL_UNSIGNED_INT, (const void *)(6 * sizeof(unsigned int)), 0);
     // glDrawArrays((unsigned int)primitive, 0, 8);
 
 

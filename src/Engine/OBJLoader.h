@@ -9,13 +9,12 @@
 
 enum class Indexer : unsigned int
 {
-  MESH_COUNT,
+  COUNT_MESH,
+  COUNT_V,
+  COUNT_VN,
   V,
-  V_COUNT,
   VT,
-  VT_COUNT,
   VN,
-  VN_COUNT,
   F,
   VERTEX_POSITION,
   VERTEX_TEXCOORD,
@@ -31,8 +30,7 @@ private:
 
   std::vector<glm::vec3> normals;
 
-  // Tracks indexes, [meshCount, v, vCount, vt, vtCount, vn, vnCount,  f, position, texCoord, normal]
-  std::vector<unsigned int> index = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  std::vector<unsigned int> index = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 
   void read()
   {
@@ -51,8 +49,7 @@ private:
           mtllib(word);
 
       if (command == "o")
-        while (iss >> word)
-          o(word);
+        o(word);
 
       if (command == "v")
       {
@@ -60,7 +57,6 @@ private:
         while (iss >> word)
           v(word);
         ++index[(int)Indexer::V];
-        ++index[(int)Indexer::V_COUNT];
       }
 
       if (command == "vt")
@@ -69,7 +65,6 @@ private:
         while (iss >> word)
           vt(word);
         ++index[(int)Indexer::VT];
-        ++index[(int)Indexer::VT_COUNT];
       }
 
       if (command == "vn")
@@ -78,25 +73,23 @@ private:
         while (iss >> word)
           vn(word);
         ++index[(int)Indexer::VN];
-        ++index[(int)Indexer::VN_COUNT];
       }
 
       if (command == "g")
-        while (iss >> word)
-          g(word);
+        g(word);
 
       if (command == "usemtl")
-        while (iss >> word)
-          usemtl(word);
+        usemtl(word);
 
       if (command == "s")
-        while (iss >> word)
-          s(word);
+        s(word);
 
       if (command == "f")
       {
+        std::vector<unsigned int> vertexIndices;
         while (iss >> word)
-          f(word);
+          vertexIndices.push_back(f(word));
+        generateIndices(vertexIndices);
         ++index[(int)Indexer::F];
       }
     }
@@ -109,10 +102,17 @@ private:
 
   void o(const std::string &text)
   {
-    ++index[(int)Indexer::MESH_COUNT];
+    ++index[(int)Indexer::COUNT_MESH];
     Mesh &mesh = meshes.emplace_back();
     mesh.name = text;
-    index = {index[(int)Indexer::MESH_COUNT], 0, index[(int)Indexer::V_COUNT], 0, index[(int)Indexer::VT_COUNT], 0, index[(int)Indexer::VN_COUNT], 0, 0, 0, 0};
+
+    normals.clear();
+    index[(int)Indexer::COUNT_V] += index[(int)Indexer::V];
+    index[(int)Indexer::COUNT_VN] += index[(int)Indexer::VN];
+    index[(int)Indexer::V] = 0;
+    index[(int)Indexer::VT] = 0;
+    index[(int)Indexer::VN] = 0;
+    index[(int)Indexer::F] = 0;
   }
 
   void v(const std::string &text)
@@ -140,7 +140,7 @@ private:
   void usemtl(const std::string &text) {}
   void s(const std::string &text) {}
 
-  void f(const std::string &text)
+  unsigned int f(const std::string &text)
   {
     Mesh &mesh = meshes.back();
 
@@ -151,16 +151,31 @@ private:
     while (std::getline(ss, token, '/'))
       tokens.push_back(token);
 
-    unsigned int vertexIndexOffset = ((index[(int)Indexer::MESH_COUNT] - 1) * (index[(int)Indexer::V_COUNT] - index[(int)Indexer::V]));
-    unsigned int textureIndexOffset = ((index[(int)Indexer::MESH_COUNT] - 1) * (index[(int)Indexer::VT_COUNT] - index[(int)Indexer::VT]));
-    unsigned int normalIndexOffset = ((index[(int)Indexer::MESH_COUNT] - 1) * (index[(int)Indexer::VN_COUNT] - index[(int)Indexer::VN]));
+    unsigned int vertexIndex = std::stoi(tokens[0]) - 1 - index[(int)Indexer::COUNT_V];
+    unsigned int normalIndex = std::stoi(tokens[2]) - 1 - index[(int)Indexer::COUNT_VN];
 
-    unsigned int vertexIndex = std::stoi(tokens[0]) - 1 - vertexIndexOffset;
-    unsigned int textureIndex = std::stoi(tokens[1]) - 1 - textureIndexOffset;
-    unsigned int normalIndex = std::stoi(tokens[2]) - 1 - normalIndexOffset;
+    Vertex &vertexNormal = mesh.vertices[vertexIndex];
+    vertexNormal.normal = normals[normalIndex];
 
-    Vertex &vertex = mesh.vertices[vertexIndex];
-    vertex.normal = normals[normalIndex];
+    return vertexIndex + index[(int)Indexer::COUNT_V];
+  }
+
+  void generateIndices(std::vector<unsigned int> vertexIndices)
+  {
+    Mesh &mesh = meshes.back();
+
+    if (vertexIndices.size() == 3)
+      mesh.indices = vertexIndices;
+    else if (vertexIndices.size() == 4)
+    {
+      mesh.indices.push_back(vertexIndices[0]);
+      mesh.indices.push_back(vertexIndices[1]);
+      mesh.indices.push_back(vertexIndices[2]);
+
+      mesh.indices.push_back(vertexIndices[0]);
+      mesh.indices.push_back(vertexIndices[2]);
+      mesh.indices.push_back(vertexIndices[3]);
+    }
   }
 
   Vertex &getCurrentVertex(Indexer vType)
