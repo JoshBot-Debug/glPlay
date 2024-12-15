@@ -159,31 +159,31 @@ void loadOBJ(const std::string &filepath, std::vector<Mesh> &meshes)
 
   meshes = loader.getMeshes();
 
-  // for (const auto &mesh : meshes)
-  // {
-  //   std::cout << mesh.name << std::endl;
+  for (const auto &mesh : meshes)
+  {
+    std::cout << mesh.name << std::endl;
 
-  //   std::cout << "position" << std::endl;
+    std::cout << "position" << std::endl;
 
-  //   for (const auto &vertex : mesh.vertices)
-  //   {
-  //     std::cout << vertex.position.x << " " << vertex.position.y << " " << vertex.position.z << std::endl;
-  //   }
+    for (const auto &vertex : mesh.vertices)
+    {
+      std::cout << vertex.position.x << " " << vertex.position.y << " " << vertex.position.z << std::endl;
+    }
 
-  //   std::cout << "texCoord" << std::endl;
+    std::cout << "texCoord" << std::endl;
 
-  //   for (const auto &vertex : mesh.vertices)
-  //   {
-  //     std::cout << vertex.texCoord.x << " " << vertex.texCoord.y << std::endl;
-  //   }
+    for (const auto &vertex : mesh.vertices)
+    {
+      std::cout << vertex.texCoord.x << " " << vertex.texCoord.y << std::endl;
+    }
 
-  //   std::cout << "normal" << std::endl;
+    std::cout << "normal" << std::endl;
 
-  //   for (const auto &vertex : mesh.vertices)
-  //   {
-  //     std::cout << vertex.normal.x << " " << vertex.normal.y << " " << vertex.normal.z << std::endl;
-  //   }
-  // }
+    for (const auto &vertex : mesh.vertices)
+    {
+      std::cout << vertex.normal.x << " " << vertex.normal.y << " " << vertex.normal.z << std::endl;
+    }
+  }
 }
 
 Model::Model(unsigned int id, const char *filepath) : id(id)

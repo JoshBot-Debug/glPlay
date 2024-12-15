@@ -37,13 +37,13 @@ const unsigned int MultiModelInstanceBuffer::addBufferData(const std::vector<Ver
   //   std::cout << e[i] << std::endl;
   // }
 
-  const auto &v = vbo.getBufferData<Vertex>(0);
+  // const auto &v = vbo.getBufferData<Vertex>(0);
 
-  for (size_t i = 0; i < v.size(); i++)
-  {
-    std::cout << v[i].position.x << " " << v[i].position.y << " " << v[i].position.z << std::endl;
-    std::cout << v[i].color.x << " " << v[i].color.y << " " << v[i].color.z << std::endl;
-  }
+  // for (size_t i = 0; i < v.size(); i++)
+  // {
+  //   std::cout << v[i].position.x << " " << v[i].position.y << " " << v[i].position.z << std::endl;
+  //   std::cout << v[i].color.x << " " << v[i].color.y << " " << v[i].color.z << std::endl;
+  // }
 
   return epID;
 }

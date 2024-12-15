@@ -9,9 +9,13 @@
 
 enum class Indexer : unsigned int
 {
+  MESH_COUNT,
   V,
+  V_COUNT,
   VT,
+  VT_COUNT,
   VN,
+  VN_COUNT,
   F,
   VERTEX_POSITION,
   VERTEX_TEXCOORD,
@@ -27,8 +31,8 @@ private:
 
   std::vector<glm::vec3> normals;
 
-  // Tracks indexes, [v, vt, vn, f, position, texCoord, normal]
-  std::vector<unsigned int> index = {0, 0, 0, 0, 0, 0, 0};
+  // Tracks indexes, [meshCount, v, vCount, vt, vtCount, vn, vnCount,  f, position, texCoord, normal]
+  std::vector<unsigned int> index = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
   void read()
   {
@@ -56,6 +60,7 @@ private:
         while (iss >> word)
           v(word);
         ++index[(int)Indexer::V];
+        ++index[(int)Indexer::V_COUNT];
       }
 
       if (command == "vt")
@@ -64,6 +69,7 @@ private:
         while (iss >> word)
           vt(word);
         ++index[(int)Indexer::VT];
+        ++index[(int)Indexer::VT_COUNT];
       }
 
       if (command == "vn")
@@ -72,6 +78,7 @@ private:
         while (iss >> word)
           vn(word);
         ++index[(int)Indexer::VN];
+        ++index[(int)Indexer::VN_COUNT];
       }
 
       if (command == "g")
@@ -88,8 +95,6 @@ private:
 
       if (command == "f")
       {
-        if (index[(int)Indexer::F] == 0)
-          index[(int)Indexer::VERTEX_NORMAL] = 0;
         while (iss >> word)
           f(word);
         ++index[(int)Indexer::F];
@@ -104,9 +109,10 @@ private:
 
   void o(const std::string &text)
   {
+    ++index[(int)Indexer::MESH_COUNT];
     Mesh &mesh = meshes.emplace_back();
     mesh.name = text;
-    index = {0, 0, index[(int)Indexer::VN], 0, 0, 0, 0};
+    index = {index[(int)Indexer::MESH_COUNT], 0, index[(int)Indexer::V_COUNT], 0, index[(int)Indexer::VT_COUNT], 0, index[(int)Indexer::VN_COUNT], 0, 0, 0, 0};
   }
 
   void v(const std::string &text)
@@ -137,15 +143,24 @@ private:
   void f(const std::string &text)
   {
     Mesh &mesh = meshes.back();
-    Vertex &vertex = mesh.vertices[index[(int)Indexer::VERTEX_NORMAL]];
 
-    std::cout << normals.size() << std::endl;
-    std::cout << text.substr(text.find_last_of('/') + 1) << std::endl;
+    std::stringstream ss(text);
+    std::string token;
+    std::vector<std::string> tokens;
 
-    unsigned int normalIndex = std::stoi(text.substr(text.find_last_of('/') + 1)) - 1;
+    while (std::getline(ss, token, '/'))
+      tokens.push_back(token);
+
+    unsigned int vertexIndexOffset = ((index[(int)Indexer::MESH_COUNT] - 1) * (index[(int)Indexer::V_COUNT] - index[(int)Indexer::V]));
+    unsigned int textureIndexOffset = ((index[(int)Indexer::MESH_COUNT] - 1) * (index[(int)Indexer::VT_COUNT] - index[(int)Indexer::VT]));
+    unsigned int normalIndexOffset = ((index[(int)Indexer::MESH_COUNT] - 1) * (index[(int)Indexer::VN_COUNT] - index[(int)Indexer::VN]));
+
+    unsigned int vertexIndex = std::stoi(tokens[0]) - 1 - vertexIndexOffset;
+    unsigned int textureIndex = std::stoi(tokens[1]) - 1 - textureIndexOffset;
+    unsigned int normalIndex = std::stoi(tokens[2]) - 1 - normalIndexOffset;
+
+    Vertex &vertex = mesh.vertices[vertexIndex];
     vertex.normal = normals[normalIndex];
-
-    ++index[(int)Indexer::VERTEX_NORMAL];
   }
 
   Vertex &getCurrentVertex(Indexer vType)
