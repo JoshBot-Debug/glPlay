@@ -165,8 +165,6 @@ void loadOBJ(const std::string &filepath, std::vector<Mesh> &meshes)
     loader.getIndices(i, mesh.indices);
   }
 
-  // meshes = loader.getMeshCount();
-
   for (const auto &mesh : meshes)
   {
     std::cout << mesh.name << std::endl;
@@ -192,7 +190,7 @@ void loadOBJ(const std::string &filepath, std::vector<Mesh> &meshes)
       std::cout << vertex.normal.x << " " << vertex.normal.y << " " << vertex.normal.z << std::endl;
     }
 
-     std::cout << "indices" << std::endl;
+    std::cout << "indices" << std::endl;
 
     for (const auto &i : mesh.indices)
     {
