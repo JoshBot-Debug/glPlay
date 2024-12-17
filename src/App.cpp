@@ -85,8 +85,8 @@ App::App() : Window(opts)
   // 3 2 1 3 1 0
   // *********
   // 3 2 1 3 1 0
-  Model *sphere = resource.loadModel("assets/model/plane.obj");
-  // Model *sphere = resource.loadModel("assets/model/cube.obj");
+  // Model *sphere = resource.loadModel("assets/model/plane.obj");
+  Model *sphere = resource.loadModel("assets/model/cube.obj");
   // Model *sphere = resource.loadModel("assets/model/cube-2-seperate.obj");
   // Model *sphere = resource.loadModel("assets/model/cube-2-joined.obj");
   // Model *sphere = resource.loadModel("assets/model/Keqing - Piercing Thunderbolt/Keqing - Piercing Thunderbolt.obj");
@@ -118,6 +118,8 @@ App::App() : Window(opts)
   command.count = sphere->getIndices().size();
   command.primCount = sphere->getInstances().size();
 
+  controlPanel.indices = sphere->getIndices();
+
   std::cout << "Vertices: " << sphere->getVertices().size() << std::endl;
   std::cout << "Indices: " << sphere->getIndices().size() << std::endl;
 
@@ -148,10 +150,13 @@ void App::onUpdate()
     for (unsigned int j = 0; j < instances.size(); j++)
       buffer.update(i, j, instances.at(j));
   }
+
+  buffer.updateEBO(0, 0, controlPanel.indices);
 }
 
 void App::onDraw()
 {
+  glDisable(GL_CULL_FACE);
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

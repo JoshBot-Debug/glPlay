@@ -80,4 +80,6 @@ public:
 
   void bind() const;
   void unbind() const;
+
+  void updateEBO(const unsigned int partition, const unsigned int offset, const std::vector<unsigned int> elements);
 };

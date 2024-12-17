@@ -20,6 +20,8 @@ private:
   glm::vec2 mouse;
 
 public:
+  std::vector<unsigned int> indices;
+
   void setCamera(PerspectiveCamera *camera)
   {
     this->camera = camera;
@@ -170,6 +172,16 @@ public:
     ImGui::End();
   }
 
+  void bufferMenu()
+  {
+    ImGui::Begin("IBO");
+
+    for (size_t i = 0; i < indices.size(); i++)
+      ImGui::DragInt(std::to_string(i).c_str(), (int *)&indices[i]);
+
+    ImGui::End();
+  }
+
   void draw()
   {
     ImGui::Begin("Debug Menu");
@@ -181,6 +193,8 @@ public:
     this->cameraMenu();
 
     this->instanceMenu();
+
+    this->bufferMenu();
 
     ImGui::End();
   }

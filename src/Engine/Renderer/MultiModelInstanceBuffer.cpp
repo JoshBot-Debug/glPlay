@@ -1,6 +1,6 @@
 #include "MultiModelInstanceBuffer.h"
 
-MultiModelInstanceBuffer::MultiModelInstanceBuffer() : vbo(BufferTarget::ARRAY_BUFFER), ebo(BufferTarget::ELEMENT_ARRAY_BUFFER), ibo(BufferTarget::ARRAY_BUFFER, VertexDraw::DYNAMIC)
+MultiModelInstanceBuffer::MultiModelInstanceBuffer() : vbo(BufferTarget::ARRAY_BUFFER), ebo(BufferTarget::ELEMENT_ARRAY_BUFFER, VertexDraw::DYNAMIC), ibo(BufferTarget::ARRAY_BUFFER, VertexDraw::DYNAMIC)
 {
   vao.generate();
   vbo.generate();
@@ -116,4 +116,9 @@ void MultiModelInstanceBuffer::unbind() const
   ebo.unbind();
   ibo.unbind();
   vao.unbind();
+}
+
+void MultiModelInstanceBuffer::updateEBO(const unsigned int partition, const unsigned int offset, const std::vector<unsigned int> elements)
+{
+  ebo.update(offset, elements, partition);
 }

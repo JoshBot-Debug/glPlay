@@ -107,7 +107,7 @@ private:
     }
   }
 
-  void processIndices(const std::vector<unsigned int> &vertices)
+  void processIndices(std::vector<unsigned int> &vertices)
   {
     MeshData &mesh = meshes.back();
 
