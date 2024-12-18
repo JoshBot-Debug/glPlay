@@ -39,7 +39,7 @@ App::App() : Window(opts)
   /**
    * Load the model foo
    */
-  Model *model = resource.loadModel("assets/model/cube-2-seperate.obj"); // "assets/model/cube-2-seperate.obj" || "assets/model/Keqing - Piercing Thunderbolt/Keqing - Piercing Thunderbolt.obj"
+  Model *model = resource.loadModel("assets/model/sphere.obj");
   model->createInstance();
 
   draw.addModel(model);

@@ -1,0 +1,15 @@
+# Blender MTL File: 'sphere.blend'
+# Material Count: 1
+
+newmtl brick-wall
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.100000 0.100000 0.100000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump /home/joshua/Projects/glPlay/assets/materials/brick-wall/sloppy-brick-wall_normal-ogl.png
+map_Ns /home/joshua/Projects/glPlay/assets/materials/brick-wall/sloppy-brick-wall_roughness.png
+refl /home/joshua/Projects/glPlay/assets/materials/brick-wall/sloppy-brick-wall_metallic.png
