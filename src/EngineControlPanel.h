@@ -9,11 +9,13 @@
 #include "Window/Input.h"
 
 #include "Engine/ResourceManager.h"
+#include "Engine/Model.h"
 #include "Engine/Camera/PerspectiveCamera.h"
 
 class EngineControlPanel
 {
 private:
+  std::vector<Model *> models;
   PerspectiveCamera *camera;
   ResourceManager *resource;
 
@@ -21,6 +23,11 @@ private:
 
 public:
   std::vector<unsigned int> indices;
+
+  void addModel(Model *model)
+  {
+    models.push_back(model);
+  }
 
   void setCamera(PerspectiveCamera *camera)
   {
@@ -174,11 +181,30 @@ public:
 
   void bufferMenu()
   {
+    if (indices.size() == 0)
+      return;
     ImGui::Begin("IBO");
 
     for (size_t i = 0; i < indices.size(); i++)
       ImGui::DragInt(std::to_string(i).c_str(), (int *)&indices[i]);
 
+    ImGui::End();
+  }
+
+  void modelsMenu()
+  {
+    if (models.size() == 0)
+      return;
+
+    ImGui::Begin("Models");
+
+    for (Model *model : models)
+    {
+      ImGui::SeparatorText("ID " + model->getID());
+
+      if (ImGui::Button("Add instance"))
+        model->createInstance();
+    }
     ImGui::End();
   }
 
@@ -195,6 +221,8 @@ public:
     this->instanceMenu();
 
     this->bufferMenu();
+
+    this->modelsMenu();
 
     ImGui::End();
   }

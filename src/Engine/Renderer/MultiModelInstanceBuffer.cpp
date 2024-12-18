@@ -7,6 +7,7 @@ MultiModelInstanceBuffer::MultiModelInstanceBuffer() : vbo(BufferTarget::ARRAY_B
   ebo.generate();
   ibo.generate();
 
+  vbo.resize(1024 * 1024);
   vao.bind();
 }
 
@@ -30,20 +31,6 @@ const unsigned int MultiModelInstanceBuffer::addBufferData(const std::vector<Ver
   vao.set(4, 3, VertexType::FLOAT, false, sizeof(Vertex), (void *)offsetof(Vertex, bitangent));
   vao.set(5, 3, VertexType::FLOAT, false, sizeof(Vertex), (void *)offsetof(Vertex, color));
 
-  const auto &e = ebo.getBufferData<unsigned int>(0);
-
-  // for (size_t i = 0; i < e.size(); i++)
-  // {
-  //   std::cout << e[i] << std::endl;
-  // }
-
-  // const auto &v = vbo.getBufferData<Vertex>(0);
-
-  // for (size_t i = 0; i < v.size(); i++)
-  // {
-  //   std::cout << v[i].position.x << " " << v[i].position.y << " " << v[i].position.z << std::endl;
-  // }
-
   return epID;
 }
 
@@ -57,10 +44,12 @@ unsigned int MultiModelInstanceBuffer::add(const unsigned int partition, const I
   ibo.upsert(sizeof(Instance), offset, sizeof(instance), (const void *)&instance, partition);
   baseInstance = ibo.getBufferPartitionOffsetSize(partition) / sizeof(Instance);
 
-  vao.set(6, 3, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, translate), 1);
-  vao.set(7, 3, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, rotation), 1);
-  vao.set(8, 3, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, scale), 1);
-  vao.set(9, 4, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, color), 1);
+  vao.bind();
+  vao.set(6, 1, VertexType::UNSIGNED_INT, false, sizeof(Instance), (void *)offsetof(Instance, id), 1);
+  vao.set(7, 3, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, translate), 1);
+  vao.set(8, 3, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, rotation), 1);
+  vao.set(9, 3, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, scale), 1);
+  vao.set(10, 4, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, color), 1);
 
   return offset;
 }
@@ -76,10 +65,11 @@ std::vector<unsigned int> MultiModelInstanceBuffer::add(const unsigned int parti
   baseInstance = ibo.getBufferPartitionOffsetSize(partition) / sizeof(Instance);
 
   vao.bind();
-  vao.set(6, 3, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, translate), 1);
-  vao.set(7, 3, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, rotation), 1);
-  vao.set(8, 3, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, scale), 1);
-  vao.set(9, 4, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, color), 1);
+  vao.set(6, 1, VertexType::UNSIGNED_INT, false, sizeof(Instance), (void *)offsetof(Instance, id), 1);
+  vao.set(7, 3, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, translate), 1);
+  vao.set(8, 3, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, rotation), 1);
+  vao.set(9, 3, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, scale), 1);
+  vao.set(10, 4, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, color), 1);
 
   std::vector<unsigned int> offsets(instances.size());
 
@@ -116,9 +106,4 @@ void MultiModelInstanceBuffer::unbind() const
   ebo.unbind();
   ibo.unbind();
   vao.unbind();
-}
-
-void MultiModelInstanceBuffer::updateEBO(const unsigned int partition, const unsigned int offset, const std::vector<unsigned int> elements)
-{
-  ebo.update(offset, elements, partition);
 }

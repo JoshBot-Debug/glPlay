@@ -7,10 +7,11 @@ layout(location=3)in vec3 in_Tangent;
 layout(location=4)in vec3 in_BiTangent;
 layout(location=5)in vec3 in_Color;
 
-layout(location=6)in vec3 in_iTranslate;
-layout(location=7)in vec3 in_iRotation;
-layout(location=8)in vec3 in_iScale;
-layout(location=9)in vec4 in_iColor;
+layout(location=6)in int in_ID;
+layout(location=7)in vec3 in_iTranslate;
+layout(location=8)in vec3 in_iRotation;
+layout(location=9)in vec3 in_iScale;
+layout(location=10)in vec4 in_iColor;
 
 out vec4 f_Color;
 out vec3 f_Normal;

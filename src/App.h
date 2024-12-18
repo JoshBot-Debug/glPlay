@@ -9,6 +9,7 @@
 #include "Engine/Renderer/MultiModelInstanceBuffer.h"
 
 #include "EngineControlPanel.h"
+#include "Engine/Renderer/DrawElementsIndirect.h"
 
 class App : Window
 {
@@ -16,8 +17,7 @@ private:
   ResourceManager resource;
   PerspectiveCamera camera;
 
-  std::vector<MultiModelInstanceBuffer> buffers;
-  std::vector<DrawElementsIndirectCommand> instancedCommands;
+  DrawElementsIndirect draw;
 
   EngineControlPanel controlPanel;
 

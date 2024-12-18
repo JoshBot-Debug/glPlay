@@ -12,6 +12,7 @@ enum class BufferTarget
 {
   ARRAY_BUFFER = GL_ARRAY_BUFFER,
   ELEMENT_ARRAY_BUFFER = GL_ELEMENT_ARRAY_BUFFER,
+  DRAW_INDIRECT_BUFFER = GL_DRAW_INDIRECT_BUFFER,
 };
 
 struct BufferPartition
@@ -23,7 +24,7 @@ struct BufferPartition
   BufferPartition(unsigned int size, unsigned int used, unsigned int chunk) : size(size), used(used), chunk(chunk) {}
 };
 
-class ArrayBuffer
+class Buffer
 {
 private:
   unsigned int buffer = 0;
@@ -42,7 +43,7 @@ public:
    *
    * @param draw VertexDraw, Static for non changing, dynamic for frequently changing, or stream
    */
-  ArrayBuffer(BufferTarget target, VertexDraw draw = VertexDraw::STATIC);
+  Buffer(BufferTarget target, VertexDraw draw = VertexDraw::STATIC);
 
   /**
    * @param target Specify weather this is a vertex array buffer or an element array buffer
@@ -53,32 +54,32 @@ public:
    *
    * @param draw VertexDraw, Static for non changing, dynamic for frequently changing, or stream
    */
-  ArrayBuffer(BufferTarget target, unsigned int resizeFactor, VertexDraw draw = VertexDraw::STATIC);
+  Buffer(BufferTarget target, unsigned int resizeFactor, VertexDraw draw = VertexDraw::STATIC);
 
   /**
-   * Destructor for the ArrayBuffer.
+   * Destructor for the Buffer.
    *
-   * This function deletes the OpenGL buffer object (buffer) when the ArrayBuffer is destroyed.
+   * This function deletes the OpenGL buffer object (buffer) when the Buffer is destroyed.
    * It ensures that the buffer is properly cleaned up to free OpenGL resources.
    *
    * If the buffer is valid (not zero), it calls `glDeleteBuffers` to delete the buffer from the GPU memory.
    */
-  ~ArrayBuffer();
+  ~Buffer();
 
   /**
    * Disable copy constructor
    */
-  ArrayBuffer(const ArrayBuffer &) = delete;
+  Buffer(const Buffer &) = delete;
 
   /**
    * Disable assignment operator
    */
-  ArrayBuffer &operator=(const ArrayBuffer &) = delete;
+  Buffer &operator=(const Buffer &) = delete;
   
   /**
    * Create a move constructor
    */
-  ArrayBuffer(ArrayBuffer &&) = default;
+  Buffer(Buffer &&) = default;
 
   /**
    * Generates a buffer if it doesn't already exist.

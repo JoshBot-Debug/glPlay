@@ -2,7 +2,7 @@
 
 #include "Engine/Types.h"
 #include "Engine/Core/VertexArray.h"
-#include "Engine/Core/ArrayBuffer.h"
+#include "Engine/Core/Buffer.h"
 
 struct Instance;
 
@@ -10,9 +10,9 @@ class MultiModelInstanceBuffer
 {
 private:
   VertexArray vao;
-  ArrayBuffer vbo;
-  ArrayBuffer ebo;
-  ArrayBuffer ibo;
+  Buffer vbo;
+  Buffer ebo;
+  Buffer ibo;
 
 public:
   MultiModelInstanceBuffer();
@@ -80,6 +80,4 @@ public:
 
   void bind() const;
   void unbind() const;
-
-  void updateEBO(const unsigned int partition, const unsigned int offset, const std::vector<unsigned int> elements);
 };

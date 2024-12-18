@@ -7,13 +7,9 @@
 #include "Engine/Light/DirectionalLight.h"
 #include "Engine/Shader.h"
 
-#include "Engine/Core/ArrayBuffer.h"
-
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "Engine/Types.h"
-#include "Engine/Core/VertexArray.h"
-#include "Engine/Core/ArrayBuffer.h"
 
 const WindowOptions opts = {.title = "glPlay", .width = 800, .height = 600, .enableDepth = true, .enableVSync = false, .MSAA = 16, .imguiEnableDocking = true, .maximized = true};
 
@@ -33,72 +29,6 @@ App::App() : Window(opts)
   camera.setPosition(0.0f, 0.0f, 20.0f);
 
   /**
-   * Load the model foo
-   */
-  // Model *sphere = resource.loadModel("assets/model/Keqing - Piercing Thunderbolt/Keqing - Piercing Thunderbolt.glb");
-  // Model *sphere = resource.loadModel("assets/model/Keqing - Piercing Thunderbolt/Keqing.fbx");
-  // Model *sphere = resource.loadModel("assets/model/Raiden Shogun/Raiden Shogun.fbx");
-
-  // Model *sphere = resource.loadModel("assets/model/cube.fbx");
-  // Model *sphere = resource.loadModel("assets/model/2B/2B.fbx");
-  // Model *sphere = resource.loadModel("assets/model/2B/2B.glb");
-  // Model *sphere = resource.loadModel("assets/model/sphere.fbx");
-
-  // Model *sphere = resource.loadModel("assets/model/2-cube-joined.fbx");
-  // Model *sphere = resource.loadModel("assets/model/2-cube-seperate.fbx");
-
-  // Vertices: 4
-  // -1 -1  0
-  //  1 -1  0
-  //  1  1  0
-  // -1  1  0
-  // Indices: 6 - 3 2 1 3 1 0
-  // Model *sphere = resource.loadModel("assets/model/plane.fbx");
-
-  // Vertices: 8
-  // -1 -1  0
-  //  1 -1  0
-  //  1  1  0
-  // -1  1  0
-  // *********
-  // -1 -4  0
-  //  1 -4  0
-  //  1 -2  0
-  // -1 -2  0
-  // Indices: 12
-  // 3 2 1 3 1 0
-  // *********
-  // 7 6 5 7 5 4
-  // Model *sphere = resource.loadModel("assets/model/plane-joined.fbx");
-
-  // Vertices: 8
-  // -1 -1  0
-  //  1 -1  0
-  //  1  1  0
-  // -1  1  0
-  // *********
-  // -1 -1  0
-  //  1 -1  0
-  //  1  1  0
-  // -1  1  0
-  // Indices: 12
-  // 3 2 1 3 1 0
-  // *********
-  // 3 2 1 3 1 0
-  // Model *sphere = resource.loadModel("assets/model/plane.obj");
-  Model *sphere = resource.loadModel("assets/model/cube.obj");
-  // Model *sphere = resource.loadModel("assets/model/cube-2-seperate.obj");
-  // Model *sphere = resource.loadModel("assets/model/cube-2-joined.obj");
-  // Model *sphere = resource.loadModel("assets/model/Keqing - Piercing Thunderbolt/Keqing - Piercing Thunderbolt.obj");
-
-  // Model *sphere = resource.loadModel("assets/model/cube-sphere-joined.fbx");
-  // Model *sphere = resource.loadModel("assets/model/cube-sphere-seperate.fbx");
-
-  // Model *sphere = resource.loadModel("assets/model/sphere.fbx");
-  // Vertices: 1984
-  // Indices: 2880
-
-  /**
    * Setup the shader
    */
   Shader &shader = resource.getShader();
@@ -106,27 +36,14 @@ App::App() : Window(opts)
   unsigned int f_material = shader.compile("src/Shader/f_material.glsl", ShaderType::FRAGMENT_SHADER);
   const unsigned int modelShader = shader.createProgram({v_transform, f_material});
 
-  unsigned int iSphereID = sphere->createInstance();
-  Instance &iSphere = sphere->getInstance(iSphereID);
+  /**
+   * Load the model foo
+   */
+  Model *model = resource.loadModel("assets/model/cube-2-seperate.obj"); // "assets/model/cube-2-seperate.obj" || "assets/model/Keqing - Piercing Thunderbolt/Keqing - Piercing Thunderbolt.obj"
+  model->createInstance();
 
-  MultiModelInstanceBuffer &buffer = buffers.emplace_back();
-
-  instancedCommands.emplace_back();
-  DrawElementsIndirectCommand &command = instancedCommands.at(sphere->getID());
-  const unsigned int spherePartitionID = buffer.addBufferData(sphere->getVertices(), sphere->getIndices(), command.firstIndex, command.baseVertex);
-  buffer.add(spherePartitionID, iSphere, command.baseInstance);
-  command.count = sphere->getIndices().size();
-  command.primCount = sphere->getInstances().size();
-
-  controlPanel.indices = sphere->getIndices();
-
-  std::cout << "Vertices: " << sphere->getVertices().size() << std::endl;
-  std::cout << "Indices: " << sphere->getIndices().size() << std::endl;
-
-  unsigned int indirectBuffer;
-  glGenBuffers(1, &indirectBuffer);
-  glBindBuffer(GL_DRAW_INDIRECT_BUFFER, indirectBuffer);
-  glBufferData(GL_DRAW_INDIRECT_BUFFER, instancedCommands.size() * sizeof(DrawElementsIndirectCommand), instancedCommands.data(), GL_STATIC_DRAW);
+  draw.addModel(model);
+  draw.update();
 
   // Begins the onDraw loop
   open();
@@ -139,24 +56,15 @@ void App::onUpdate()
   camera.setViewportSize(size);
   camera.update();
 
-  controlPanel.update();
-
-  MultiModelInstanceBuffer &buffer = buffers.at(0);
   const std::vector<Model *> &models = resource.getModels();
+  for (Model *model : resource.getModels())
+    draw.update(model->getID(), 0, model->getInstances());
 
-  for (unsigned int i = 0; i < models.size(); i++)
-  {
-    const std::vector<Instance> &instances = models.at(i)->getInstances();
-    for (unsigned int j = 0; j < instances.size(); j++)
-      buffer.update(i, j, instances.at(j));
-  }
-
-  buffer.updateEBO(0, 0, controlPanel.indices);
+  controlPanel.update();
 }
 
 void App::onDraw()
 {
-  glDisable(GL_CULL_FACE);
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -164,7 +72,7 @@ void App::onDraw()
   shader.bind(0);
   shader.setUniformMatrix4fv("u_ViewProjection", camera.getViewProjectionMatrix());
 
-  Renderer::Draw(instancedCommands);
+  Renderer::Draw(draw.getCommands());
 
   controlPanel.draw();
 }

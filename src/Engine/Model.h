@@ -28,13 +28,13 @@ public:
    * Disable assignment operator
    */
   Model &operator=(const Model &) = delete;
-  
+
   /**
    * Create a move constructor
    */
   Model(Model &&) = default;
 
-  const unsigned int getID();
+  const unsigned int getID() const;
 
   const unsigned int createInstance();
   Instance &getInstance(unsigned int id);

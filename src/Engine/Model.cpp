@@ -155,48 +155,7 @@ void loadModel(const char *path, std::vector<Mesh> &meshes)
 
 void loadOBJ(const std::string &filepath, std::vector<Mesh> &meshes)
 {
-  OBJLoader loader(filepath);
-
-  for (size_t i = 0; i < loader.getMeshCount(); i++)
-  {
-    Mesh &mesh = meshes.emplace_back();
-    loader.getName(i, mesh.name);
-    loader.getVertices(i, mesh.vertices);
-    loader.getIndices(i, mesh.indices);
-  }
-
-  for (const auto &mesh : meshes)
-  {
-    std::cout << mesh.name << std::endl;
-
-    std::cout << "position" << std::endl;
-
-    for (const auto &vertex : mesh.vertices)
-    {
-      std::cout << vertex.position.x << " " << vertex.position.y << " " << vertex.position.z << std::endl;
-    }
-
-    std::cout << "texCoord" << std::endl;
-
-    for (const auto &vertex : mesh.vertices)
-    {
-      std::cout << vertex.texCoord.x << " " << vertex.texCoord.y << std::endl;
-    }
-
-    std::cout << "normal" << std::endl;
-
-    for (const auto &vertex : mesh.vertices)
-    {
-      std::cout << vertex.normal.x << " " << vertex.normal.y << " " << vertex.normal.z << std::endl;
-    }
-
-    std::cout << "indices" << std::endl;
-
-    for (const auto &i : mesh.indices)
-    {
-      std::cout << i << std::endl;
-    }
-  }
+  OBJLoader loader(filepath, meshes);
 }
 
 Model::Model(unsigned int id, const char *filepath) : id(id)
@@ -207,7 +166,7 @@ Model::Model(unsigned int id, const char *filepath) : id(id)
 
 Model::~Model() {}
 
-const unsigned int Model::getID()
+const unsigned int Model::getID() const
 {
   return id;
 }
@@ -215,10 +174,7 @@ const unsigned int Model::getID()
 const unsigned int Model::createInstance()
 {
   instances.emplace_back();
-
-  const unsigned int id = instances.size() - 1;
-
-  return id;
+  return instances.size() - 1;
 }
 
 Instance &Model::getInstance(unsigned int id)

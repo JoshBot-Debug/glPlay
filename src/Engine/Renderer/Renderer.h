@@ -14,8 +14,8 @@ public:
 
   static void Draw(const std::vector<DrawElementsIndirectCommand> &commands, const Primitive &primitive = Primitive::TRIANGLES)
   {
-    glMultiDrawElementsIndirect((unsigned int)Primitive::TRIANGLES, GL_UNSIGNED_INT, (const void *)0, commands.size(), 0);
-    // glMultiDrawElementsIndirect((unsigned int)primitive, GL_UNSIGNED_INT, (const void *)0, commands.size(), 0);
+    // glMultiDrawArraysIndirect((unsigned int)primitive, 0, 1, 0);
+    glMultiDrawElementsIndirect((unsigned int)primitive, GL_UNSIGNED_INT, (const void *)0, commands.size(), 0);
 
     // glDrawElementsBaseVertex((unsigned int)primitive, 12, GL_UNSIGNED_INT, (const void *)(0 * sizeof(unsigned int)), 0);
     // glDrawElementsBaseVertex((unsigned int)primitive, 6, GL_UNSIGNED_INT, (const void *)(6 * sizeof(unsigned int)), 0);
@@ -26,7 +26,7 @@ public:
     // glDrawArrays((unsigned int)primitive, 0, 24);
 
     // glDrawElements((unsigned int)primitive, 72, GL_UNSIGNED_INT, (const void *)0);
-    // glDrawArrays((unsigned int)primitive, 0, 48);
+    // glDrawArrays((unsigned int)primitive, 0, 72);
 
     // glDrawElements((unsigned int)primitive, 2916, GL_UNSIGNED_INT, (const void *)(0 * sizeof(unsigned int)));
     // glDrawArrays((unsigned int)primitive, 0, 2008);

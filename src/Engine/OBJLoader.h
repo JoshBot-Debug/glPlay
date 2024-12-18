@@ -1,5 +1,6 @@
 #pragma once
 
+#include <unordered_map>
 #include <tuple>
 #include <iostream>
 #include <fstream>
@@ -8,27 +9,19 @@
 #include "Types.h"
 #include "Debug.h"
 
-struct MeshData
-{
-  std::string name;
-  unsigned int facesIndex;
-  std::vector<unsigned int> indices;
-};
-
 class OBJLoader
 {
 private:
   std::ifstream file;
   std::string filepath;
 
-  // Name, faces start index, faces batch size (3/4)
-  std::vector<MeshData> meshes;
   std::vector<glm::vec3> positions;
   std::vector<glm::vec2> texCoords;
   std::vector<glm::vec3> normals;
-  std::vector<glm::ivec3> faces;
 
-  void read()
+  std::unordered_map<Vertex, unsigned int, Vertex, Vertex> uniqueVertices;
+
+  void read(std::vector<Mesh> &meshes)
   {
     std::string line;
 
@@ -48,7 +41,7 @@ private:
       if (command == "o")
       {
         iss >> word;
-        meshes.emplace_back(word, faces.size());
+        meshes.emplace_back(word);
       }
 
       if (command == "v")
@@ -95,33 +88,49 @@ private:
 
       if (command == "f")
       {
-        std::vector<unsigned int> vertices;
+        std::vector<glm::ivec3> faces;
+
         while (iss >> word)
         {
           glm::ivec3 &face = faces.emplace_back();
           getFace(face, word);
-          vertices.push_back(face[0]);
         }
-        processIndices(vertices);
+
+        processFaces(meshes, faces);
       }
     }
   }
 
-  void processIndices(std::vector<unsigned int> &vertices)
+  void processFaces(std::vector<Mesh> &meshes, std::vector<glm::ivec3> faces)
   {
-    MeshData &mesh = meshes.back();
+    Mesh &mesh = meshes.back();
 
-    if (vertices.size() == 3)
-      mesh.indices = vertices;
-    else if (vertices.size() == 4)
+    unsigned int vIndexOffset = 0;
+
+    for (size_t i = 0; i < meshes.size() - 1; i++)
+      vIndexOffset += meshes[i].vertices.size();
+
+    if (faces.size() == 4)
+      faces = {faces[0], faces[1], faces[2], faces[0], faces[2], faces[3]};
+
+    for (const auto &face : faces)
     {
-      mesh.indices.push_back(vertices[0]);
-      mesh.indices.push_back(vertices[1]);
-      mesh.indices.push_back(vertices[2]);
+      Vertex vertex;
+      vertex.position = positions[face[0]];
+      vertex.texCoord = texCoords[face[1]];
+      vertex.normal = normals[face[2]];
 
-      mesh.indices.push_back(vertices[0]);
-      mesh.indices.push_back(vertices[2]);
-      mesh.indices.push_back(vertices[3]);
+      auto it = uniqueVertices.find(vertex);
+
+      if (it == uniqueVertices.end())
+      {
+        unsigned int index = static_cast<unsigned int>(vIndexOffset + mesh.vertices.size());
+        mesh.vertices.push_back(vertex);
+        mesh.indices.push_back(index);
+        uniqueVertices[vertex] = index;
+      }
+      else
+        mesh.indices.push_back(it->second);
     }
   }
 
@@ -141,7 +150,7 @@ private:
   }
 
 public:
-  OBJLoader(const std::string &filepath) : file(std::ifstream(filepath, std::ios::binary)), filepath(filepath)
+  OBJLoader(const std::string &filepath, std::vector<Mesh> &meshes) : file(std::ifstream(filepath, std::ios::binary)), filepath(filepath)
   {
     if (!file)
     {
@@ -150,43 +159,11 @@ public:
       LOG_BREAK_AFTER;
     }
 
-    read();
+    read(meshes);
   }
 
   ~OBJLoader()
   {
     file.close();
-  }
-
-  unsigned int getMeshCount()
-  {
-    return meshes.size();
-  };
-
-  void getName(unsigned int meshIndex, std::string &name)
-  {
-    name = meshes[meshIndex].name;
-  }
-
-  void getVertices(unsigned int meshIndex, std::vector<Vertex> &vertices)
-  {
-    const MeshData &mesh = meshes[meshIndex];
-    const unsigned int faceSize = meshes.size() > meshIndex + 1 ? meshes[meshIndex + 1].facesIndex : faces.size();
-
-    std::cout << mesh.name << " " << mesh.facesIndex << " " << faceSize << std::endl;
-
-    for (size_t i = mesh.facesIndex; i < faceSize; i++)
-    {
-      Vertex &vertex = vertices.emplace_back();
-
-      vertex.position = positions[faces[i][0]];
-      vertex.texCoord = texCoords[faces[i][1]];
-      vertex.normal = normals[faces[i][2]];
-    }
-  }
-
-  void getIndices(unsigned int meshIndex, std::vector<unsigned int> &indices)
-  {
-    indices = meshes[meshIndex].indices;
   }
 };
