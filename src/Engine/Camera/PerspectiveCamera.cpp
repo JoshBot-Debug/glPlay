@@ -80,3 +80,13 @@ const glm::mat4 PerspectiveCamera::getViewProjectionMatrix() const
 {
   return projection * view;
 }
+
+const glm::mat4 PerspectiveCamera::getProjectionMatrix() const
+{
+  return projection;
+}
+
+const glm::mat4 PerspectiveCamera::getViewMatrix() const
+{
+  return view;
+}

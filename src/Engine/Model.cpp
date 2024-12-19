@@ -200,11 +200,6 @@ const std::vector<Vertex> Model::getVertices() const
   for (const auto &mesh : meshes)
     vertices.insert(vertices.end(), mesh.vertices.begin(), mesh.vertices.end());
 
-  // for (size_t i = 0; i < meshes[0].vertices.size(); i++)
-  // {
-  //   std::cout << meshes[0].vertices[i].position.x << " " << meshes[0].vertices[i].position.y << " " << meshes[0].vertices[i].position.z << std::endl;
-  // }
-
   return vertices;
 }
 

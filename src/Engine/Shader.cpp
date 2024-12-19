@@ -330,6 +330,33 @@ void Shader::setUniform3f(const std::string &name, float value1, float value2, f
   }
 }
 
+void Shader::setUniform3f(const std::string &name, glm::vec3 value)
+{
+  try
+  {
+    if (program < 0)
+    {
+      LOG_BREAK_BEFORE;
+      LOG("Error! No shader program bound");
+      LOG("Cannot set uniform", name);
+      LOG_BREAK_AFTER;
+      return;
+    }
+
+    if (!uniforms[name])
+      uniforms[name] = glGetUniformLocation(programs[program].id, name.c_str());
+
+    glUniform3f(uniforms[name], value.x, value.y, value.z);
+  }
+  catch (const std::exception &e)
+  {
+    LOG_BREAK_BEFORE;
+    LOG("Failed to set uniform:", name);
+    LOG("Bound program:", program);
+    LOG_BREAK_AFTER;
+  }
+}
+
 void Shader::setUniform4i(const std::string &name, int value1, int value2, int value3, int value4)
 {
   try

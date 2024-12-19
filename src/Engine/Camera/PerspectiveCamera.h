@@ -44,4 +44,6 @@ public:
   void rotate(float deltaPitch, float deltaYaw, float deltaRoll) override;
 
   const glm::mat4 getViewProjectionMatrix() const override;
+  const glm::mat4 getProjectionMatrix() const override;
+  const glm::mat4 getViewMatrix() const override;
 };

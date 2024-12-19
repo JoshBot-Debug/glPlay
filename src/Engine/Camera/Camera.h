@@ -22,4 +22,6 @@ public:
   virtual void rotate(float deltaPitch, float deltaYaw, float deltaRoll) = 0;
 
   virtual const glm::mat4 getViewProjectionMatrix() const = 0;
+  virtual const glm::mat4 getProjectionMatrix() const = 0;
+  virtual const glm::mat4 getViewMatrix() const = 0;
 };

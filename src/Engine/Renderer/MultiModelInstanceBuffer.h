@@ -69,14 +69,14 @@ public:
    * @param offset The offset in the partiton where you want to insert or update
    * @param instance The instance data
    */
-  void update(const unsigned int partition, const unsigned int offset, const Instance &instance);
+  void update(const unsigned int partition, const unsigned int offset, Instance &instance);
 
   /**
    * @param partition The partition we are creating or updating. Starts from 0, MUST GO IN SEQUENCE
    * @param offset The offset in the partiton where you want to insert or update
    * @param instance The instance data
    */
-  void update(const unsigned int partition, const unsigned int offset, const std::vector<Instance> &instances);
+  void update(const unsigned int partition, const unsigned int offset, std::vector<Instance> &instances);
 
   void bind() const;
   void unbind() const;

@@ -127,6 +127,7 @@ public:
    * @param value3 The third float value.
    */
   void setUniform3f(const std::string &name, float value1, float value2, float value3);
+  void setUniform3f(const std::string &name, glm::vec3 value);
 
   /**
    * Sets a uniform of type `int` (four values) in the currently active shader program.

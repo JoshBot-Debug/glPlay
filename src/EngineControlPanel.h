@@ -64,28 +64,27 @@ public:
 
         ImGui::SeparatorText("Translate");
 
-        ImGui::DragFloat("Translate X", &instance.translate.x, 0.1f);
-        ImGui::DragFloat("Translate Y", &instance.translate.y, 0.1f);
-        ImGui::DragFloat("Translate Z", &instance.translate.z, 0.1f);
+        ImGui::DragFloat("Translate X", &instance.translate.x, 0.01f);
+        ImGui::DragFloat("Translate Y", &instance.translate.y, 0.01f);
+        ImGui::DragFloat("Translate Z", &instance.translate.z, 0.01f);
 
         ImGui::SeparatorText("Rotation");
 
-        ImGui::DragFloat("Rotation X", &instance.rotation.x, 0.1f);
-        ImGui::DragFloat("Rotation Y", &instance.rotation.y, 0.1f);
-        ImGui::DragFloat("Rotation Z", &instance.rotation.z, 0.1f);
+        ImGui::DragFloat("Rotation X", &instance.rotation.x, 0.01f);
+        ImGui::DragFloat("Rotation Y", &instance.rotation.y, 0.01f);
+        ImGui::DragFloat("Rotation Z", &instance.rotation.z, 0.01f);
 
         ImGui::SeparatorText("Scale");
 
-        ImGui::DragFloat("Scale X", &instance.scale.x, 0.1f);
-        ImGui::DragFloat("Scale Y", &instance.scale.y, 0.1f);
-        ImGui::DragFloat("Scale Z", &instance.scale.z, 0.1f);
+        ImGui::DragFloat("Scale X", &instance.scale.x, 0.01f);
+        ImGui::DragFloat("Scale Y", &instance.scale.y, 0.01f);
+        ImGui::DragFloat("Scale Z", &instance.scale.z, 0.01f);
 
         ImGui::SeparatorText("Color");
 
         ImGui::DragFloat("Color R", &instance.color.r, 0.1f, 0.0f, 1.0f);
         ImGui::DragFloat("Color G", &instance.color.g, 0.1f, 0.0f, 1.0f);
         ImGui::DragFloat("Color B", &instance.color.b, 0.1f, 0.0f, 1.0f);
-        ImGui::DragFloat("Color A", &instance.color.a, 0.1f, 0.0f, 1.0f);
 
         ImGui::End();
       }

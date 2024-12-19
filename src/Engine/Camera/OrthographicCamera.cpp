@@ -68,3 +68,13 @@ const glm::mat4 OrthographicCamera::getViewProjectionMatrix() const
 {
   return projection * view;
 }
+
+const glm::mat4 OrthographicCamera::getProjectionMatrix() const
+{
+  return projection;
+}
+
+const glm::mat4 OrthographicCamera::getViewMatrix() const
+{
+  return view;
+}

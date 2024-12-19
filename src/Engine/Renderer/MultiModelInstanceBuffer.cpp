@@ -45,11 +45,14 @@ unsigned int MultiModelInstanceBuffer::add(const unsigned int partition, const I
   baseInstance = ibo.getBufferPartitionOffsetSize(partition) / sizeof(Instance);
 
   vao.bind();
-  vao.set(6, 1, VertexType::UNSIGNED_INT, false, sizeof(Instance), (void *)offsetof(Instance, id), 1);
-  vao.set(7, 3, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, translate), 1);
-  vao.set(8, 3, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, rotation), 1);
-  vao.set(9, 3, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, scale), 1);
-  vao.set(10, 4, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, color), 1);
+  vao.set(6, 4, VertexType::FLOAT, false, sizeof(InstanceBuffer), (void *)offsetof(InstanceBuffer, model), 1);
+  vao.set(7, 4, VertexType::FLOAT, false, sizeof(InstanceBuffer), (void *)(offsetof(InstanceBuffer, model) + (sizeof(float) * 4)), 1);
+  vao.set(8, 4, VertexType::FLOAT, false, sizeof(InstanceBuffer), (void *)(offsetof(InstanceBuffer, model) + (sizeof(float) * 8)), 1);
+  vao.set(9, 4, VertexType::FLOAT, false, sizeof(InstanceBuffer), (void *)(offsetof(InstanceBuffer, model) + (sizeof(float) * 12)), 1);
+  vao.set(10, 3, VertexType::FLOAT, false, sizeof(InstanceBuffer), (void *)offsetof(InstanceBuffer, normalMatrix), 1);
+  vao.set(11, 3, VertexType::FLOAT, false, sizeof(InstanceBuffer), (void *)(offsetof(InstanceBuffer, normalMatrix) + (sizeof(float) * 3)), 1);
+  vao.set(12, 3, VertexType::FLOAT, false, sizeof(InstanceBuffer), (void *)(offsetof(InstanceBuffer, normalMatrix) + (sizeof(float) * 6)), 1);
+  vao.set(13, 3, VertexType::FLOAT, false, sizeof(InstanceBuffer), (void *)offsetof(InstanceBuffer, color), 1);
 
   return offset;
 }
@@ -65,11 +68,14 @@ std::vector<unsigned int> MultiModelInstanceBuffer::add(const unsigned int parti
   baseInstance = ibo.getBufferPartitionOffsetSize(partition) / sizeof(Instance);
 
   vao.bind();
-  vao.set(6, 1, VertexType::UNSIGNED_INT, false, sizeof(Instance), (void *)offsetof(Instance, id), 1);
-  vao.set(7, 3, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, translate), 1);
-  vao.set(8, 3, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, rotation), 1);
-  vao.set(9, 3, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, scale), 1);
-  vao.set(10, 4, VertexType::FLOAT, false, sizeof(Instance), (void *)offsetof(Instance, color), 1);
+  vao.set(6, 4, VertexType::FLOAT, false, sizeof(InstanceBuffer), (void *)offsetof(InstanceBuffer, model), 1);
+  vao.set(7, 4, VertexType::FLOAT, false, sizeof(InstanceBuffer), (void *)(offsetof(InstanceBuffer, model) + (sizeof(float) * 4)), 1);
+  vao.set(8, 4, VertexType::FLOAT, false, sizeof(InstanceBuffer), (void *)(offsetof(InstanceBuffer, model) + (sizeof(float) * 8)), 1);
+  vao.set(9, 4, VertexType::FLOAT, false, sizeof(InstanceBuffer), (void *)(offsetof(InstanceBuffer, model) + (sizeof(float) * 12)), 1);
+  vao.set(10, 3, VertexType::FLOAT, false, sizeof(InstanceBuffer), (void *)offsetof(InstanceBuffer, normalMatrix), 1);
+  vao.set(11, 3, VertexType::FLOAT, false, sizeof(InstanceBuffer), (void *)(offsetof(InstanceBuffer, normalMatrix) + (sizeof(float) * 3)), 1);
+  vao.set(12, 3, VertexType::FLOAT, false, sizeof(InstanceBuffer), (void *)(offsetof(InstanceBuffer, normalMatrix) + (sizeof(float) * 6)), 1);
+  vao.set(13, 3, VertexType::FLOAT, false, sizeof(InstanceBuffer), (void *)offsetof(InstanceBuffer, color), 1);
 
   std::vector<unsigned int> offsets(instances.size());
 
@@ -79,20 +85,26 @@ std::vector<unsigned int> MultiModelInstanceBuffer::add(const unsigned int parti
   return offsets;
 }
 
-void MultiModelInstanceBuffer::update(const unsigned int partition, const unsigned int offset, const Instance &instance)
+void MultiModelInstanceBuffer::update(const unsigned int partition, const unsigned int offset, Instance &instance)
 {
   assert(ibo.partitionExists(partition));
   assert(offset < ibo.getBufferPartitionSize(partition));
 
-  ibo.upsert(sizeof(Instance), offset, sizeof(instance), (const void *)&instance, partition);
+  const InstanceBuffer buffer = instance.update();
+  ibo.upsert(sizeof(Instance), offset, sizeof(buffer), (const void *)&buffer, partition);
 }
 
-void MultiModelInstanceBuffer::update(const unsigned int partition, const unsigned int offset, const std::vector<Instance> &instances)
+void MultiModelInstanceBuffer::update(const unsigned int partition, const unsigned int offset, std::vector<Instance> &instances)
 {
   assert(ibo.partitionExists(partition));
   assert(offset < ibo.getBufferPartitionSize(partition));
 
-  ibo.upsert(offset, instances, partition);
+  std::vector<InstanceBuffer> buffers;
+
+  for (auto &instance : instances)
+    buffers.push_back(instance.update());
+
+  ibo.upsert(offset, buffers, partition);
 }
 
 void MultiModelInstanceBuffer::bind() const

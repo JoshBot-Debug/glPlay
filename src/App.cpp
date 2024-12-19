@@ -32,8 +32,8 @@ App::App() : Window(opts)
    * Setup the shader
    */
   Shader &shader = resource.getShader();
-  unsigned int v_transform = shader.compile("src/Shader/v_transform.glsl", ShaderType::VERTEX_SHADER);
-  unsigned int f_material = shader.compile("src/Shader/f_material.glsl", ShaderType::FRAGMENT_SHADER);
+  unsigned int v_transform = shader.compile("src/Shader/v_p_transform.glsl", ShaderType::VERTEX_SHADER);
+  unsigned int f_material = shader.compile("src/Shader/f_p_material.glsl", ShaderType::FRAGMENT_SHADER);
   const unsigned int modelShader = shader.createProgram({v_transform, f_material});
 
   /**
@@ -70,7 +70,26 @@ void App::onDraw()
 
   Shader &shader = resource.getShader();
   shader.bind(0);
-  shader.setUniformMatrix4fv("u_ViewProjection", camera.getViewProjectionMatrix());
+  shader.setUniformMatrix4fv("u_View", camera.getViewMatrix());
+  shader.setUniformMatrix4fv("u_Projection", camera.getProjectionMatrix());
+
+  double delta = Time::GetDeltaTime();
+
+  glm::vec3 lightPosition = {5.0f, 5.0f, 5.0f};
+  lightPosition.x = 1.0f + sin(glfwGetTime()) * 5.0f;
+  lightPosition.y = sin(glfwGetTime() / 2.0f) * 5.0f;
+
+  shader.setUniform3f("u_CameraPosition", camera.position);
+
+  shader.setUniform3f("u_Material.ambient", 0.24725f, 0.1995f, 0.0745f);
+  shader.setUniform3f("u_Material.diffuse", 0.75164f, 0.60648f, 0.22648f);
+  shader.setUniform3f("u_Material.specular", 0.628281f, 0.555802f, 0.366065f);
+  shader.setUniform1f("u_Material.shininess", 0.4f * 128.0f);
+
+  shader.setUniform3f("u_Light.position", lightPosition);
+  shader.setUniform3f("u_Light.specular", 1.0f, 1.0f, 1.0f);
+  shader.setUniform3f("u_Light.ambient", 1.0f, 1.0f, 1.0f);
+  shader.setUniform3f("u_Light.diffuse", 1.0f, 1.0f, 1.0f);
 
   Renderer::Draw(draw.getCommands());
 

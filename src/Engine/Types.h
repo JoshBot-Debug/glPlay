@@ -5,6 +5,7 @@
 
 #include <GL/glew.h>
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 enum class VertexDraw
 {
@@ -67,13 +68,38 @@ struct Vertex
   }
 };
 
-struct Instance
+struct InstanceBuffer
 {
+  glm::mat4 model = glm::mat4(1.0f);
+  glm::mat3 normalMatrix = glm::mat3(1.0f);
+  glm::vec3 color = glm::vec3(1.0f);
+};
+
+class Instance
+{
+private:
+  InstanceBuffer buffer;
+
+public:
   unsigned int id;
   glm::vec3 translate = glm::vec3(0.0f);
   glm::vec3 rotation = glm::vec3(0.0f);
   glm::vec3 scale = glm::vec3(1.0f);
-  glm::vec4 color = glm::vec4(1.0f);
+  glm::vec3 color = glm::vec3(1.0f);
+
+  const InstanceBuffer &update()
+  {
+    buffer.model = glm::mat4(1.0f);
+    buffer.model = glm::scale(buffer.model, scale);
+    buffer.model = glm::rotate(buffer.model, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+    buffer.model = glm::rotate(buffer.model, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+    buffer.model = glm::rotate(buffer.model, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+    buffer.model = glm::translate(buffer.model, translate);
+    buffer.color = color;
+    buffer.normalMatrix = glm::transpose(glm::inverse(glm::mat3(buffer.model)));
+
+    return buffer;
+  }
 };
 
 struct Mesh
