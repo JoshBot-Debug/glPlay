@@ -32,7 +32,6 @@ void Buffer::set(unsigned int chunk, unsigned int count, const void *data, const
 
 void Buffer::update(unsigned int chunk, unsigned int offset, unsigned int size, const void *data, unsigned int partition)
 {
-  glBindBuffer((unsigned int)target, buffer);
   glBufferSubData((unsigned int)target, (offset * chunk) + getBufferPartitionOffsetSize(partition), size, data);
 }
 

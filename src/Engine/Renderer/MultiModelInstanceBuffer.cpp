@@ -6,9 +6,6 @@ MultiModelInstanceBuffer::MultiModelInstanceBuffer() : vbo(BufferTarget::ARRAY_B
   vbo.generate();
   ebo.generate();
   ibo.generate();
-
-  vbo.resize(1024 * 1024);
-  vao.bind();
 }
 
 const unsigned int MultiModelInstanceBuffer::addBufferData(const std::vector<Vertex> &vertices, const std::vector<unsigned int> &indices, unsigned int &firstIndex, unsigned int &baseVertex)
@@ -107,9 +104,16 @@ void MultiModelInstanceBuffer::update(const unsigned int partition, const unsign
   ibo.upsert(offset, buffers, partition);
 }
 
+void MultiModelInstanceBuffer::resize(unsigned int vboSize, unsigned int eboSize)
+{
+  vbo.resize(vboSize);
+  ebo.resize(eboSize);
+}
+
 void MultiModelInstanceBuffer::bind() const
 {
   vao.bind();
+  ibo.bind();
 }
 
 void MultiModelInstanceBuffer::unbind() const

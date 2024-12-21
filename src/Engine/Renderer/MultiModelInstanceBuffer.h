@@ -78,6 +78,12 @@ public:
    */
   void update(const unsigned int partition, const unsigned int offset, std::vector<Instance> &instances);
 
+  /**
+   * @param vboSize The size of the vertex array buffer object
+   * @param eboSize The size of the element array buffer object
+   */
+  void resize(unsigned int vboSize, unsigned int eboSize);
+
   void bind() const;
   void unbind() const;
 };

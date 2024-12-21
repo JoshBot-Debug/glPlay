@@ -52,8 +52,13 @@ App::App() : Window(opts)
   /**
    * Add the model to the draw class
    */
-  draw.addModel(model);
-  draw.update();
+  DrawElementsIndirect *draw = new DrawElementsIndirect();
+  draw->bind();
+  draw->addModel(model);
+  draw->update();
+
+  drawChunks.push_back(draw);
+  drawChunks.push_back(new DrawElementsIndirect());
 
   // Begins the onDraw loop
   open();
@@ -68,7 +73,7 @@ void App::onUpdate()
 
   const std::vector<Model *> &models = resource.getModels();
   for (Model *model : resource.getModels())
-    draw.update(model->getID(), 0, model->getInstances());
+    drawChunks[0]->update(model->getID(), 0, model->getInstances());
 
   controlPanel.update();
 }
@@ -98,7 +103,13 @@ void App::onDraw()
   shader.setUniform3f("u_Light.ambient", 1.0f, 1.0f, 1.0f);
   shader.setUniform3f("u_Light.diffuse", 1.0f, 1.0f, 1.0f);
 
-  Renderer::Draw(draw.getCommands());
+  Renderer::Draw(drawChunks[0]->getCommands());
 
   controlPanel.draw();
+}
+
+void App::onCleanUp()
+{
+  for (const auto draw : drawChunks)
+    delete draw;
 }

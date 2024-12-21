@@ -17,7 +17,7 @@ private:
   ResourceManager resource;
   PerspectiveCamera camera;
 
-  DrawElementsIndirect draw;
+  std::vector<DrawElementsIndirect *> drawChunks;
 
   EngineControlPanel controlPanel;
 
@@ -27,4 +27,5 @@ public:
 
   void onUpdate() override;
   void onDraw() override;
+  void onCleanUp() override;
 };

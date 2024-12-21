@@ -132,7 +132,6 @@ public:
   template <typename T>
   void update(unsigned int offset, const std::vector<T> &data, unsigned int partition = 0)
   {
-    glBindBuffer((unsigned int)target, buffer);
     glBufferSubData((unsigned int)target, offset * sizeof(T) + getBufferPartitionOffsetSize(partition), data.size() * sizeof(T), data.data());
   }
 
@@ -198,7 +197,6 @@ public:
     if (expansionSize > 0)
       resize(partition, expansionSize + (size * resizeFactor), offsetSize);
 
-    glBindBuffer((unsigned int)target, buffer);
     glBufferSubData((unsigned int)target, offsetSize + getBufferPartitionOffsetSize(partition), size, data);
   }
 

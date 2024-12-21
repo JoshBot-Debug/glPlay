@@ -23,11 +23,31 @@ private:
   std::unordered_map<unsigned int, DrawElementsIndirectMesh> meshes;
 
 public:
-  DrawElementsIndirect(VertexDraw draw = VertexDraw::STATIC) : indirect(BufferTarget::DRAW_INDIRECT_BUFFER, draw)
+  DrawElementsIndirect() : indirect(BufferTarget::DRAW_INDIRECT_BUFFER, VertexDraw::STATIC)
   {
     indirect.generate();
   };
-  ~DrawElementsIndirect() = default;
+
+  DrawElementsIndirect(unsigned int vboSize, unsigned int eboSize) : indirect(BufferTarget::DRAW_INDIRECT_BUFFER, VertexDraw::STATIC)
+  {
+    indirect.generate();
+    buffer.resize(vboSize, eboSize);
+  };
+
+  /**
+   * Disable copy constructor
+   */
+  DrawElementsIndirect(const DrawElementsIndirect &) = delete;
+
+  /**
+   * Disable assignment operator
+   */
+  DrawElementsIndirect &operator=(const DrawElementsIndirect &) = delete;
+
+  /**
+   * Create a move constructor
+   */
+  DrawElementsIndirect(DrawElementsIndirect &&) = default;
 
   /**
    * Takes in a model, adds it to the buffer and returns an ID that can be used to reference it.
@@ -78,5 +98,15 @@ public:
   std::vector<DrawElementsIndirectCommand> getCommands()
   {
     return commands;
+  }
+
+  void bind() {
+    buffer.bind();
+    indirect.bind();
+  }
+
+  void unbind() {
+    buffer.unbind();
+    indirect.unbind();
   }
 };
