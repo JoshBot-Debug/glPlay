@@ -24,11 +24,10 @@ enum class TextureFilter
 class Texture2D
 {
 private:
-  unsigned int id;
   unsigned int texture = 0;
 
 public:
-  Texture2D(unsigned int id, const char *filepath);
+  Texture2D(const char *filepath);
   ~Texture2D();
 
   void setWrap(TextureWrap s = TextureWrap::REPEAT, TextureWrap t = TextureWrap::REPEAT, TextureWrap r = TextureWrap::REPEAT) const;

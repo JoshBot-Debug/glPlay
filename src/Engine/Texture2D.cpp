@@ -3,20 +3,28 @@
 #include "Debug.h"
 #include <stb/stb_image.h>
 
-Texture2D::Texture2D(unsigned int id, const char *filepath): id(id)
+Texture2D::Texture2D(const char *filepath)
 {
   glGenTextures(1, &texture);
   bind();
-  setWrap();
-  setFilter();
-  setMipmapLevel(0, 5);
 
   int width, height, nrChannels;
   unsigned char *data = stbi_load(filepath, &width, &height, &nrChannels, 0);
   if (data)
   {
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    unsigned int format;
+    if (nrChannels == 1)
+      format = GL_RED;
+    else if (nrChannels == 3)
+      format = GL_RGB;
+    else if (nrChannels == 4)
+      format = GL_RGBA;
+
+    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
     glGenerateMipmap(GL_TEXTURE_2D);
+    setWrap();
+    setFilter();
+    setMipmapLevel(0, 5);
   }
   else
   {
@@ -62,8 +70,6 @@ void Texture2D::setBorderColor(float color[4]) const
 
 void Texture2D::bind(int activate) const
 {
-  if (texture == 0)
-    return;
   if (activate > -1)
     glActiveTexture(GL_TEXTURE0 + activate);
   glBindTexture(GL_TEXTURE_2D, texture);

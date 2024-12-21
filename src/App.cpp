@@ -6,6 +6,7 @@
 #include "Engine/Light/PointLight.h"
 #include "Engine/Light/DirectionalLight.h"
 #include "Engine/Shader.h"
+#include "Engine/Texture2D.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -39,9 +40,18 @@ App::App() : Window(opts)
   /**
    * Load the model foo
    */
-  Model *model = resource.loadModel("assets/model/sphere.obj");
+  Model *model = resource.loadModel("assets/model/cube.obj");
   model->createInstance();
 
+  Texture2D diffuse("assets/materials/brick-wall/sloppy-brick-wall_albedo.png");
+  Texture2D specular("assets/materials/brick-wall/sloppy-brick-wall_metallic.png");
+
+  diffuse.bind(0);
+  specular.bind(1);
+
+  /**
+   * Add the model to the draw class
+   */
   draw.addModel(model);
   draw.update();
 
@@ -73,17 +83,14 @@ void App::onDraw()
   shader.setUniformMatrix4fv("u_View", camera.getViewMatrix());
   shader.setUniformMatrix4fv("u_Projection", camera.getProjectionMatrix());
 
-  double delta = Time::GetDeltaTime();
-
   glm::vec3 lightPosition = {5.0f, 5.0f, 5.0f};
   lightPosition.x = 1.0f + sin(glfwGetTime()) * 5.0f;
   lightPosition.y = sin(glfwGetTime() / 2.0f) * 5.0f;
 
   shader.setUniform3f("u_CameraPosition", camera.position);
 
-  shader.setUniform3f("u_Material.ambient", 0.24725f, 0.1995f, 0.0745f);
-  shader.setUniform3f("u_Material.diffuse", 0.75164f, 0.60648f, 0.22648f);
-  shader.setUniform3f("u_Material.specular", 0.628281f, 0.555802f, 0.366065f);
+  shader.setUniform1i("u_Material.diffuse", 0);
+  shader.setUniform1i("u_Material.specular", 1);
   shader.setUniform1f("u_Material.shininess", 0.4f * 128.0f);
 
   shader.setUniform3f("u_Light.position", lightPosition);
